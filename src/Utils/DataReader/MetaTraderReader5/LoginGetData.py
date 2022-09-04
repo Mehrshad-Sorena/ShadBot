@@ -1,4 +1,4 @@
-from Mt5_Config import accountConfig
+from .Config import accountConfig
 from datetime import datetime
 
 try:
