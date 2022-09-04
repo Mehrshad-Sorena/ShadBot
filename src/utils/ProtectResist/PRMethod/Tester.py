@@ -330,7 +330,7 @@ class Tester:
 		
 		if flag_savepic == True:
 			divergence_config = Divergence_Config()
-			divergence_parameters = Divergence_Parameters()
+			# divergence_parameters = Divergence_Parameters()
 			divergence = Divergence(parameters = divergence_parameters, config = divergence_config)
 			divergence.PlotSaver(
 								signals = signals,
@@ -639,7 +639,7 @@ class Tester:
 
 		if flag_savepic == True:
 			divergence_config = Divergence_Config()
-			divergence_parameters = Divergence_Parameters()
+			# divergence_parameters = Divergence_Parameters()
 			divergence = Divergence(parameters = divergence_parameters, config = divergence_config)
 			divergence.PlotSaver(
 								signals = signals,
