@@ -1,1 +1,1 @@
-import GeneticLearningRunner.MACD
+from . import MACD
