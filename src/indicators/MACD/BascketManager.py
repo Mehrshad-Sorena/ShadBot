@@ -1,6 +1,9 @@
 from src.Utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
-from MetaTrader5 import *
-import MetaTrader5 as mt5
+try:
+	from MetaTrader5 import *
+	import MetaTrader5 as mt5
+except Exception as ex:
+	print(ex)
 from .Config import Config as MACDConfig
 import pandas as pd
 import os
