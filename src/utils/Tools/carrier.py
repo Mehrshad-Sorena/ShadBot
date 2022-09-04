@@ -1,4 +1,8 @@
-import MetaTrader5 as mt5
+try:
+	import MetaTrader5 as mt5
+except Exception as ex:
+	print(ex)
+
 #from logger import logs
 
 def carrier_buy(symbol,lot,st,tp,comment,magic):
