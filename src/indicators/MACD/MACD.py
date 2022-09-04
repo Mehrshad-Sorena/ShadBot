@@ -82,8 +82,8 @@ class MACD:
 			if 'Unnamed: 0' in GL_Results.columns:
 				GL_Results = GL_Results.drop(columns = ['Unnamed: 0'])
 
-			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-			# 	print(GL_Results)
+			with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+				print(GL_Results)
 
 			for elm in GL_Results.columns:
 
