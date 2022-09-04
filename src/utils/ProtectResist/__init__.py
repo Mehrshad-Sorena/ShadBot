@@ -1,4 +1,4 @@
-from src.Utils.ProtectResist import (
+from src.utils.ProtectResist import (
 									MLMethod,
 									PRMethod,
 									)
