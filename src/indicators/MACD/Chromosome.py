@@ -1,5 +1,5 @@
 from .Config import Config as MACDConfig
-from src.Utils.Divergence.Parameters import Parameters as IndicatorParameters
+from ...Utils.Divergence.Parameters import Parameters as IndicatorParameters
 from scipy.stats import foldnorm, dweibull, rayleigh, expon, nakagami, norm
 from fitter import Fitter, get_common_distributions, get_distributions
 from sklearn.cluster import KMeans
