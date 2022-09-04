@@ -1,8 +1,8 @@
-from src.Utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
-from src.Utils.Tools.carrier import carrier_buy, carrier_sell
+from src.utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
+from src.utils.Tools.carrier import carrier_buy, carrier_sell
 from .BascketManager import basket_manager_macd_div
 from datetime import datetime
-from src.Utils.ForexNews.forex_news import news
+from src.utils.ForexNews.forex_news import news
 import MetaTrader5 as mt5
 import pandas as pd
 import numpy as np
