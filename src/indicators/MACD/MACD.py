@@ -83,7 +83,7 @@ class MACD:
 				GL_Results = GL_Results.drop(columns = ['Unnamed: 0'])
 
 			with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-				print(GL_Results)
+				print('DB Readed = ', GL_Results)
 
 			for elm in GL_Results.columns:
 
