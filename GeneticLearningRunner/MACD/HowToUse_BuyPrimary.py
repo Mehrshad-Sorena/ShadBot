@@ -1,11 +1,11 @@
-from src.Utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
+from src.utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
 from .Parameters import Parameters
 from .Config import Config
 from .MACD import MACD
 import pandas as pd
-from src.Utils.Divergence.Parameters import Parameters as IndicatorParameters
-from src.Utils.Divergence.Config import Config as IndicatorConfig
-from src.Utils.Divergence.Divergence import Divergence
+from src.utils.Divergence.Parameters import Parameters as IndicatorParameters
+from src.utils.Divergence.Config import Config as IndicatorConfig
+from src.utils.Divergence.Divergence import Divergence
 import os
 import numpy as np
 import pandas as pd
