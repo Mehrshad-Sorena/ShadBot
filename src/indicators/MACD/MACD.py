@@ -7,18 +7,18 @@ from .Config import Config as MACDConfig
 from .Parameters import Parameters as MACDParameters
 from progress.bar import Bar
 from random import randint
-from src.Utils.Divergence.Parameters import Parameters as indicator_parameters
-from src.Utils.Divergence.Config import Config as indicator_config
+from src.utils.Divergence.Parameters import Parameters as indicator_parameters
+from src.utils.Divergence.Config import Config as indicator_config
 
-from src.Utils.ProtectResist.PRMethod.Parameters import Parameters as PRParameters
-from src.Utils.ProtectResist.PRMethod.Config import Config as PRConfig
+from src.utils.ProtectResist.PRMethod.Parameters import Parameters as PRParameters
+from src.utils.ProtectResist.PRMethod.Config import Config as PRConfig
 
-from src.Utils.Tools.timer import stTime
+from src.utils.Tools.timer import stTime
 
-from src.Utils.Divergence.Divergence import Divergence
-from src.Utils.Divergence.Tester import Tester
+from src.utils.Divergence.Divergence import Divergence
+from src.utils.Divergence.Tester import Tester
 
-from src.Utils.ProtectResist.PRMethod.Runner import Runner
+from src.utils.ProtectResist.PRMethod.Runner import Runner
 
 #Functions Used:
 
