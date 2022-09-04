@@ -63,7 +63,8 @@ class MACD:
 	def ParameterReader(self, symbol, signaltype, signalpriority):
 
 		macd_config = MACDConfig()
-		path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + '/' + signaltype + '/'
+		path_superhuman = macd_config.cfg['path_superhuman'] + '\\' + signalpriority + '\\' + signaltype + '\\'
+		print(path_superhuman)
 
 		macd_parameters = MACDParameters()
 
@@ -74,6 +75,7 @@ class MACD:
 
 		print('param reader = ', ind_parameters)
 
+		print(os.path.exists(path_superhuman + symbol + '.csv'))
 
 		if os.path.exists(path_superhuman + symbol + '.csv'):
 
