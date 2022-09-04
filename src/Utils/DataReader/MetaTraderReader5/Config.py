@@ -1,6 +1,6 @@
 from configparser import RawConfigParser
 
-def accountConfig(filename='config.ini', section='accounts'):
+def accountConfig(filename='.config.ini', section='accounts'):
     parser = RawConfigParser()
     parser.read(filename)
 
