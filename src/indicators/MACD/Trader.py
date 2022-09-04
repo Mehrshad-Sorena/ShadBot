@@ -1,8 +1,8 @@
-from Mt5_LoginGetData import LoginGetData as getdata
-from carrier import carrier_buy, carrier_sell
+from src.Utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
+from src.Utils.Tools.carrier import carrier_buy, carrier_sell
 from .BascketManager import basket_manager_macd_div
 from datetime import datetime
-from forex_news import news
+from src.Utils.ForexNews.forex_news import news
 import MetaTrader5 as mt5
 import pandas as pd
 import numpy as np
@@ -10,9 +10,9 @@ import json
 import time
 import os
 
-from macd_Parameters import Parameters as MACDParameters
-from macd_Config import Config as MACDConfig
-from macd_MACD import MACD
+from src.Indicators.MACD.Parameters import Parameters as MACDParameters
+from src.Indicators.MACD.Config import Config as MACDConfig
+from src.Indicators.MACD.MACD import MACD
 
 
 
