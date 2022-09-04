@@ -857,7 +857,7 @@ class MACD:
 									 																				signaltype = signaltype, 
 									 																				signalpriority = signalpriority
 									 																				)
-		print(ind_parameters.elements)
+		print(ind_parameters)
 		ind_config = indicator_config()
 		macd = Divergence(parameters = ind_parameters, config = ind_config)
 
