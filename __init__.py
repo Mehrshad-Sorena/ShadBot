@@ -1,3 +1,5 @@
-import ShadBot.src
-import ShadBot.GeneticLearningRunner
-import ShadBot.OnlineBot
+from . import (
+				src,
+				GeneticLearningRunner,
+				OnlineBot,
+				)
