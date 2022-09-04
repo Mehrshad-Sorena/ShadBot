@@ -6,5 +6,4 @@ from src.Indicators.MACD import (
 									ParameterLimits,
 									Parameters,
 									Trader,
-									HowToUse_BuyPrimary,
 								)
