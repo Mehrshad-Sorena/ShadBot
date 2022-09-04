@@ -3,7 +3,12 @@ from src.utils.Tools.carrier import carrier_buy, carrier_sell
 from .BascketManager import basket_manager_macd_div
 from datetime import datetime
 from src.utils.ForexNews.forex_news import news
-import MetaTrader5 as mt5
+
+try:
+	import MetaTrader5 as mt5
+except Exception as ex:
+	print(ex)
+	
 import pandas as pd
 import numpy as np
 import json
