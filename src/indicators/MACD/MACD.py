@@ -6,22 +6,22 @@ import os
 from .Config import Config as MACDConfig
 from .Parameters import Parameters as MACDParameters
 
-from indicator_Parameters import Parameters as IndicatorParameters
+from src.Utils.ProtectResist.PRMethod.Parameters import Parameters as IndicatorParameters
 
 from progress.bar import Bar
 from random import randint
-from indicator_Parameters import Parameters as indicator_parameters
-from indicator_Config import Config as indicator_config
+from src.Utils.Divergence.Parameters import Parameters as indicator_parameters
+from src.Utils.Divergence.Config import Config as indicator_config
 
-from pr_Parameters import Parameters as PRParameters
-from pr_Config import Config as PRConfig
+from src.Utils.ProtectResist.PRMethod.Parameters import Parameters as PRParameters
+from src.Utils.ProtectResist.PRMethod.Config import Config as PRConfig
 
-from timer import stTime
+from src.Utils.Tools.timer import stTime
 
-from indicator_Divergence import Divergence
-from indicator_Tester import Tester
+from src.Utils.Divergence.Divergence import Divergence
+from src.Utils.Divergence.Tester import Tester
 
-from pr_Runner import Runner
+from src.Utils.ProtectResist.PRMethod.Runner import Runner
 
 #Functions Used:
 
