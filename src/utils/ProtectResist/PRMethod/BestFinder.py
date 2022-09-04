@@ -1,7 +1,7 @@
 from scipy.stats import foldnorm, dweibull, rayleigh, expon, nakagami, norm
 from fitter import Fitter, get_common_distributions, get_distributions
 from sklearn.cluster import KMeans
-from timer import stTime
+from src.Utils.Tools.timer import stTime
 from scipy import stats
 import pandas as pd
 import numpy as np
