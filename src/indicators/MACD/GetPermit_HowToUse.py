@@ -25,7 +25,7 @@ parameters.elements['dataset_5M'], parameters.elements['dataset_1H'] = loging.re
 parameters.elements['symbol'] = 'XAUUSD_i'
 parameters.elements['MACD_apply_to'] = 'close'
 
-#print(parameters.elements['dataset_1H']['ETHUSD_i'])
+print(parameters.elements['dataset_1H']['XAUUSD_i'])
 
 macd = MACD(parameters = parameters, config = config)
 macd_calc = macd.GetPermit(
