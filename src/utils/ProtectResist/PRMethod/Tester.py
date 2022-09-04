@@ -1,6 +1,6 @@
-from indicator_Parameters import Parameters as Divergence_Parameters
-from indicator_Config import Config as Divergence_Config
-from indicator_Divergence import Divergence
+from src.Utils.Divergence.Parameters import Parameters as Divergence_Parameters
+from src.Utils.Divergence.Config import Config as Divergence_Config
+from src.Utils.Divergence.Divergence import Divergence
 import pandas as pd
 import numpy as np
 
