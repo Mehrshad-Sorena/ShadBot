@@ -1,4 +1,4 @@
-from Mt5_LoginGetData import LoginGetData as getdata
+from .LoginGetData import LoginGetData as getdata
 
 loging = getdata()
 
