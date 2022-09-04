@@ -1,2 +1,2 @@
-import src.indicators
-import src.Utils
+from . import indicators
+from . import Utils
