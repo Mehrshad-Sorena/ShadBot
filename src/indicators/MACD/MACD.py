@@ -64,7 +64,7 @@ class MACD:
 
 		macd_config = MACDConfig()
 		path_superhuman = macd_config.cfg['path_superhuman'] + '\\' + signalpriority + '\\' + signaltype + '\\'
-		print(path_superhuman)
+		print('super = ', path_superhuman)
 
 		macd_parameters = MACDParameters()
 
