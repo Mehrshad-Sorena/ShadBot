@@ -1,2 +1,2 @@
-import src.Indicators
+import src.indicators
 import src.Utils
