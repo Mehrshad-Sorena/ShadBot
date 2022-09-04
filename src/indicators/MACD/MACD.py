@@ -72,6 +72,8 @@ class MACD:
 
 		ind_parameters = indicator_parameters()
 
+		print('param reader = ', ind_parameters)
+
 
 		if os.path.exists(path_superhuman + symbol + '.csv'):
 
@@ -857,7 +859,7 @@ class MACD:
 									 																				signaltype = signaltype, 
 									 																				signalpriority = signalpriority
 									 																				)
-		print(ind_parameters)
+		print('ind_params = ', ind_parameters)
 		ind_config = indicator_config()
 		macd = Divergence(parameters = ind_parameters, config = ind_config)
 
