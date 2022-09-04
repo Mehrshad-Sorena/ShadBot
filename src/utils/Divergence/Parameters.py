@@ -1,5 +1,5 @@
 import pandas as pd
-from src.Utils.ProtectResist.PRMethod.Parameters import Parameters as pr_Parameters
+from src.utils.ProtectResist.PRMethod.Parameters import Parameters as pr_Parameters
 
 class Parameters:
 
