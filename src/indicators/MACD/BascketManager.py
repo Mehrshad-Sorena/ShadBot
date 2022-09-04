@@ -1,4 +1,4 @@
-from Mt5_LoginGetData import LoginGetData as getdata
+from src.Utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
 from MetaTrader5 import *
 import MetaTrader5 as mt5
 from .Config import Config as MACDConfig
