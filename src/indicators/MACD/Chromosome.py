@@ -1,10 +1,10 @@
 from .Config import Config as MACDConfig
-from indicator_Parameters import Parameters as IndicatorParameters
+from src.Utils.Divergence.Parameters import Parameters as IndicatorParameters
 from scipy.stats import foldnorm, dweibull, rayleigh, expon, nakagami, norm
 from fitter import Fitter, get_common_distributions, get_distributions
 from sklearn.cluster import KMeans
-from pr_Parameters import Parameters as PRParameters
-from pr_Config import Config as PRConfig
+from src.Utils.ProtectResist.PRMethod.Parameters import Parameters as PRParameters
+from src.Utils.ProtectResist.PRMethod.Config import Config as PRConfig
 from .Parameters import Parameters as MACDParameters
 from .ParameterLimits import ParameterLimits as Limits
 from random import randint
@@ -13,7 +13,7 @@ import pandas as pd
 import os
 import sys
 import numpy as np
-from timer import stTime
+from src.Utils.Tools.timer import stTime
 import warnings
 warnings.filterwarnings("ignore")
 
