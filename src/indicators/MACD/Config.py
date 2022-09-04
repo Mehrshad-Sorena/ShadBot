@@ -8,10 +8,10 @@ class Config:
 
 						#************** Divergence:
 
-						'path_society': 'src/Indicators/MACD/GeneticLearning_DB/society/',
-						'path_graveyard': 'src/Indicators/MACD/GeneticLearning_DB/graveyard/',
-						'path_superhuman': 'src/Indicators/MACD/GeneticLearning_DB/superhuman/',
-						'path_elites': 'src/Indicators/MACD/GeneticLearning_DB/elites/',
+						'path_society': 'src/indicators/MACD/GeneticLearning_DB/society/',
+						'path_graveyard': 'src/indicators/MACD/GeneticLearning_DB/graveyard/',
+						'path_superhuman': 'src/indicators/MACD/GeneticLearning_DB/superhuman/',
+						'path_elites': 'src/indicators/MACD/GeneticLearning_DB/elites/',
 
 						#/////////////////////////////
 
