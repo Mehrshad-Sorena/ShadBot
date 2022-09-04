@@ -1,4 +1,4 @@
-import src.Utils.Tools.ExtremePoints as extremepoints
+from src.Utils.Tools import ExtremePoints as extremepoints
 import matplotlib as matplotlib
 import matplotlib.pyplot as plt
 from src.Utils.Tools.timer import stTime
