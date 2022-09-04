@@ -10,9 +10,9 @@ import json
 import time
 import os
 
-from src.Indicators.MACD.Parameters import Parameters as MACDParameters
-from src.Indicators.MACD.Config import Config as MACDConfig
-from src.Indicators.MACD.MACD import MACD
+from src.indicators.MACD.Parameters import Parameters as MACDParameters
+from src.indicators.MACD.Config import Config as MACDConfig
+from src.indicators.MACD.MACD import MACD
 
 
 
