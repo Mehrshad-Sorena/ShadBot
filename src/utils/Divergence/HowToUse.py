@@ -1,15 +1,15 @@
-from src.Utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
-from src.Utils.Divergence import Divergence
-from src.Utils.Tester import Tester
+from src.utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
+from src.utils.Divergence import Divergence
+from src.utils.Tester import Tester
 from src.indicator.MACD.Parameters import Parameters
 from src.indicator.MACD.Config import Config
 from src.indicator.MACD.MACD import MACD
 import pandas as pd
-from src.Utils.Divergence.Parameters import Parameters as indicator_parameters
-from src.Utils.Divergence.Config import Config as indicator_config
+from src.utils.Divergence.Parameters import Parameters as indicator_parameters
+from src.utils.Divergence.Config import Config as indicator_config
 
-from src.Utils.ProtectResist.PRMethod.Parameters import Parameters as pr_Parameters
-from src.Utils.ProtectResist.PRMethod.Config import Config as pr_Config
+from src.utils.ProtectResist.PRMethod.Parameters import Parameters as pr_Parameters
+from src.utils.ProtectResist.PRMethod.Config import Config as pr_Config
 
 loging = getdata()
 
