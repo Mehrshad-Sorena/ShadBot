@@ -1,6 +1,6 @@
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
-from timer import stTime
+from src.Utils.Tools.timer import stTime
 import pandas_ta as ind
 import pandas as pd
 import numpy as np
