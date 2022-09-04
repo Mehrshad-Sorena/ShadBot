@@ -1,7 +1,7 @@
-from src.Utils.Tools import ExtremePoints as extremepoints
+from src.utils.Tools import ExtremePoints as extremepoints
 import matplotlib as matplotlib
 import matplotlib.pyplot as plt
-from src.Utils.Tools.timer import stTime
+from src.utils.Tools.timer import stTime
 import mplfinance as mpf
 import pandas as pd
 import numpy as np
