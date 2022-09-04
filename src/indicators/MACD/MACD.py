@@ -5,9 +5,6 @@ from .Chromosome import Chromosome
 import os
 from .Config import Config as MACDConfig
 from .Parameters import Parameters as MACDParameters
-
-from src.Utils.ProtectResist.PRMethod.Parameters import Parameters as IndicatorParameters
-
 from progress.bar import Bar
 from random import randint
 from src.Utils.Divergence.Parameters import Parameters as indicator_parameters
@@ -73,7 +70,7 @@ class MACD:
 		pr_parameters = PRParameters()
 		pr_config = PRConfig()
 
-		ind_parameters = IndicatorParameters()
+		ind_parameters = indicator_parameters()
 
 
 		if os.path.exists(path_superhuman + symbol + '.csv'):
@@ -1025,10 +1022,10 @@ class MACD:
 			max_corr = chromosome_output['corr'].min()/3
 
 			if num_turn <= len(learning_result['score']):
-				num_turn = (len(learning_result['score'])) + 4
+				num_turn = (len(learning_result['score'])) + 0
 
 				if len(chromosome_output) >= num_turn:
-					num_turn = len(chromosome_output) + 4
+					num_turn = len(chromosome_output) + 0
 
 		else:
 			learning_result = pd.DataFrame()
