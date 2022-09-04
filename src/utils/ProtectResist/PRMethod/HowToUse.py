@@ -1,13 +1,13 @@
 from multiprocessing.spawn import import_main_path
-from src.Utils.Tools.ExtremePoints import ExtremePoints
-from src.Utils.ProtectResist.PRMethode.IchimokouFlatLines import IchimokouFlatLines
-from src.Utils.ProtectResist.PRMethode.TrendLines import TrendLines
-from src.Utils.ProtectResist.PRMethode.Parameters import Parameters
-from src.Utils.ProtectResist.PRMethode.Config import Config
+from src.utils.Tools.ExtremePoints import ExtremePoints
+from src.utils.ProtectResist.PRMethode.IchimokouFlatLines import IchimokouFlatLines
+from src.utils.ProtectResist.PRMethode.TrendLines import TrendLines
+from src.utils.ProtectResist.PRMethode.Parameters import Parameters
+from src.utils.ProtectResist.PRMethode.Config import Config
 import numpy as np
 from timer import stTime
-from src.Utils.ProtectResist.PRMethode.Runner import Runner
-from src.Utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
+from src.utils.ProtectResist.PRMethode.Runner import Runner
+from src.utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
 #import MetaTrader5 as mt5
 import sys
 import pandas as pd
