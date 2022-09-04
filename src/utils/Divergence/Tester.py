@@ -1,7 +1,7 @@
 from .BestFinder import BestFinder
-from src.Utils.Tools import ExtremePoints as extremepoints
-from src.Utils.ProtectResist.PRMethod.Runner import Runner
-from src.Utils.Tools.timer import stTime
+from src.utils.Tools import ExtremePoints as extremepoints
+from src.utils.ProtectResist.PRMethod.Runner import Runner
+from src.utils.Tools.timer import stTime
 import pandas as pd
 import numpy as np
 
