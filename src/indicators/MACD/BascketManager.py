@@ -9,7 +9,7 @@ levrage_now = 100
 risk_lot_now = 0.02
 
 #******************************** Find Max Score ********************************************
-
+ 
 def find_max_score(account_name):
 
 	loging = getdata()
