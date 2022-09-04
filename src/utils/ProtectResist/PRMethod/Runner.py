@@ -1,13 +1,13 @@
-from pr_IchimokouFlatLines import IchimokouFlatLines
-from ExtremePoints import ExtremePoints
-from pr_BestFinder import BestFinder
-from pr_TrendLines import TrendLines
-from DataChanger import DataChanger
+from .IchimokouFlatLines import IchimokouFlatLines
+from src.Utils.Tools.ExtremePoints import ExtremePoints
+from .BestFinder import BestFinder
+from .TrendLines import TrendLines
+from src.Utils.Tools.DataChanger import DataChanger
 import matplotlib.pyplot as plt
-from pr_Tester import Tester
+from .Tester import Tester
 import concurrent.futures
 import mplfinance as mpf
-from timer import stTime
+from src.Utils.Tools.timer import stTime
 import pandas as pd
 import numpy as np
 
