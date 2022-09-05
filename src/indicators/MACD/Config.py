@@ -27,11 +27,3 @@ class Config:
 
 						})
 
-config = Config()
-
-print(config.cfg['path_society'])
-
-# import pandas as pd
-
-# print(pd.read_csv(config.cfg['path_society'] + '/primary/buy/XAUUSD_i' + '.csv'))
-
