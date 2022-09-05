@@ -512,7 +512,9 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_buy_primary = pd.DataFrame()
+					res_pro_buy_primary = pd.DataFrame(np.zeros(int(lst_idx_buy_primary)))
+					res_pro_buy_primary['high_upper'] = np.nan
+					res_pro_buy_primary['low_lower'] = np.nan
 
 
 				if (res_pro_buy_primary.empty == False):
@@ -591,7 +593,9 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_buy_secondry = pd.DataFrame()
+					res_pro_buy_secondry = pd.DataFrame(np.zeros(int(lst_idx_buy_secondry)))
+					res_pro_buy_secondry['high_upper'] = np.nan
+					res_pro_buy_secondry['low_lower'] = np.nan
 
 				if (res_pro_buy_secondry.empty == False):
 
@@ -667,7 +671,9 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_sell_primary = pd.DataFrame()
+					res_pro_sell_primary = pd.DataFrame(np.zeros(int(lst_idx_sell_primary)))
+					res_pro_sell_primary['high_upper'] = np.nan
+					res_pro_sell_primary['low_lower'] = np.nan
 
 
 				if (res_pro_sell_primary.empty == False):
@@ -738,7 +744,9 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_sell_secondry = pd.DataFrame()
+					res_pro_sell_secondry = pd.DataFrame(np.zeros(int(lst_idx_sell_secondry)))
+					res_pro_sell_secondry['high_upper'] = np.nan
+					res_pro_sell_secondry['low_lower'] = np.nan
 
 
 				if (res_pro_sell_secondry.empty == False):
