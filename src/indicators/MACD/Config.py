@@ -23,6 +23,8 @@ class Config:
 						'path_superhuman': os.path.join(Path(__file__).parent , 'GeneticLearning_DB' + path_slash + 'superhuman' + path_slash),
 						'path_elites': os.path.join(Path(__file__).parent , 'GeneticLearning_DB' + path_slash + 'elites' + path_slash),
 
+						'path_optimized_params': os.path.join(Path(__file__).parent , 'OptimizeParameters' + path_slash),
+
 						#/////////////////////////////
 
 						})
