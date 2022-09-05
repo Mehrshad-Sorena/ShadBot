@@ -1,3 +1,4 @@
+
 class ParameterLimits:
 
 	def __new__(cls, *args, **kwargs):
@@ -11,7 +12,7 @@ class ParameterLimits:
 
 							#Chromosome Limit Parameters:
 
-							'MACD_fast_upper': 500,#144,#800,
+							'MACD_fast_upper': 500,#500,#144,#800,
 							'MACD_fast_lower': 2,
 
 							'MACD_slow_upper': 500,#312,#1500,
