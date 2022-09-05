@@ -4,6 +4,6 @@ from GeneticLearningRunner.MACD import (
 										Runner_SellPrimary,
 										Runner_SellSecondry,
 										)
-from src.indicators.MACD import GetPermit_HowToUse
+# from src.indicators.MACD import GetPermit_HowToUse
 
-# Runner_BuyPrimary.Run()
+Runner_BuyPrimary.Run()
