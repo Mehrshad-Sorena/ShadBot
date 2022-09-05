@@ -16,7 +16,6 @@ import ExtremePoints as extremepoints
 import matplotlib.pyplot as plt
 import sys
 import os
-import winsound
 import threading
 from multiprocessing import Process
 import time
