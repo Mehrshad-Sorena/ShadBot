@@ -13,6 +13,16 @@ import os
 import warnings
 warnings.filterwarnings("ignore")
 
+from pathlib import Path, PurePosixPath
+import os
+import sys
+
+
+if 'win' in sys.platform:
+	path_slash = '\\'
+elif 'linux' in sys.platform:
+	path_slash = '/'
+
 #********* Methodes:
 
 #login()
@@ -27,7 +37,7 @@ warnings.filterwarnings("ignore")
 
 #/////////////////////
 
-main_path_dataset = 'src/Utils/DataReader/MetaTraderReader5/'
+main_path_dataset = Path(__file__).parent
 
 class LoginGetData:
 
@@ -50,8 +60,8 @@ class LoginGetData:
 
 	def Update(self, timeframe, symbol, number):
 
-		dataset_path = main_path_dataset + 'dataset/' + timeframe + '/' + symbol + '.csv'
-		dataset_path_dir = main_path_dataset + 'dataset/' + timeframe + '/'
+		dataset_path = os.path.join(main_path_dataset , 'dataset' + path_slash + timeframe + path_slash + symbol + '.csv')
+		dataset_path_dir = os.path.join(main_path_dataset , 'dataset' + path_slash + timeframe + path_slash)
 
 		if not os.path.exists(dataset_path_dir):
 			os.makedirs(dataset_path_dir)
@@ -195,8 +205,8 @@ class LoginGetData:
 
 		data = self.loging.getone(timeframe = timeframe, number = number, symbol = symbol)
 
-		dataset_path = main_path_dataset + 'dataset/' + timeframe + '/' + symbol + '.csv'
-		dataset_path_dir = main_path_dataset + 'dataset/' + timeframe + '/'
+		dataset_path = os.path.join(main_path_dataset , 'dataset' + path_slash + timeframe + path_slash + symbol + '.csv')
+		dataset_path_dir = os.path.join(main_path_dataset , 'dataset' + path_slash + timeframe + path_slash)
 
 		if not os.path.exists(dataset_path_dir):
 			os.makedirs(dataset_path_dir)
@@ -208,7 +218,7 @@ class LoginGetData:
 
 	def readone(self, timeframe, symbol, number):
 
-		dataset_path = main_path_dataset + 'dataset/' + timeframe + '/' + symbol + '.csv'
+		dataset_path = os.path.join(main_path_dataset , 'dataset' + path_slash + timeframe + path_slash + symbol + '.csv')
 		
 		symbols = symbol
 		count=0
@@ -270,8 +280,8 @@ class LoginGetData:
 		
 	def readall(self, symbol, number_5M, number_1H):
 
-		dataset_path_5M = main_path_dataset + 'dataset/5M/' + symbol + '.csv'
-		dataset_path_1H = main_path_dataset + 'dataset/1H/' + symbol + '.csv'
+		dataset_path_5M = os.path.join(main_path_dataset , 'dataset' + path_slash + '5M' + path_slash + symbol + '.csv')
+		dataset_path_1H = os.path.join(main_path_dataset , 'dataset' + path_slash + '1H' + path_slash + symbol + '.csv')
 
 		symbol_data_5M = self.readone(timeframe = '5M', symbol = symbol, number = number_5M)
 
