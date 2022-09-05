@@ -1,4 +1,3 @@
-import winsound
 import threading
 from .Config import Config as ConfigOptimizers
 from src.utils.Divergence.Parameters import Parameters as indicator_parameters
