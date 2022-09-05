@@ -1,8 +1,12 @@
 from configparser import RawConfigParser
+from pathlib import Path, PurePosixPath
+import os
 
-def accountConfig(filename='.config.ini', section='accounts'):
+
+
+def accountConfig(filename='config.ini', section='accounts'):
     parser = RawConfigParser()
-    parser.read(filename)
+    parser.read(os.path.join(Path(__file__).parent , filename))
 
     accounts = dict()
     db = {}
@@ -19,6 +23,7 @@ def accountConfig(filename='.config.ini', section='accounts'):
     users = db.get('username').split(',')
     password = db.get('password').split(',')
     types = db.get('type').split(',')
+    print(name,users,password)
     for n, u, p, t in zip(name, users, password, types):
         accounts.update(
                 {
