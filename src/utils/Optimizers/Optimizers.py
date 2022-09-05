@@ -1,13 +1,26 @@
 import winsound
 import threading
-from ConfigOptimizers import Config as ConfigOptimizers
-from indicator_Parameters import Parameters as indicator_parameters
-from indicator_Config import Config as indicator_config
-from src.Indicators.MACD import MACD
-from indicator_Divergence import Divergence
-from src.Indicators.MACD.Parameters import Parameters
-from src.Indicators.MACD.Config import Config
+from .Config import Config as ConfigOptimizers
+from src.utils.Divergence.Parameters import Parameters as indicator_parameters
+from src.utils.Divergence.Config import Config as indicator_config
+from src.indicators.MACD.MACD import MACD
+from src.utils.Divergence.Divergence import Divergence
+from src.indicators.MACD.Parameters import Parameters
+from src.indicators.MACD.Config import Config
+from progress.bar import Bar
+import pandas as pd
+import numpy as np
 import time
+import os
+import sys
+import random
+from random import randint
+
+
+if 'win' in sys.platform:
+	path_slash = '\\'
+elif 'linux' in sys.platform:
+	path_slash = '/'
 
 
 class Optimizers():
@@ -23,7 +36,7 @@ class Optimizers():
 		self.timeframe = '5M'
 
 
-	def FreqFinder(ts, detrend='linear'):
+	def FreqFinder(self, ts, detrend='linear'):
 	    from scipy.signal import periodogram
 
 	    if self.timeframe == '5M':
@@ -52,9 +65,9 @@ class Optimizers():
 	    return round(freq)
 
 
-	def MacdOptimizer():
+	def MacdOptimizer(self):
 
-		print('Start ...')
+		print('Start MACD Optimizer ', self.sigtype, ' ', self.sigpriority, ' ', self.timeframe, ' ...')
 
 		configoptimizers = ConfigOptimizers()
 		macd_parameters = Parameters()
@@ -63,25 +76,27 @@ class Optimizers():
 		ind_params = indicator_parameters()
 		ind_config = indicator_config()
 
-		self.dataset = self.dataset.assign(index = self.dataset.index)
+		self.dataset[self.symbol] = self.dataset[self.symbol].assign(index = self.dataset[self.symbol].index)
 
-		freq = self.FreqFinder(self.dataset.close)
+		freq = self.FreqFinder(self.dataset[self.symbol].close)
 
 		if self.timeframe == '5M':
 			freq_time = str(5 * freq) + 'T'
 		elif self.timeframe == '1H':
 			freq_time = str(freq) + 'H'
 
-		self.dataset = self.dataset.set_index('time').resample(freq_time).last().dropna()
-		self.dataset = self.dataset.assign(time = self.dataset.index)
-		self.dataset = self.dataset.set_index('index')
+		bar = Bar(self.sigtype + ' ' + self.sigpriority + ' ' + self.timeframe, max = int(self.turn))
 
-		path = configoptimizers.cfg['path_macd'] + '/' + self.sigtype + '/' + self.sigpriority+ '/' + self.timeframe + '/'
+		self.dataset[self.symbol] = self.dataset[self.symbol].set_index('time').resample(freq_time).last().dropna()
+		self.dataset[self.symbol] = self.dataset[self.symbol].assign(time = self.dataset[self.symbol].index)
+		self.dataset[self.symbol] = self.dataset[self.symbol].set_index('index')
+
+		path = configoptimizers.cfg['path_MACD'] + path_slash + self.sigpriority + path_slash + self.sigtype + path_slash + self.timeframe + path_slash
 
 		if not os.path.exists(path):
 			os.makedirs(path)
 
-		path = configoptimizers.cfg['path_macd'] + '/' + self.sigtype + '/' + self.sigpriority+ '/' + self.timeframe + '/' + self.symbol + '.csv'
+		path = configoptimizers.cfg['path_MACD'] + path_slash + self.sigpriority + path_slash + self.sigtype + path_slash + self.timeframe + path_slash + self.symbol + '.csv'
 
 		if os.path.exists(path):
 			output_read = pd.read_csv(path).drop(columns = ['Unnamed: 0'])
@@ -94,10 +109,12 @@ class Optimizers():
 			output_read['MACD_column_div'] = np.nan
 			output_read['corr_low'] = np.nan
 			output_read['corr_high'] = np.nan
-			output_read['diff_divergence'] = np.nan
-			output_read['num_extreme_min'] = np.nan
-			output_read['num_extreme_max'] = np.nan
+			output_read['Divergence_diff_extereme'] = np.nan
+			output_read['Divergence_num_exteremes_min'] = np.nan
+			output_read['Divergence_num_exteremes_max'] = np.nan
+			output_read['frequency'] = np.nan
 			output_read['score'] = np.nan
+			
 		
 		output = pd.DataFrame(np.ones(self.turn))
 		output['MACD_apply_to'] = np.nan
@@ -107,10 +124,12 @@ class Optimizers():
 		output['MACD_column_div'] = np.nan
 		output['corr_low'] = np.nan
 		output['corr_high'] = np.nan
-		output['diff_divergence'] = np.nan
-		output['num_extreme_min'] = np.nan
-		output['num_extreme_max'] = np.nan
+		output['Divergence_diff_extereme'] = np.nan
+		output['Divergence_num_exteremes_min'] = np.nan
+		output['Divergence_num_exteremes_max'] = np.nan
+		output['frequency'] = np.nan
 		output['score'] = np.nan
+		
 
 		for i in range(self.turn):
 			macd_parameters.elements['MACD' + '_apply_to'] = random.choice([
@@ -144,8 +163,9 @@ class Optimizers():
 											(macd_parameters.elements['MACD' + '_fast'] == output['MACD_fast'].values) &
 											(macd_parameters.elements['MACD' + '_slow'] == output['MACD_slow'].values) &
 											(macd_parameters.elements['MACD' + '_signal'] == output['MACD_signal'].values) &
-											(ind_params.elements['Divergence' + '_diff_extereme'] == output['diff_divergence'].values) &
-											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output['num_extreme_min'].values) &
+											(ind_params.elements['Divergence' + '_diff_extereme'] == output['Divergence_diff_extereme'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output['Divergence_num_exteremes_min'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output['Divergence_num_exteremes_max'].values) &
 											(macd_parameters.elements['MACD' + '_apply_to'] == output['MACD_apply_to'].values) &
 											(dive_column == output['MACD_column_div'].values)
 										)[0]
@@ -154,8 +174,9 @@ class Optimizers():
 											(macd_parameters.elements['MACD' + '_fast'] == output_read['MACD_fast'].values) &
 											(macd_parameters.elements['MACD' + '_slow'] == output_read['MACD_slow'].values) &
 											(macd_parameters.elements['MACD' + '_signal'] == output_read['MACD_signal'].values) &
-											(ind_params.elements['Divergence' + '_diff_extereme'] == output_read['diff_divergence'].values) &
-											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output_read['num_extreme_min'].values) &
+											(ind_params.elements['Divergence' + '_diff_extereme'] == output_read['Divergence_diff_extereme'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output_read['Divergence_num_exteremes_min'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output_read['Divergence_num_exteremes_max'].values) &
 											(macd_parameters.elements['MACD' + '_apply_to'] == output_read['MACD_apply_to'].values) &
 											(dive_column == output_read['MACD_column_div'].values)
 										)[0]
@@ -192,8 +213,9 @@ class Optimizers():
 											(macd_parameters.elements['MACD' + '_fast'] == output['MACD_fast'].values) &
 											(macd_parameters.elements['MACD' + '_slow'] == output['MACD_slow'].values) &
 											(macd_parameters.elements['MACD' + '_signal'] == output['MACD_signal'].values) &
-											(ind_params.elements['Divergence' + '_diff_extereme'] == output['diff_divergence'].values) &
-											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output['num_extreme_min'].values) &
+											(ind_params.elements['Divergence' + '_diff_extereme'] == output['Divergence_diff_extereme'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output['Divergence_num_exteremes_min'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output['Divergence_num_exteremes_max'].values) &
 											(macd_parameters.elements['MACD' + '_apply_to'] == output['MACD_apply_to'].values) &
 											(dive_column == output['MACD_column_div'].values)
 										)[0]
@@ -202,8 +224,9 @@ class Optimizers():
 												(macd_parameters.elements['MACD' + '_fast'] == output_read['MACD_fast'].values) &
 												(macd_parameters.elements['MACD' + '_slow'] == output_read['MACD_slow'].values) &
 												(macd_parameters.elements['MACD' + '_signal'] == output_read['MACD_signal'].values) &
-												(ind_params.elements['Divergence' + '_diff_extereme'] == output_read['diff_divergence'].values) &
-												(ind_params.elements['Divergence' + '_num_exteremes_min'] == output_read['num_extreme_min'].values) &
+												(ind_params.elements['Divergence' + '_diff_extereme'] == output_read['Divergence_diff_extereme'].values) &
+												(ind_params.elements['Divergence' + '_num_exteremes_min'] == output_read['Divergence_num_exteremes_min'].values) &
+												(ind_params.elements['Divergence' + '_num_exteremes_max'] == output_read['Divergence_num_exteremes_max'].values) &
 												(macd_parameters.elements['MACD' + '_apply_to'] == output_read['MACD_apply_to'].values) &
 												(dive_column == output_read['MACD_column_div'].values)
 											)[0]
@@ -217,25 +240,30 @@ class Optimizers():
 			output['MACD_slow'][i] = macd_parameters.elements['MACD' + '_slow']
 			output['MACD_signal'][i] = macd_parameters.elements['MACD' + '_signal']
 			output['MACD_column_div'][i] = dive_column
+			output['frequency'][i] = freq_time
 
+			macd_parameters.elements['dataset_5M'] = self.dataset
+			macd_parameters.elements['dataset_1H'] = self.dataset
 
-			macd = MACD(parameters = macd_parameters, config = config)
+			macd = MACD(parameters = macd_parameters, config = macd_config)
 			macd_calc = macd.calculator_macd()
 
 
 			macd = Divergence(parameters = ind_params, config = ind_config)
 			signal, signaltype, indicator = macd.divergence(
-															sigtype = sigtype,
-															sigpriority = sigpriority,
+															sigtype = self.sigtype,
+															sigpriority = self.sigpriority,
 															indicator = macd_calc,
 															column_div = dive_column,
 															ind_name = 'macd',
 															dataset_5M = macd_parameters.elements['dataset_' + self.timeframe],
 															dataset_1H = macd_parameters.elements['dataset_' + self.timeframe],
-															symbol = symbol,
+															symbol = self.symbol,
 															flaglearn = False,
 															flagtest = True
 															)
+			bar.next()
+
 			if signal.empty == True: continue
 			divergence_out = pd.DataFrame(np.ones(signal.index[-1]))
 			divergence_out['macd'] = np.nan
@@ -272,11 +300,11 @@ class Optimizers():
 
 			output['corr_low'][i] = divergence_out['macd'][1]
 			output['corr_high'][i] = divergence_out['macd'][2]
-			output['diff_divergence'][i] = ind_params.elements['Divergence' + '_diff_extereme']
-			output['num_extreme_min'][i] = ind_params.elements['Divergence' + '_num_exteremes_min']
-			output['num_extreme_max'][i] = ind_params.elements['Divergence' + '_num_exteremes_max']
+			output['Divergence_diff_extereme'][i] = ind_params.elements['Divergence' + '_diff_extereme']
+			output['Divergence_num_exteremes_min'][i] = ind_params.elements['Divergence' + '_num_exteremes_min']
+			output['Divergence_num_exteremes_max'][i] = ind_params.elements['Divergence' + '_num_exteremes_max']
 			#print(output.head(i))
-			print('turn = ', self.main_turn * i, ', score = ', output_read['score'].min(), ' ', self.sigtype, ' ', self.sigpriority)
+			#print('turn = ', self.main_turn * i, ', score = ', output_read['score'].min(), ' ', self.sigtype, ' ', self.sigpriority)
 
 		if os.path.exists(path):
 			os.remove(path)
@@ -285,5 +313,8 @@ class Optimizers():
 		output = pd.concat([output, output_read], ignore_index=True)
 
 		output.dropna().sort_values(by = ['score'], ascending = False).to_csv(path)
+
+		print()
+		print('MACD Optimizer ', self.sigtype, ' ', self.sigpriority, ' ', self.timeframe, ' is Finished')
 
 		return output.dropna().sort_values(by = ['score'], ascending = False)
