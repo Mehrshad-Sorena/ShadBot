@@ -31,7 +31,6 @@ class Divergence:
 				parameters,
 				config
 				):
-		print('params = ', parameters)
 
 		self.elements = dict({
 							
