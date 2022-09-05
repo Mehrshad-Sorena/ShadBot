@@ -63,7 +63,7 @@ class MACD:
 	def ParameterReader(self, symbol, signaltype, signalpriority):
 
 		macd_config = MACDConfig()
-		path_superhuman = macd_config.cfg['path_superhuman'] + '\\' + signalpriority + '\\' + signaltype + '\\'
+		path_superhuman = macd_config.cfg['path_superhuman'] + '/' + signalpriority + '/' + signaltype + '/'
 		print('super = ', path_superhuman)
 
 		macd_parameters = MACDParameters()
