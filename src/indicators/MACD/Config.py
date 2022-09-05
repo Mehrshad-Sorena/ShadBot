@@ -9,9 +9,9 @@ class Config:
 						#************** Divergence:
 
 						'path_society': str(PurePosixPath(str(PurePosixPath(__file__).parent) + '/GeneticLearning_DB/society/')),
-						'path_graveyard': str(PurePosixPath(str(Path(__file__).parent) + '/GeneticLearning_DB/graveyard/')),
-						'path_superhuman': str(PurePosixPath(str(Path(__file__).parent) + '/GeneticLearning_DB/superhuman/')),
-						'path_elites': str(PurePosixPath(str(Path(__file__).parent) + '/GeneticLearning_DB/elites/')),
+						'path_graveyard': str(PurePosixPath(str(PurePosixPath(__file__).parent) + '/GeneticLearning_DB/graveyard/')),
+						'path_superhuman': str(PurePosixPath(str(PurePosixPath(__file__).parent) + '/GeneticLearning_DB/superhuman/')),
+						'path_elites': str(PurePosixPath(str(PurePosixPath(__file__).parent) + '/GeneticLearning_DB/elites/')),
 
 						#/////////////////////////////
 
