@@ -6,6 +6,15 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import time
 import json
+import os
+from pathlib import Path
+import sys
+
+
+if 'win' in sys.platform:
+    path_slash = '\\'
+elif 'linux' in sys.platform:
+    path_slash = '/'
 
 
 user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
@@ -22,11 +31,11 @@ options.add_argument('--no-sandbox')
 
 def news():
     url = 'https://www.forexfactory.com/'
-    news_path = 'forexnews.json'
+    news_path = os.path.join(Path(__file__).parent , 'forexnews.json')
     result = dict()
 
     #chromedriver_path = './geckodriver.exe'
-    chromedriver_path = './chromedriver.exe'
+    chromedriver_path = os.path.join(Path(__file__).parent , 'chromedriver.exe')
     #driver = Firefox(options=options, executable_path=chromedriver_path)
     driver = Chrome(options=options, executable_path=chromedriver_path)
     driver.implicitly_wait(10)
