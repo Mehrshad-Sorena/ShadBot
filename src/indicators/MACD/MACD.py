@@ -81,9 +81,6 @@ class MACD:
 
 		ind_parameters = indicator_parameters()
 
-		print('param reader = ', ind_parameters)
-
-		print(os.path.exists(path_superhuman + symbol + '.csv'))
 
 		if os.path.exists(path_superhuman + symbol + '.csv'):
 
@@ -92,8 +89,8 @@ class MACD:
 			if 'Unnamed: 0' in GL_Results.columns:
 				GL_Results = GL_Results.drop(columns = ['Unnamed: 0'])
 
-			with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-				print('DB Readed = ', GL_Results)
+			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+			# 	print('DB Readed = ', GL_Results)
 
 			for elm in GL_Results.columns:
 
