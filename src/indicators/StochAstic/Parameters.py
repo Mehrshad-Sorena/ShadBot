@@ -11,13 +11,12 @@ class Parameters:
 		self.elements = dict(
 							{
 							
-							#*********** Divergence:
+							#*********** StochAstic:
 
-							'MACD' + '_apply_to': 'close',
-
-							'MACD' + '_fast': 12,
-							'MACD' + '_slow': 26,
-							'MACD' + '_signal': 9,
+							'StochAstic' + '_k': 5,
+							'StochAstic' + '_d': 3,
+							'StochAstic' + '_smooth_k': 3,
+							'StochAstic' + '_mamod': 'sma',
 
 							#///////////////////////
 
