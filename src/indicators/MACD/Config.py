@@ -1,4 +1,14 @@
 from pathlib import Path, PurePosixPath
+import os
+import sys
+
+
+if 'win' in sys.platform:
+	path_slash = '\\'
+elif 'linux' in sys.platform:
+	path_slash = '/'
+
+
 
 class Config:
 
@@ -8,10 +18,10 @@ class Config:
 
 						#************** Divergence:
 
-						'path_society': str(PurePosixPath(str(PurePosixPath(__file__).parent) + '/GeneticLearning_DB/society/')),
-						'path_graveyard': str(PurePosixPath(str(PurePosixPath(__file__).parent) + '/GeneticLearning_DB/graveyard/')),
-						'path_superhuman': str(PurePosixPath(str(PurePosixPath(__file__).parent) + '/GeneticLearning_DB/superhuman/')),
-						'path_elites': str(PurePosixPath(str(PurePosixPath(__file__).parent) + '/GeneticLearning_DB/elites/')),
+						'path_society': os.path.join(Path(__file__).parent , 'GeneticLearning_DB' + path_slash + 'society' + path_slash),
+						'path_graveyard': os.path.join(Path(__file__).parent , 'GeneticLearning_DB' + path_slash + 'graveyard' + path_slash),
+						'path_superhuman': os.path.join(Path(__file__).parent , 'GeneticLearning_DB' + path_slash + 'superhuman' + path_slash),
+						'path_elites': os.path.join(Path(__file__).parent , 'GeneticLearning_DB' + path_slash + 'elites' + path_slash),
 
 						#/////////////////////////////
 
@@ -19,9 +29,9 @@ class Config:
 
 config = Config()
 
-print(config.cfg['path_society'] + '/XAUUSD_i' + '.csv')
+print(config.cfg['path_society'])
 
-import pandas as pd
+# import pandas as pd
 
-print(pd.read_csv(config.cfg['path_society'] + '/primary/buy/XAUUSD_i' + '.csv'))
+# print(pd.read_csv(config.cfg['path_society'] + '/primary/buy/XAUUSD_i' + '.csv'))
 
