@@ -23,7 +23,6 @@ def accountConfig(filename='config.ini', section='accounts'):
     users = db.get('username').split(',')
     password = db.get('password').split(',')
     types = db.get('type').split(',')
-    print(name,users,password)
     for n, u, p, t in zip(name, users, password, types):
         accounts.update(
                 {
