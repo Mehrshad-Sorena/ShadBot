@@ -986,7 +986,7 @@ class MACD:
 
 		GL_Results.to_csv(path_superhuman + symbol + '.csv')
 
-		return learning_output
+		return GL_Results
 
 
 	def Genetic(self, dataset_5M, dataset_1H, symbol, signaltype, signalpriority, num_turn):
