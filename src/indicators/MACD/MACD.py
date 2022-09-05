@@ -512,7 +512,7 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_buy_primary = pd.DataFrame(np.zeros(int(lst_idx_buy_primary)))
+					res_pro_buy_primary = pd.DataFrame(np.zeros(int(lst_idx_buy_primary) + 1))
 					res_pro_buy_primary['high_upper'] = np.nan
 					res_pro_buy_primary['low_lower'] = np.nan
 
@@ -542,6 +542,10 @@ class MACD:
 					signal = 'buy_primary'
 
 				else:
+					res_pro_buy_primary = pd.DataFrame(np.zeros(int(lst_idx_buy_primary) + 1))
+					res_pro_buy_primary['high_upper'] = np.nan
+					res_pro_buy_primary['low_lower'] = np.nan
+
 					diff_pr_top_buy_primary = pr_parameters_buy_primary.elements['tp_percent_min']
 					res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['high'][int(lst_idx_buy_primary)]*(1+(diff_pr_top_buy_primary/100))
 
@@ -593,7 +597,7 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_buy_secondry = pd.DataFrame(np.zeros(int(lst_idx_buy_secondry)))
+					res_pro_buy_secondry = pd.DataFrame(np.zeros(int(lst_idx_buy_secondry) + 1))
 					res_pro_buy_secondry['high_upper'] = np.nan
 					res_pro_buy_secondry['low_lower'] = np.nan
 
@@ -622,6 +626,11 @@ class MACD:
 					signal = 'buy_secondry'
 
 				else:
+
+					res_pro_buy_secondry = pd.DataFrame(np.zeros(int(lst_idx_buy_secondry) + 1))
+					res_pro_buy_secondry['high_upper'] = np.nan
+					res_pro_buy_secondry['low_lower'] = np.nan
+
 					diff_pr_top_buy_secondry = pr_parameters_buy_secondry.elements['tp_percent_min']
 					res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)] = dataset_5M[symbol]['high'][int(lst_idx_buy_secondry)]*(1+(diff_pr_top_buy_secondry/100))
 
@@ -671,7 +680,7 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_sell_primary = pd.DataFrame(np.zeros(int(lst_idx_sell_primary)))
+					res_pro_sell_primary = pd.DataFrame(np.zeros(int(lst_idx_sell_primary) + 1))
 					res_pro_sell_primary['high_upper'] = np.nan
 					res_pro_sell_primary['low_lower'] = np.nan
 
@@ -697,6 +706,10 @@ class MACD:
 					signal = 'sell_primary'
 
 				else:
+
+					res_pro_sell_primary = pd.DataFrame(np.zeros(int(lst_idx_sell_primary) + 1))
+					res_pro_sell_primary['high_upper'] = np.nan
+					res_pro_sell_primary['low_lower'] = np.nan
 
 					diff_pr_top_sell_primary = pr_parameters_sell_primary.elements['st_percent_min']
 					(res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)]) = dataset_5M[symbol]['high'][int(lst_idx_sell_primary)]*(1+(diff_pr_top_sell_primary/100))
@@ -744,7 +757,7 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_sell_secondry = pd.DataFrame(np.zeros(int(lst_idx_sell_secondry)))
+					res_pro_sell_secondry = pd.DataFrame(np.zeros(int(lst_idx_sell_secondry) + 1))
 					res_pro_sell_secondry['high_upper'] = np.nan
 					res_pro_sell_secondry['low_lower'] = np.nan
 
@@ -771,6 +784,10 @@ class MACD:
 
 				else:
 
+					res_pro_sell_secondry = pd.DataFrame(np.zeros(int(lst_idx_sell_secondry) + 1))
+					res_pro_sell_secondry['high_upper'] = np.nan
+					res_pro_sell_secondry['low_lower'] = np.nan
+					
 					diff_pr_top_sell_secondry = pr_parameters_sell_secondry.elements['st_percent_min']
 					(res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)]) = dataset_5M[symbol]['high'][int(lst_idx_sell_secondry)]*(1+(diff_pr_top_sell_secondry/100))
 
@@ -968,6 +985,8 @@ class MACD:
 			os.remove(path_superhuman + symbol + '.csv')
 
 		GL_Results.to_csv(path_superhuman + symbol + '.csv')
+
+		return learning_output
 
 
 	def Genetic(self, dataset_5M, dataset_1H, symbol, signaltype, signalpriority, num_turn):
