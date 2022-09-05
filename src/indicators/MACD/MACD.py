@@ -72,7 +72,6 @@ class MACD:
 
 		macd_config = MACDConfig()
 		path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + path_slash + signaltype + path_slash
-		print('super = ', path_superhuman)
 
 		macd_parameters = MACDParameters()
 
@@ -261,7 +260,7 @@ class MACD:
 		signalpriority = 'primary'
 
 		macd_config = MACDConfig()
-		path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + '/' + signaltype + '/'
+		path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + path_slash + signaltype + path_slash
 
 		if not os.path.exists(path_superhuman + symbol + '.csv'): return 'no_trade', 0, 0
 
@@ -866,7 +865,7 @@ class MACD:
 									 																				signaltype = signaltype, 
 									 																				signalpriority = signalpriority
 									 																				)
-		print('ind_params = ', ind_parameters)
+
 		ind_config = indicator_config()
 		macd = Divergence(parameters = ind_parameters, config = ind_config)
 
@@ -881,7 +880,7 @@ class MACD:
 
 		macd_calc = self.calculator_macd()
 
-		if True:#try:
+		try:
 
 			signal, signaltype, indicator = macd.divergence(
 															sigtype = signaltype,
@@ -914,7 +913,7 @@ class MACD:
 																indicator = indicator,
 																flag_savepic = flag_savepic
 																)
-		else:#except Exception as ex:
+		except Exception as ex:
 			print('Permit Error: ', ex)
 
 			signal_output = pd.DataFrame()
@@ -978,7 +977,7 @@ class MACD:
 
 		chrom = Chromosome(parameters = self)
 		macd_config = MACDConfig()
-		path_elites_chromosome = macd_config.cfg['path_elites'] + signalpriority + '/' + signaltype + '/' + symbol + '_ChromosomeResults.csv'
+		path_elites_chromosome = macd_config.cfg['path_elites'] + signalpriority + path_slash + signaltype + path_slash + symbol + '_ChromosomeResults.csv'
 		
 		# while not chrom.Get(
 		# 					work = 'Optimize',
@@ -1004,8 +1003,8 @@ class MACD:
 																							)
 
 		macd_config = MACDConfig()
-		path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + '/' + signaltype + '/'
-		path_elites = macd_config.cfg['path_elites'] + signalpriority + '/' + signaltype + '/'
+		path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + path_slash + signaltype + path_slash
+		path_elites = macd_config.cfg['path_elites'] + signalpriority + path_slash + signaltype + path_slash
 
 		if os.path.exists(path_superhuman + symbol + '.csv'):
 			max_score_gl = pd.read_csv(path_superhuman + symbol + '.csv')['score'][0]
@@ -1670,7 +1669,7 @@ class MACD:
 			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 			# 	print(best_chromosome)
 
-			path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + '/' + signaltype + '/'
+			path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + path_slash + signaltype + path_slash
 			if not os.path.exists(path_superhuman):
 				os.makedirs(path_superhuman)
 
