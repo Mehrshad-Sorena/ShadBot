@@ -31,11 +31,12 @@ def Run():
 							num_turn = 40
 							)
 
-	macd_calc = macd.GetPermit(
-							dataset_5M = parameters.elements['dataset_5M'],
-							dataset_1H = parameters.elements['dataset_1H'], 
-							symbol = 'XAUUSD_i',
-							signaltype = 'buy',
-							signalpriority = 'secondry',
-							flag_savepic = False
-							)
+	for turn in range(0,4):
+		macd_calc = macd.GetPermit(
+								dataset_5M = parameters.elements['dataset_5M'],
+								dataset_1H = parameters.elements['dataset_1H'], 
+								symbol = 'XAUUSD_i',
+								signaltype = 'buy',
+								signalpriority = 'secondry',
+								flag_savepic = False
+								)
