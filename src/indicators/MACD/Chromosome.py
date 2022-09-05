@@ -15,6 +15,15 @@ import sys
 import numpy as np
 from src.utils.Tools.timer import stTime
 import warnings
+
+import sys
+
+
+if 'win' in sys.platform:
+	path_slash = '\\'
+elif 'linux' in sys.platform:
+	path_slash = '/'
+
 warnings.filterwarnings("ignore")
 
 limits = Limits()
@@ -296,8 +305,8 @@ class Chromosome:
 					):
 		#************************** initialize Values ******************************************************
 		macdconfig = MACDConfig()
-		path_society = macdconfig.cfg['path_society'] + signalpriority + '/' + signaltype + '/'
-		path_superhuman = macdconfig.cfg['path_superhuman'] + signalpriority + '/' + signaltype + '/'
+		path_society = macdconfig.cfg['path_society'] + signalpriority + path_slash + signaltype + path_slash
+		path_superhuman = macdconfig.cfg['path_superhuman'] + signalpriority + path_slash + signaltype + path_slash
 
 		Chromosome_vares = dict()
 
@@ -399,7 +408,7 @@ class Chromosome:
 				):
 
 		macdconfig = MACDConfig()
-		path_society = macdconfig.cfg['path_society'] + signalpriority + '/' + signaltype + '/'
+		path_society = macdconfig.cfg['path_society'] + signalpriority + path_slash + signaltype + path_slash
 
 		Chromosome_vares = dict()
 
@@ -467,7 +476,7 @@ class Chromosome:
 						):
 
 		macd_config = MACDConfig()
-		path_graveyard = macd_config.cfg['path_graveyard'] + signalpriority + '/' + signaltype + '/'
+		path_graveyard = macd_config.cfg['path_graveyard'] + signalpriority + path_slash + signaltype + path_slash
 
 		if (
 			Chromosome[chrom_counter]['isborn'] == False and
@@ -841,7 +850,7 @@ class Chromosome:
 						):
 		
 		macdconfig = MACDConfig()
-		path_society = macdconfig.cfg['path_society'] + signalpriority + '/' + signaltype + '/'
+		path_society = macdconfig.cfg['path_society'] + signalpriority + path_slash + signaltype + path_slash
 
 		if os.path.exists(path_society + symbol + '.csv'):
 			os.remove(path_society + symbol + '.csv')
