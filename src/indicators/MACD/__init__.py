@@ -6,5 +6,4 @@ from . import (
 				ParameterLimits,
 				Parameters,
 				Trader,
-				GeneticLearning_DB,
 			)
