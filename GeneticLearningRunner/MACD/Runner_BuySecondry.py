@@ -6,6 +6,7 @@ import pandas as pd
 from src.utils.Divergence.Parameters import Parameters as IndicatorParameters
 from src.utils.Divergence.Config import Config as IndicatorConfig
 from src.utils.Divergence.Divergence import Divergence
+from src.utils.Optimizers import Optimizers
 import os
 import numpy as np
 import pandas as pd
@@ -20,6 +21,17 @@ def Run():
 	parameters.elements['dataset_5M'], parameters.elements['dataset_1H'] = loging.readall(symbol = 'XAUUSD_i', number_5M = 'all', number_1H = 'all')
 	parameters.elements['symbol'] = 'XAUUSD_i'
 	parameters.elements['MACD_apply_to'] = 'close'
+
+	optimizers = Optimizers.Optimizers() 
+
+	optimizers.symbol = 'XAUUSD_i'
+	optimizers.sigpriority = 'secondry'
+	optimizers.sigtype = 'buy'
+	optimizers.turn = 500
+	optimizers.dataset = parameters.elements['dataset_5M']
+	optimizers.timeframe = '5M'
+
+	optimizers.MacdOptimizer()
 
 	macd = MACD(parameters = parameters, config = config)
 	macd_calc = macd.Genetic(

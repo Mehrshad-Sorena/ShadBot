@@ -171,6 +171,32 @@ class Chromosome:
 
 		ind_parameters = IndicatorParameters()
 
+		macd_config = MACDConfig()
+		optimizer_params = pd.read_csv(
+										macd_config.cfg['path_optimized_params'] + 
+										signalpriority + path_slash + 
+										signaltype + path_slash + 
+										'5M' + path_slash + 
+										symbol + '.csv'
+										)
+
+		limits.elements['MACD_fast_upper'] = int(optimizer_params['MACD_fast'].iloc[-1] * 1.2)
+		limits.elements['MACD_fast_lower'] = int(optimizer_params['MACD_fast'].iloc[-1] * 0.8)
+
+		limits.elements['MACD_slow_upper'] = int(optimizer_params['MACD_slow'].iloc[-1] * 1.2)
+		limits.elements['MACD_slow_lower'] = int(optimizer_params['MACD_slow'].iloc[-1] * 0.8)
+
+		limits.elements['MACD_signal_upper'] = int(optimizer_params['MACD_signal'].iloc[-1] * 1.2)
+		limits.elements['MACD_signal_lower'] = int(optimizer_params['MACD_signal'].iloc[-1] * 0.8)
+
+		if signaltype == 'buy':
+			limits.elements['Divergence_num_exteremes_min_upper'] = int(optimizer_params['Divergence_num_exteremes_min'].iloc[-1] * 1.2)
+			limits.elements['Divergence_num_exteremes_min_lower'] = int(optimizer_params['Divergence_num_exteremes_min'].iloc[-1] * 0.8)
+
+		elif signaltype == 'sell':
+			limits.elements['Divergence_num_exteremes_max_upper'] = int(optimizer_params['Divergence_num_exteremes_max'].iloc[-1] * 1.2)
+			limits.elements['Divergence_num_exteremes_max_lower'] = int(optimizer_params['Divergence_num_exteremes_max'].iloc[-1] * 0.8)
+
 		#Select Which Work is Be Done:
 
 		if work == 'Optimize':

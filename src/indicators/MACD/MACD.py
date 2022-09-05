@@ -986,7 +986,7 @@ class MACD:
 
 		GL_Results.to_csv(path_superhuman + symbol + '.csv')
 
-		return learning_output
+		return GL_Results
 
 
 	def Genetic(self, dataset_5M, dataset_1H, symbol, signaltype, signalpriority, num_turn):
@@ -1057,10 +1057,10 @@ class MACD:
 			max_corr = chromosome_output['corr'].min()/3
 
 			if num_turn <= len(learning_result['score']):
-				num_turn = (len(learning_result['score'])) + 50
+				num_turn = (len(learning_result['score'])) + 2
 
 				if len(chromosome_output) >= num_turn:
-					num_turn = len(chromosome_output) + 50
+					num_turn = len(chromosome_output) + 2
 
 		else:
 			learning_result = pd.DataFrame()
