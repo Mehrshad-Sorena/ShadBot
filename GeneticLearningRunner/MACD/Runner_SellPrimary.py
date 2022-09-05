@@ -40,3 +40,5 @@ def Run():
 								signalpriority = 'primary',
 								flag_savepic = False
 								)
+
+		if macd_calc['draw_down'][0] <= 7: break
