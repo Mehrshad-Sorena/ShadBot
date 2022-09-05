@@ -1030,10 +1030,10 @@ class MACD:
 			max_corr = chromosome_output['corr'].min()/3
 
 			if num_turn <= len(learning_result['score']):
-				num_turn = (len(learning_result['score'])) + 0
+				num_turn = (len(learning_result['score'])) + 4
 
 				if len(chromosome_output) >= num_turn:
-					num_turn = len(chromosome_output) + 0
+					num_turn = len(chromosome_output) + 4
 
 		else:
 			learning_result = pd.DataFrame()
