@@ -41,4 +41,8 @@ def Run():
 								flag_savepic = False
 								)
 
-		if macd_calc['draw_down'][0] <= 7: break
+		if (
+			macd_calc['draw_down'][0] <= 7 &
+			macd_calc['permit'][0] == True
+			): 
+			break
