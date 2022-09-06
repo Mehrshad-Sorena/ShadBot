@@ -1122,7 +1122,7 @@ class MACD:
 			# print()
 			# print('================== Num =========> ', len(chromosome_output))
 			# print('================== Num Chroms ======> ', chrom_counter)
-			print('================== All Chorms ======> ', all_chorms)
+			# print('================== All Chorms ======> ', all_chorms)
 			# print('================== Flag Learn ======> ', chromosome[chrom_counter]['islearned'])
 			# print('================== Chorm Reseter ===> ',chorm_reset_counter)
 			# print('===== bad score counter ========> ',bad_score_counter)
@@ -1238,7 +1238,7 @@ class MACD:
 				learning_output_now = pd.DataFrame()
 				learning_output_before = pd.DataFrame()
 
-			#print('siiiiiiignaaaaaal ====> ', len(signal['index']))
+			# print('siiiiiiignaaaaaal ====> ', len(signal['index']))
 
 			if signal.empty == True:
 				chromosome[chrom_counter]['isborn'] = False
@@ -1575,7 +1575,7 @@ class MACD:
 				):
 				break
 
-
+			print(bad_flag)
 			if bad_flag == True:
 
 				if bad_score_counter < 4:
