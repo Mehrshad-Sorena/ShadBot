@@ -188,5 +188,5 @@ def trader_task_macd_div(symbol, account_name):
 						)
 		print('****************** Finish *************************')
 	except Exception as ex:
-		print('===== Trader Error ===> ',ex)
+		print('===== Trader Error MACD ===> ',ex)
 	return
