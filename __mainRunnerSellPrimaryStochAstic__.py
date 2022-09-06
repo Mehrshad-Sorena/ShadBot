@@ -1,3 +1,0 @@
-from GeneticLearningRunner.StochAstic import Runner_SellPrimary
-
-Runner_SellPrimary.Run()

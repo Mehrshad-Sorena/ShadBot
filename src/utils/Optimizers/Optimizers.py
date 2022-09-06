@@ -13,6 +13,10 @@ from src.indicators.StochAstic.Parameters import Parameters as StochAsticParamet
 from src.indicators.StochAstic.Config import Config as StochAsticConfig
 from src.indicators.StochAstic.StochAstic import StochAstic
 
+from src.indicators.RSI.Parameters import Parameters as RSIParameters
+from src.indicators.RSI.Config import Config as RSIConfig
+from src.indicators.RSI.RSI import RSI
+
 from progress.bar import Bar
 import pandas as pd
 import numpy as np
@@ -571,5 +575,223 @@ class Optimizers():
 
 		print()
 		print('StochAstic Optimizer ', self.sigtype, ' ', self.sigpriority, ' ', self.timeframe, ' is Finished')
+
+		return output.dropna().sort_values(by = ['score'], ascending = False)
+
+
+	def RSIOptimizer(self):
+
+		print('Start RSI Optimizer ', self.sigtype, ' ', self.sigpriority, ' ', self.timeframe, ' ...')
+
+		configoptimizers = ConfigOptimizers()
+		rsi_parameters = RSIParameters()
+		rsi_config = RSIConfig()
+
+		ind_params = indicator_parameters()
+		ind_config = indicator_config()
+
+		self.dataset[self.symbol] = self.dataset[self.symbol].assign(index = self.dataset[self.symbol].index)
+
+		freq = self.FreqFinder(self.dataset[self.symbol].close)
+
+		if self.timeframe == '5M':
+			freq_time = str(5 * freq) + 'T'
+		elif self.timeframe == '1H':
+			freq_time = str(freq) + 'H'
+
+		bar = Bar(self.sigtype + ' ' + self.sigpriority + ' ' + self.timeframe, max = int(self.turn))
+
+		self.dataset[self.symbol] = self.dataset[self.symbol].set_index('time').resample(freq_time).last().dropna()
+		self.dataset[self.symbol] = self.dataset[self.symbol].assign(time = self.dataset[self.symbol].index)
+		self.dataset[self.symbol] = self.dataset[self.symbol].set_index('index')
+
+		path = configoptimizers.cfg['path_RSI'] + path_slash + self.sigpriority + path_slash + self.sigtype + path_slash + self.timeframe + path_slash
+
+		if not os.path.exists(path):
+			os.makedirs(path)
+
+		path = configoptimizers.cfg['path_RSI'] + path_slash + self.sigpriority + path_slash + self.sigtype + path_slash + self.timeframe + path_slash + self.symbol + '.csv'
+
+		if os.path.exists(path):
+			output_read = pd.read_csv(path).drop(columns = ['Unnamed: 0'])
+		else:
+			output_read = pd.DataFrame()
+			output_read['RSI_apply_to'] = np.nan
+			output_read['RSI_length'] = np.nan
+			output_read['corr_low'] = np.nan
+			output_read['corr_high'] = np.nan
+			output_read['Divergence_diff_extereme'] = np.nan
+			output_read['Divergence_num_exteremes_min'] = np.nan
+			output_read['Divergence_num_exteremes_max'] = np.nan
+			output_read['frequency'] = np.nan
+			output_read['score'] = np.nan
+			
+		
+		output = pd.DataFrame(np.ones(self.turn))
+		output['RSI_apply_to'] = np.nan
+		output['RSI_length'] = np.nan
+		output['corr_low'] = np.nan
+		output['corr_high'] = np.nan
+		output['Divergence_diff_extereme'] = np.nan
+		output['Divergence_num_exteremes_min'] = np.nan
+		output['Divergence_num_exteremes_max'] = np.nan
+		output['frequency'] = np.nan
+		output['score'] = np.nan
+		
+
+		for i in range(self.turn):
+			rsi_parameters.elements['RSI' + '_apply_to'] = random.choice([
+																		'open',
+																		'close',
+																		'low',
+																		'high',
+																		'HL/2',
+																		'HLC/3',
+																		'HLCC/4',
+																		'OHLC/4'
+																		])
+			rsi_parameters.elements['RSI' + '_length'] = randint(2, 300)
+
+			ind_params.elements['Divergence' + '_diff_extereme'] = randint(1 , 6)
+			ind_params.elements['Divergence' + '_num_exteremes_min'] = randint(2 , 500)
+			ind_params.elements['Divergence' + '_num_exteremes_max'] = randint(2 , 500)
+
+			repeat_counter = 0
+			if output.dropna().empty == False:
+
+				repeat_checker_now = np.where(
+											(rsi_parameters.elements['RSI' + '_length'] == output['RSI_length'].values) &
+											(ind_params.elements['Divergence' + '_diff_extereme'] == output['Divergence_diff_extereme'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output['Divergence_num_exteremes_min'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output['Divergence_num_exteremes_max'].values) &
+											(rsi_parameters.elements['RSI' + '_apply_to'] == output['RSI_apply_to'].values)
+										)[0]
+
+				repeat_checker_before = np.where(
+											(rsi_parameters.elements['RSI' + '_length'] == output_read['RSI_length'].values) &
+											(ind_params.elements['Divergence' + '_diff_extereme'] == output_read['Divergence_diff_extereme'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output_read['Divergence_num_exteremes_min'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output_read['Divergence_num_exteremes_max'].values) &
+											(rsi_parameters.elements['RSI' + '_apply_to'] == output_read['RSI_apply_to'].values)
+										)[0]
+
+				while (
+						len(repeat_checker_now) > 0 or
+						len(repeat_checker_before) >0
+						):
+					rsi_parameters.elements['RSI' + '_apply_to'] = random.choice([
+																				'open',
+																				'close',
+																				'low',
+																				'high',
+																				'HL/2',
+																				'HLC/3',
+																				'HLCC/4',
+																				'OHLC/4'
+																				])
+					rsi_parameters.elements['RSI' + '_length'] = randint(2, 300)
+
+					ind_params.elements['Divergence' + '_diff_extereme'] = randint(1 , 6)
+					ind_params.elements['Divergence' + '_num_exteremes_min'] = randint(2 , 250)
+					ind_params.elements['Divergence' + '_num_exteremes_max'] = randint(2 , 250)
+
+					repeat_checker_now = np.where(
+											(rsi_parameters.elements['RSI' + '_length'] == output['RSI_length'].values) &
+											(ind_params.elements['Divergence' + '_diff_extereme'] == output['Divergence_diff_extereme'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output['Divergence_num_exteremes_min'].values) &
+											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output['Divergence_num_exteremes_max'].values) &
+											(rsi_parameters.elements['RSI' + '_apply_to'] == output['RSI_apply_to'].values)
+										)[0]
+
+					repeat_checker_before = np.where(
+												(rsi_parameters.elements['RSI' + '_length'] == output_read['RSI_length'].values) &
+												(ind_params.elements['Divergence' + '_diff_extereme'] == output_read['Divergence_diff_extereme'].values) &
+												(ind_params.elements['Divergence' + '_num_exteremes_min'] == output_read['Divergence_num_exteremes_min'].values) &
+												(ind_params.elements['Divergence' + '_num_exteremes_max'] == output_read['Divergence_num_exteremes_max'].values) &
+												(rsi_parameters.elements['RSI' + '_apply_to'] == output_read['RSI_apply_to'].values)
+											)[0]
+
+					if repeat_counter >= len(output_read['RSI_length'].dropna().index): break
+					repeat_counter += 1
+				
+
+			output['RSI_apply_to'][i] = rsi_parameters.elements['RSI' + '_apply_to']
+			output['RSI_length'][i] = rsi_parameters.elements['RSI' + '_length']
+			output['frequency'][i] = freq_time
+
+			rsi_parameters.elements['dataset_5M'] = self.dataset
+			rsi_parameters.elements['dataset_1H'] = self.dataset
+
+			rsi = RSI(parameters = rsi_parameters, config = rsi_config)
+			rsi_calc = rsi.calculator_rsi()
+
+
+			rsi = Divergence(parameters = ind_params, config = ind_config)
+			signal, signaltype, indicator = rsi.divergence(
+															sigtype = self.sigtype,
+															sigpriority = self.sigpriority,
+															indicator = rsi_calc,
+															column_div = 'rsi',
+															ind_name = 'rsi',
+															dataset_5M = rsi_parameters.elements['dataset_' + self.timeframe],
+															dataset_1H = rsi_parameters.elements['dataset_' + self.timeframe],
+															symbol = self.symbol,
+															flaglearn = False,
+															flagtest = True
+															)
+			bar.next()
+
+			if signal.empty == True: continue
+			divergence_out = pd.DataFrame(np.ones(signal.index[-1]))
+			divergence_out['rsi'] = np.nan
+			divergence_out['low'] = np.nan
+			divergence_out['high'] = np.nan
+
+			counter = 0
+			for elm in signal.index:
+				divergence_out['rsi'][counter] = signal.indicator_front[elm]
+				divergence_out['rsi'][counter + 1] = signal.indicator_back[elm]
+
+				divergence_out['low'][counter] = signal.low_front[elm]
+				divergence_out['low'][counter + 1] = signal.low_back[elm]
+
+				divergence_out['high'][counter] = signal.high_front[elm]
+				divergence_out['high'][counter + 1] = signal.high_back[elm]
+
+				counter += 2
+
+			divergence_out = divergence_out.dropna()
+			divergence_out = divergence_out.drop(columns = [0])
+
+			number_divergence = len(divergence_out.index)/1000
+
+			divergence_out = divergence_out.corr()
+
+			output['score'][i] = -((divergence_out['rsi'][2] * divergence_out['rsi'][1] * number_divergence) ** (1/3))
+
+			if (
+				divergence_out['rsi'][2] > 0 and
+				divergence_out['rsi'][1] > 0
+				):
+				output['score'][i] = -output['score'][i]
+
+			output['corr_low'][i] = divergence_out['rsi'][1]
+			output['corr_high'][i] = divergence_out['rsi'][2]
+			output['Divergence_diff_extereme'][i] = ind_params.elements['Divergence' + '_diff_extereme']
+			output['Divergence_num_exteremes_min'][i] = ind_params.elements['Divergence' + '_num_exteremes_min']
+			output['Divergence_num_exteremes_max'][i] = ind_params.elements['Divergence' + '_num_exteremes_max']
+			#print(output.head(i))
+			#print('turn = ', self.main_turn * i, ', score = ', output_read['score'].min(), ' ', self.sigtype, ' ', self.sigpriority)
+
+		if os.path.exists(path):
+			os.remove(path)
+
+		output = output.drop(columns = [0])
+		output = pd.concat([output, output_read], ignore_index=True)
+
+		output.dropna().sort_values(by = ['score'], ascending = False).to_csv(path)
+
+		print()
+		print('RSI Optimizer ', self.sigtype, ' ', self.sigpriority, ' ', self.timeframe, ' is Finished')
 
 		return output.dropna().sort_values(by = ['score'], ascending = False)

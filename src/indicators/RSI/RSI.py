@@ -1,35 +1,40 @@
 import pandas_ta as ind
 import pandas as pd
 import numpy as np
-from src.Indicators.MACD.Chromosome import Chromosome
+from .Chromosome import Chromosome
 import os
-from src.Indicators.MACD.Config import Config as MACDConfig
-from src.Indicators.MACD.Parameters import Parameters as MACDParameters
-
-from indicator_Parameters import Parameters as IndicatorParameters
-
+from .Config import Config as RSIConfig
+from .Parameters import Parameters as RSIParameters
 from progress.bar import Bar
 from random import randint
-from indicator_Parameters import Parameters as indicator_parameters
-from indicator_Config import Config as indicator_config
+from src.utils.Divergence.Parameters import Parameters as indicator_parameters
+from src.utils.Divergence.Config import Config as indicator_config
 
-from pr_Parameters import Parameters as PRParameters
-from pr_Config import Config as PRConfig
+from src.utils.ProtectResist.PRMethod.Parameters import Parameters as PRParameters
+from src.utils.ProtectResist.PRMethod.Config import Config as PRConfig
 
-from timer import stTime
+from src.utils.Tools.timer import stTime
 
-from indicator_Divergence import Divergence
-from indicator_Tester import Tester
+from src.utils.Divergence.Divergence import Divergence
+from src.utils.Divergence.Tester import Tester
 
-from pr_Runner import Runner
+from src.utils.ProtectResist.PRMethod.Runner import Runner
+
+import sys
+
+
+if 'win' in sys.platform:
+	path_slash = '\\'
+elif 'linux' in sys.platform:
+	path_slash = '/'
 
 #Functions Used:
 
-#calculator_macd(self)
+#calculator_rsi(self)
 
 #/////////////////////////////////
 
-class MACD:
+class RSI:
 
 	def __init__(
 				self,
@@ -40,9 +45,7 @@ class MACD:
 		self.elements = dict({
 							#*********************
 
-							__class__.__name__ + '_fast': parameters.elements[__class__.__name__ + '_fast'],
-							__class__.__name__ + '_slow': parameters.elements[__class__.__name__ + '_slow'],
-							__class__.__name__ + '_signal': parameters.elements[__class__.__name__ + '_signal'],
+							__class__.__name__ + '_length': parameters.elements[__class__.__name__ + '_length'],
 
 							__class__.__name__ + '_apply_to': parameters.elements[__class__.__name__ + '_apply_to'],
 
@@ -65,26 +68,31 @@ class MACD:
 
 	def ParameterReader(self, symbol, signaltype, signalpriority):
 
-		macd_config = MACDConfig()
-		path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + '/' + signaltype + '/'
+		rsi_config = RSIConfig()
+		path_superhuman = rsi_config.cfg['path_superhuman'] + signalpriority + path_slash + signaltype + path_slash
 
-		macd_parameters = MACDParameters()
+		rsi_parameters = RSIParameters()
 
 		pr_parameters = PRParameters()
 		pr_config = PRConfig()
 
-		ind_parameters = IndicatorParameters()
+		ind_parameters = indicator_parameters()
 
 
 		if os.path.exists(path_superhuman + symbol + '.csv'):
 
 			GL_Results = pd.read_csv(path_superhuman + symbol + '.csv')
 
+			if 'Unnamed: 0' in GL_Results.columns:
+				GL_Results = GL_Results.drop(columns = ['Unnamed: 0'])
+
+			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+			# 	print('DB Readed = ', GL_Results)
+
 			for elm in GL_Results.columns:
 
 				for pr_param_elm in pr_parameters.elements.keys():
 					if pr_param_elm == elm:
-
 						if (
 							elm == 'BestFinder_alpha_low' or
 							elm == 'BestFinder_alpha_high' or
@@ -111,14 +119,14 @@ class MACD:
 							ind_parameters.elements[ind_elm] = int(GL_Results[elm][0])
 
 
-				for macd_elm in macd_parameters.elements.keys():
-					if macd_elm == elm:
-						if elm == 'MACD_apply_to':
-							macd_parameters.elements[macd_elm] = GL_Results[elm][0]
+				for rsi_elm in rsi_parameters.elements.keys():
+					if rsi_elm == elm:
+						if elm == 'RSI_apply_to':
+							rsi_parameters.elements[rsi_elm] = GL_Results[elm][0]
 						else:
-							macd_parameters.elements[macd_elm] = int(GL_Results[elm][0])
+							rsi_parameters.elements[rsi_elm] = int(GL_Results[elm][0])
 
-			return GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters, pr_config
+			return GL_Results, path_superhuman, rsi_parameters, ind_parameters, pr_parameters, pr_config
 
 		else:
 			return pd.DataFrame(), '', '', '', '', ''
@@ -129,7 +137,7 @@ class MACD:
 	def Simulator(self, dataset_5M, dataset_1H, symbol, signaltype, signalpriority, flag_savepic):
 
 
-		GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters, pr_config = self.ParameterReader(
+		GL_Results, path_superhuman, rsi_parameters, ind_parameters, pr_parameters, pr_config = self.ParameterReader(
 										 																				symbol = symbol, 
 										 																				signaltype = signaltype, 
 										 																				signalpriority = signalpriority
@@ -138,9 +146,9 @@ class MACD:
 		ind_parameters.elements['dataset_5M'] = dataset_5M
 		ind_parameters.elements['dataset_1H'] = dataset_1H
 		ind_config = indicator_config()
-		macd_tester = Tester(parameters = ind_parameters, config = ind_config)
+		rsi_tester = Tester(parameters = ind_parameters, config = ind_config)
 
-		self.elements = macd_parameters.elements
+		self.elements = rsi_parameters.elements
 		self.elements['dataset_1H'] = dataset_1H
 		self.elements['symbol'] = symbol
 
@@ -157,7 +165,7 @@ class MACD:
 											symbol:	dataset_5M[symbol].loc[cut_first:candle_counter,['close', 'open', 'high', 'low', 'HL/2', 'HLC/3', 'HLCC/4', 'OHLC/4', 'time']],
 											}
 
-			macd = Divergence(parameters = ind_parameters, config = ind_config)
+			rsi = Divergence(parameters = ind_parameters, config = ind_config)
 
 			
 
@@ -165,14 +173,14 @@ class MACD:
 
 			try:	
 
-				macd_calc = self.calculator_macd()
+				rsi_calc = self.calculator_rsi()
 
-				signal, _, indicator = macd.divergence(
+				signal, _, indicator = rsi.divergence(
 												sigtype = signaltype,
 												sigpriority = signalpriority,
-												indicator = macd_calc,
-												column_div = GL_Results['MACD_column_div'][0],
-												ind_name = 'macd',
+												indicator = rsi_calc,
+												column_div = 'rsi',
+												ind_name = 'rsi',
 												dataset_5M = self.elements['dataset_5M'],
 												dataset_1H = dataset_1H,
 												symbol = symbol,
@@ -222,7 +230,7 @@ class MACD:
 		learning_output = pd.DataFrame()
 
 		try:
-			signal_output, learning_output = macd_tester.RunGL(
+			signal_output, learning_output = rsi_tester.RunGL(
 															signal = output, 
 															sigtype = signaltype, 
 															flaglearn = GL_Results['islearned'][0], 
@@ -249,26 +257,26 @@ class MACD:
 		signaltype = 'buy'
 		signalpriority = 'primary'
 
-		macd_config = MACDConfig()
-		path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + '/' + signaltype + '/'
+		rsi_config = RSIConfig()
+		path_superhuman = rsi_config.cfg['path_superhuman'] + signalpriority + path_slash + signaltype + path_slash
 
 		if not os.path.exists(path_superhuman + symbol + '.csv'): return 'no_trade', 0, 0
 
-		GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters_buy_primary, pr_config_buy_primary = self.ParameterReader(
+		GL_Results, path_superhuman, rsi_parameters, ind_parameters, pr_parameters_buy_primary, pr_config_buy_primary = self.ParameterReader(
 												 																				symbol = symbol, 
 												 																				signaltype = signaltype, 
 												 																				signalpriority = signalpriority
 												 																				)
 
 		ind_config = indicator_config()
-		macd = Divergence(parameters = ind_parameters, config = ind_config)
+		rsi = Divergence(parameters = ind_parameters, config = ind_config)
 
-		self.elements = macd_parameters.elements
+		self.elements = rsi_parameters.elements
 		self.elements['dataset_5M'] = dataset_5M
 		self.elements['dataset_1H'] = dataset_1H
 		self.elements['symbol'] = symbol
 
-		macd_calc = self.calculator_macd()
+		rsi_calc = self.calculator_rsi()
 
 		signal_buy_primary = pd.DataFrame()
 
@@ -276,12 +284,12 @@ class MACD:
 
 			if GL_Results['permit'][0] == True:
 
-				signal_buy_primary, _, _ = macd.divergence(
+				signal_buy_primary, _, _ = rsi.divergence(
 															sigtype = signaltype,
 															sigpriority = signalpriority,
-															indicator = macd_calc,
-															column_div = GL_Results['MACD_column_div'][0],
-															ind_name = 'macd',
+															indicator = rsi_calc,
+															column_div = 'rsi',
+															ind_name = 'rsi',
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
@@ -290,6 +298,7 @@ class MACD:
 															)
 			else:
 				lst_idx_buy_primary = 0
+				signal_buy_primary = pd.DataFrame()
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")
@@ -309,21 +318,21 @@ class MACD:
 		signaltype = 'buy'
 		signalpriority = 'secondry'
 
-		GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters_buy_secondry, pr_config_buy_secondry = self.ParameterReader(
+		GL_Results, path_superhuman, rsi_parameters, ind_parameters, pr_parameters_buy_secondry, pr_config_buy_secondry = self.ParameterReader(
 													 																				symbol = symbol, 
 													 																				signaltype = signaltype, 
 													 																				signalpriority = signalpriority
 													 																				)
 
 		ind_config = indicator_config()
-		macd = Divergence(parameters = ind_parameters, config = ind_config)
+		rsi = Divergence(parameters = ind_parameters, config = ind_config)
 
-		self.elements = macd_parameters.elements
+		self.elements = rsi_parameters.elements
 		self.elements['dataset_5M'] = dataset_5M
 		self.elements['dataset_1H'] = dataset_1H
 		self.elements['symbol'] = symbol
 
-		macd_calc = self.calculator_macd()
+		rsi_calc = self.calculator_rsi()
 
 		signal_buy_secondry = pd.DataFrame()
 
@@ -331,12 +340,12 @@ class MACD:
 
 			if GL_Results['permit'][0] == True:
 				
-				signal_buy_secondry, _, _ = macd.divergence(
+				signal_buy_secondry, _, _ = rsi.divergence(
 															sigtype = signaltype,
 															sigpriority = signalpriority,
-															indicator = macd_calc,
-															column_div = GL_Results['MACD_column_div'][0],
-															ind_name = 'macd',
+															indicator = rsi_calc,
+															column_div = 'rsi',
+															ind_name = 'rsi',
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
@@ -345,6 +354,7 @@ class MACD:
 															)
 			else:
 				signal_buy_secondry = 0
+				signal_buy_secondry = pd.DataFrame()
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")
@@ -364,33 +374,33 @@ class MACD:
 		signaltype = 'sell'
 		signalpriority = 'primary'
 
-		GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters_sell_primary, pr_config_sell_primary = self.ParameterReader(
+		GL_Results, path_superhuman, rsi_parameters, ind_parameters, pr_parameters_sell_primary, pr_config_sell_primary = self.ParameterReader(
 													 																				symbol = symbol, 
 													 																				signaltype = signaltype, 
 													 																				signalpriority = signalpriority
 													 																				)
 
 		ind_config = indicator_config()
-		macd = Divergence(parameters = ind_parameters, config = ind_config)
+		rsi = Divergence(parameters = ind_parameters, config = ind_config)
 
-		self.elements = macd_parameters.elements
+		self.elements = rsi_parameters.elements
 		self.elements['dataset_5M'] = dataset_5M
 		self.elements['dataset_1H'] = dataset_1H
 		self.elements['symbol'] = symbol
 
-		macd_calc = self.calculator_macd()
+		rsi_calc = self.calculator_rsi()
 
 		signal_sell_primary = pd.DataFrame()
 
 		try:
 			if GL_Results['permit'][0] == True:
 
-				signal_sell_primary, _, _ = macd.divergence(
+				signal_sell_primary, _, _ = rsi.divergence(
 															sigtype = signaltype,
 															sigpriority = signalpriority,
-															indicator = macd_calc,
-															column_div = GL_Results['MACD_column_div'][0],
-															ind_name = 'macd',
+															indicator = rsi_calc,
+															column_div = 'rsi',
+															ind_name = 'rsi',
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
@@ -399,6 +409,7 @@ class MACD:
 															)
 			else:
 				lst_idx_sell_primary = 0
+				signal_sell_primary = pd.DataFrame()
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")
@@ -418,33 +429,33 @@ class MACD:
 		signaltype = 'sell'
 		signalpriority = 'secondry'
 
-		GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters_sell_secondry, pr_config_sell_secondry = self.ParameterReader(
+		GL_Results, path_superhuman, rsi_parameters, ind_parameters, pr_parameters_sell_secondry, pr_config_sell_secondry = self.ParameterReader(
 													 																				symbol = symbol, 
 													 																				signaltype = signaltype, 
 													 																				signalpriority = signalpriority
 													 																				)
 
 		ind_config = indicator_config()
-		macd = Divergence(parameters = ind_parameters, config = ind_config)
+		rsi = Divergence(parameters = ind_parameters, config = ind_config)
 
-		self.elements = macd_parameters.elements
+		self.elements = rsi_parameters.elements
 		self.elements['dataset_5M'] = dataset_5M
 		self.elements['dataset_1H'] = dataset_1H
 		self.elements['symbol'] = symbol
 
-		macd_calc = self.calculator_macd()
+		rsi_calc = self.calculator_rsi()
 
 		signal_sell_secondry = pd.DataFrame()
 
 		try:
 			if GL_Results['permit'][0] == True:
 
-				signal_sell_secondry, _, _ = macd.divergence(
+				signal_sell_secondry, _, _ = rsi.divergence(
 															sigtype = signaltype,
 															sigpriority = signalpriority,
-															indicator = macd_calc,
-															column_div = GL_Results['MACD_column_div'][0],
-															ind_name = 'macd',
+															indicator = rsi_calc,
+															column_div = 'rsi',
+															ind_name = 'rsi',
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
@@ -453,6 +464,7 @@ class MACD:
 															)
 			else:
 				lst_idx_sell_secondry = 0
+				signal_sell_secondry = pd.DataFrame()
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")
@@ -467,10 +479,10 @@ class MACD:
 
 		#*****************************
 
-		print('lst_idx_buy_primary = ', lst_idx_buy_primary)
-		print('lst_idx_buy_secondry = ', lst_idx_buy_secondry)
-		print('lst_idx_sell_primary = ', lst_idx_sell_primary)
-		print('lst_idx_sell_secondry = ', lst_idx_sell_secondry)
+		print('lst_idx_buy_primary rsi = ', lst_idx_buy_primary)
+		print('lst_idx_buy_secondry rsi = ', lst_idx_buy_secondry)
+		print('lst_idx_sell_primary rsi = ', lst_idx_sell_primary)
+		print('lst_idx_sell_secondry rsi = ', lst_idx_sell_secondry)
 		print('len data = ', len(dataset_5M[symbol]['close']) - 1)
 
 		#***** Last Signal:
@@ -482,7 +494,7 @@ class MACD:
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) <= 6
 			):
 
-			print('======> last signal buy primary ',symbol)
+			print('======> last signal buy primary rsi ',symbol)
 			print('dataset length: ',len(dataset_5M[symbol]['close']))
 			print('last index: ',lst_idx_buy_primary)
 			
@@ -502,7 +514,9 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_buy_primary = pd.DataFrame()
+					res_pro_buy_primary = pd.DataFrame(np.zeros(int(lst_idx_buy_primary) + 1))
+					res_pro_buy_primary['high_upper'] = np.nan
+					res_pro_buy_primary['low_lower'] = np.nan
 
 
 				if (res_pro_buy_primary.empty == False):
@@ -530,15 +544,30 @@ class MACD:
 					signal = 'buy_primary'
 
 				else:
-					diff_pr_top_buy = 0
-					diff_pr_down_buy = 0
-					diff_pr_top_buy_power = 0
-					diff_pr_down_buy_power = 0
+					res_pro_buy_primary = pd.DataFrame(np.zeros(int(lst_idx_buy_primary) + 1))
+					res_pro_buy_primary['high_upper'] = np.nan
+					res_pro_buy_primary['low_lower'] = np.nan
 
-					resist_buy = 0
-					protect_buy = 0
+					diff_pr_top_buy_primary = pr_parameters_buy_primary.elements['tp_percent_min']
+					res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['high'][int(lst_idx_buy_primary)]*(1+(diff_pr_top_buy_primary/100))
 
-					signal = 'no_trade'		
+					diff_pr_down_buy_primary = pr_parameters_buy_primary.elements['st_percent_min']
+					res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary/100))
+
+					resist_buy = (res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)])
+					protect_buy = (res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)])
+
+					signal = 'buy_primary'
+
+					# diff_pr_top_buy = 0
+					# diff_pr_down_buy = 0
+					# diff_pr_top_buy_power = 0
+					# diff_pr_down_buy_power = 0
+
+					# resist_buy = 0
+					# protect_buy = 0
+
+					# signal = 'no_trade'		
 
 			print('================================')\
 
@@ -549,7 +578,7 @@ class MACD:
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) <= 6
 			):
 
-			print('======> last signal buy secondry ',symbol)
+			print('======> last signal buy secondry rsi ',symbol)
 			print('dataset length: ',len(dataset_5M[symbol]['close']))
 			print('last index: ',lst_idx_buy_secondry)
 			
@@ -570,7 +599,9 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_buy_secondry = pd.DataFrame()
+					res_pro_buy_secondry = pd.DataFrame(np.zeros(int(lst_idx_buy_secondry) + 1))
+					res_pro_buy_secondry['high_upper'] = np.nan
+					res_pro_buy_secondry['low_lower'] = np.nan
 
 				if (res_pro_buy_secondry.empty == False):
 
@@ -597,15 +628,32 @@ class MACD:
 					signal = 'buy_secondry'
 
 				else:
-					diff_pr_top_buy = 0
-					diff_pr_down_buy = 0
-					diff_pr_top_buy_power = 0
-					diff_pr_down_buy_power = 0
 
-					resist_buy = 0
-					protect_buy = 0
+					res_pro_buy_secondry = pd.DataFrame(np.zeros(int(lst_idx_buy_secondry) + 1))
+					res_pro_buy_secondry['high_upper'] = np.nan
+					res_pro_buy_secondry['low_lower'] = np.nan
 
-					signal = 'no_trade'	
+					diff_pr_top_buy_secondry = pr_parameters_buy_secondry.elements['tp_percent_min']
+					res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)] = dataset_5M[symbol]['high'][int(lst_idx_buy_secondry)]*(1+(diff_pr_top_buy_secondry/100))
+
+					diff_pr_down_buy_secondry = pr_parameters_buy_secondry.elements['st_percent_min']
+					res_pro_buy_secondry['low_lower'][int(lst_idx_buy_secondry)] = dataset_5M[symbol]['low'][int(lst_idx_buy_secondry)]*(1-(diff_pr_down_buy_secondry/100))
+
+
+					resist_buy = (res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)])
+					protect_buy = (res_pro_buy_secondry['low_lower'][int(lst_idx_buy_secondry)])
+
+					signal = 'buy_secondry'
+
+					# diff_pr_top_buy = 0
+					# diff_pr_down_buy = 0
+					# diff_pr_top_buy_power = 0
+					# diff_pr_down_buy_power = 0
+
+					# resist_buy = 0
+					# protect_buy = 0
+
+					# signal = 'no_trade'	
 
 		elif (
 			lst_idx_sell_primary > lst_idx_buy_primary and
@@ -614,7 +662,7 @@ class MACD:
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) <= 6
 			):
 
-			print('======> last signal sell primary ',symbol)
+			print('======> last signal sell primary rsi ',symbol)
 			print('dataset length: ',len(dataset_5M[symbol]['close']))
 			print('last index: ',lst_idx_sell_primary)
 			
@@ -634,7 +682,9 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_sell_primary = pd.DataFrame()
+					res_pro_sell_primary = pd.DataFrame(np.zeros(int(lst_idx_sell_primary) + 1))
+					res_pro_sell_primary['high_upper'] = np.nan
+					res_pro_sell_primary['low_lower'] = np.nan
 
 
 				if (res_pro_sell_primary.empty == False):
@@ -658,13 +708,29 @@ class MACD:
 					signal = 'sell_primary'
 
 				else:
-					diff_pr_top_sell_primary = 0
-					diff_pr_down_sell_primary = 0
 
-					resist_sell = 0
-					protect_sell = 0
+					res_pro_sell_primary = pd.DataFrame(np.zeros(int(lst_idx_sell_primary) + 1))
+					res_pro_sell_primary['high_upper'] = np.nan
+					res_pro_sell_primary['low_lower'] = np.nan
 
-					signal = 'no_trade'
+					diff_pr_top_sell_primary = pr_parameters_sell_primary.elements['st_percent_min']
+					(res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)]) = dataset_5M[symbol]['high'][int(lst_idx_sell_primary)]*(1+(diff_pr_top_sell_primary/100))
+
+					diff_pr_down_sell_primary = pr_parameters_sell_primary.elements['tp_percent_min']
+					(res_pro_sell_primary['low_lower'][int(lst_idx_sell_primary)]) = dataset_5M[symbol]['low'][int(lst_idx_sell_primary)]*(1-(diff_pr_down_sell_primary/100))
+						
+					resist_sell = (res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)])
+					protect_sell = (res_pro_sell_primary['low_lower'][int(lst_idx_sell_primary)])
+
+					signal = 'sell_primary'
+
+					# diff_pr_top_sell_primary = 0
+					# diff_pr_down_sell_primary = 0
+
+					# resist_sell = 0
+					# protect_sell = 0
+
+					# signal = 'no_trade'
 
 		
 		elif (
@@ -674,7 +740,7 @@ class MACD:
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) <= 6
 			):
 
-			print('======> last signal sell secondry ',symbol)
+			print('======> last signal sell secondry rsi ',symbol)
 			print('dataset length: ',len(dataset_5M[symbol]['close']))
 			print('last index: ',lst_idx_sell_secondry)
 
@@ -693,7 +759,9 @@ class MACD:
 															)
 				except Exception as ex:
 					print('ERROR PR Last Signal: ',ex)
-					res_pro_sell_secondry = pd.DataFrame()
+					res_pro_sell_secondry = pd.DataFrame(np.zeros(int(lst_idx_sell_secondry) + 1))
+					res_pro_sell_secondry['high_upper'] = np.nan
+					res_pro_sell_secondry['low_lower'] = np.nan
 
 
 				if (res_pro_sell_secondry.empty == False):
@@ -717,13 +785,29 @@ class MACD:
 					signal = 'sell_secondry'
 
 				else:
-					diff_pr_top_sell_secondry = 0
-					diff_pr_down_sell_secondry = 0
 
-					resist_sell = 0
-					protect_sell = 0
+					res_pro_sell_secondry = pd.DataFrame(np.zeros(int(lst_idx_sell_secondry) + 1))
+					res_pro_sell_secondry['high_upper'] = np.nan
+					res_pro_sell_secondry['low_lower'] = np.nan
+					
+					diff_pr_top_sell_secondry = pr_parameters_sell_secondry.elements['st_percent_min']
+					(res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)]) = dataset_5M[symbol]['high'][int(lst_idx_sell_secondry)]*(1+(diff_pr_top_sell_secondry/100))
 
-					signal = 'no_trade'			
+					diff_pr_down_sell_secondry = pr_parameters_sell_secondry.elements['tp_percent_min']
+					(res_pro_sell_secondry['low_lower'][int(lst_idx_sell_secondry)]) = dataset_5M[symbol]['low'][int(lst_idx_sell_secondry)]*(1-(diff_pr_down_sell_secondry/100))
+						
+					resist_sell = (res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)])
+					protect_sell = (res_pro_sell_secondry['low_lower'][int(lst_idx_sell_secondry)])
+					
+					signal = 'sell_secondry'
+
+					# diff_pr_top_sell_secondry = 0
+					# diff_pr_down_sell_secondry = 0
+
+					# resist_sell = 0
+					# protect_sell = 0
+
+					# signal = 'no_trade'			
 
 			print('================================')
 		else:
@@ -777,7 +861,7 @@ class MACD:
 								sigtype = sigtype,
 								flaglearn = True,
 								flagtest = False,
-								indicator = 'macd',
+								indicator = 'rsi',
 								signals = signal,
 								flag_savepic = False
 								)
@@ -803,34 +887,34 @@ class MACD:
 
 	def GetPermit(self,dataset_5M, dataset_1H, symbol, signaltype, signalpriority, flag_savepic):
 
-		GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters, pr_config = self.ParameterReader(
+		GL_Results, path_superhuman, rsi_parameters, ind_parameters, pr_parameters, pr_config = self.ParameterReader(
 									 																				symbol = symbol, 
 									 																				signaltype = signaltype, 
 									 																				signalpriority = signalpriority
 									 																				)
 
 		ind_config = indicator_config()
-		macd = Divergence(parameters = ind_parameters, config = ind_config)
+		rsi = Divergence(parameters = ind_parameters, config = ind_config)
 
 		ind_parameters.elements['dataset_5M'] = dataset_5M
 		ind_parameters.elements['dataset_1H'] = dataset_1H
-		macd_tester = Tester(parameters = ind_parameters, config = ind_config)
+		rsi_tester = Tester(parameters = ind_parameters, config = ind_config)
 
-		self.elements = macd_parameters.elements
+		self.elements = rsi_parameters.elements
 		self.elements['dataset_5M'] = dataset_5M
 		self.elements['dataset_1H'] = dataset_1H
 		self.elements['symbol'] = symbol
 
-		macd_calc = self.calculator_macd()
+		rsi_calc = self.calculator_rsi()
 
 		try:
 
-			signal, signaltype, indicator = macd.divergence(
+			signal, signaltype, indicator = rsi.divergence(
 															sigtype = signaltype,
 															sigpriority = signalpriority,
-															indicator = macd_calc,
-															column_div = GL_Results['MACD_column_div'][0],
-															ind_name = 'macd',
+															indicator = rsi_calc,
+															column_div = 'rsi',
+															ind_name = 'rsi',
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
@@ -840,7 +924,13 @@ class MACD:
 			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 			# 	print(signal)
 
-			signal_output, learning_output = macd_tester.RunGL(
+			# pr_parameters.elements['st_percent_min'] = 0.09
+			# pr_parameters.elements['st_percent_max'] = 0.12
+
+			# pr_parameters.elements['tp_percent_min'] = 0.26
+			# pr_parameters.elements['tp_percent_max'] = 0.3
+
+			signal_output, learning_output = rsi_tester.RunGL(
 																signal = signal, 
 																sigtype = signaltype, 
 																flaglearn = GL_Results['islearned'][0], 
@@ -860,17 +950,34 @@ class MACD:
 		# 	print('signals = ', signal_output)
 
 		with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-			print('learning = ', learning_output)
+			print(learning_output)
 
 		if learning_output.empty == False:
 
 			if learning_output['score'][0] >= GL_Results['score'][0] * 0.9:
 				GL_Results['permit'] = [True]
-				GL_Results['score'][0] = learning_output['score'][0]
 
 			else:
 				GL_Results['permit'] = [False]
-				GL_Results['score'][0] = learning_output['score'][0]
+			
+			GL_Results['score'][0] = learning_output['score'][0]
+			GL_Results['mean_tp_pr'][0] = learning_output['mean_tp_pr'][0]
+			GL_Results['mean_st_pr'][0] = learning_output['mean_st_pr'][0]
+			GL_Results['max_tp_pr'][0] = learning_output['max_tp_pr'][0]
+			GL_Results['max_st_pr'][0] = learning_output['max_st_pr'][0]
+			GL_Results['sum_st_pr'][0] = learning_output['sum_st_pr'][0]
+			GL_Results['sum_tp_pr'][0] = learning_output['sum_tp_pr'][0]
+
+			GL_Results['num_tp_pr'][0] = learning_output['num_tp_pr'][0]
+			GL_Results['num_st_pr'][0] = learning_output['num_st_pr'][0]
+			GL_Results['num_trade_pr'][0] = learning_output['num_trade_pr'][0]
+			GL_Results['money'][0] = learning_output['money'][0]
+			GL_Results['draw_down'][0] = learning_output['draw_down'][0]
+
+			if learning_output['max_st'][0] > 0.09: GL_Results['st_percent_max'][0] = learning_output['max_st'][0]
+			if learning_output['min_st'][0] > 0.08: GL_Results['st_percent_min'][0] = learning_output['min_st'][0]
+			if learning_output['max_tp'][0] > 0.27: GL_Results['tp_percent_max'][0] = learning_output['max_tp'][0]
+			if learning_output['min_tp'][0] > 0.24: GL_Results['tp_percent_min'][0] = learning_output['min_tp'][0]
 
 		else:
 			GL_Results['permit'] = [False]
@@ -880,6 +987,8 @@ class MACD:
 			os.remove(path_superhuman + symbol + '.csv')
 
 		GL_Results.to_csv(path_superhuman + symbol + '.csv')
+
+		return GL_Results
 
 
 	def Genetic(self, dataset_5M, dataset_1H, symbol, signaltype, signalpriority, num_turn):
@@ -891,13 +1000,13 @@ class MACD:
 			self.elements['tp_percent_down'] = 1500
 		else:
 			self.elements['st_percent_up'] = 120
-			self.elements['st_percent_down'] = 90
+			self.elements['st_percent_down'] = 100
 			self.elements['tp_percent_up'] = 120
-			self.elements['tp_percent_down'] = 90
+			self.elements['tp_percent_down'] = 100
 
 		chrom = Chromosome(parameters = self)
-		macd_config = MACDConfig()
-		path_elites_chromosome = macd_config.cfg['path_elites'] + signalpriority + '/' + signaltype + '/' + symbol + '_ChromosomeResults.csv'
+		rsi_config = RSIConfig()
+		path_elites_chromosome = rsi_config.cfg['path_elites'] + signalpriority + path_slash + signaltype + path_slash + symbol + '_ChromosomeResults.csv'
 		
 		# while not chrom.Get(
 		# 					work = 'Optimize',
@@ -912,7 +1021,7 @@ class MACD:
 		# 					):
 		# 	pass
 
-		chromosome, macd_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
+		chromosome, rsi_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																							work = 'BigBang',
 																							signaltype = signaltype,
 																							signalpriority = signalpriority,
@@ -922,19 +1031,19 @@ class MACD:
 																							chrom_counter = 0
 																							)
 
-		macd_config = MACDConfig()
-		path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + '/' + signaltype + '/'
-		path_elites = macd_config.cfg['path_elites'] + signalpriority + '/' + signaltype + '/'
+		rsi_config = RSIConfig()
+		path_superhuman = rsi_config.cfg['path_superhuman'] + signalpriority + path_slash + signaltype + path_slash
+		path_elites = rsi_config.cfg['path_elites'] + signalpriority + path_slash + signaltype + path_slash
 
 		if os.path.exists(path_superhuman + symbol + '.csv'):
 			max_score_gl = pd.read_csv(path_superhuman + symbol + '.csv')['score'][0]
 		else:
-			max_score_gl = 0.00001
+			max_score_gl = 5
 
-		max_score_gl = 0.00001
+		max_score_gl = 5
 
 
-		print('================================ START Genetic ',signaltype,' ===> ',symbol,' ',signalpriority)
+		print('================================ START Genetic RSI ',signaltype,' ===> ',symbol,' ',signalpriority)
 		print('\n')
 
 		learning_output_before = pd.DataFrame()
@@ -947,17 +1056,19 @@ class MACD:
 			learning_result = pd.read_csv(path_elites + symbol + '_LearningResults.csv').drop(columns='Unnamed: 0')
 			chromosome_output = pd.read_csv(path_elites + symbol + '_ChromosomeResults.csv').drop(columns='Unnamed: 0')
 
+			max_corr = chromosome_output['corr'].min()/3
+
 			if num_turn <= len(learning_result['score']):
-				num_turn = (len(learning_result['score'])) + 4
+				num_turn = (len(learning_result['score'])) + 2
 
 				if len(chromosome_output) >= num_turn:
-					num_turn = len(chromosome_output) + 4
+					num_turn = len(chromosome_output) + 2
 
 		else:
 			learning_result = pd.DataFrame()
 			chromosome_output = pd.DataFrame()
+			max_corr = 0
 
-		
 
 		chrom_counter = 0
 		all_chorms = 0
@@ -969,6 +1080,8 @@ class MACD:
 
 		learning_interval_counter = 0
 		learn_counter = 1
+
+		bad_flag = False
 
 		bar = Bar(signaltype + ' ' + signalpriority, max = int(num_turn))
 
@@ -986,7 +1099,7 @@ class MACD:
 		if chrom_counter >= len(chromosome):
 			chrom_counter = 0
 			print("Group Sex Start")
-			chromosome, macd_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
+			chromosome, rsi_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																								work = 'group_sex',
 																								signaltype = signaltype,
 																								signalpriority = signalpriority,
@@ -1026,7 +1139,7 @@ class MACD:
 			if (chorm_reset_counter >= 27):
 				chorm_reset_counter = 0
 				
-				chromosome, macd_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
+				chromosome, rsi_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																							work = 'fucker_0',
 																							signaltype = signaltype,
 																							signalpriority = signalpriority,
@@ -1040,34 +1153,86 @@ class MACD:
 				all_chorms += 1
 				continue
 
-			if all_chorms >= int(num_turn): break
+			# if all_chorms >= int(num_turn): break
+			if all_chorms >= 30: break
 			all_chorms += 1
 
 
-			self.elements = macd_parameters.elements
+			self.elements = rsi_parameters.elements
 			self.elements['dataset_5M'] = dataset_5M
 			self.elements['dataset_1H'] = dataset_1H
 			self.elements['symbol'] = symbol
 
-			macd_calc = self.calculator_macd()
+			rsi_calc = self.calculator_rsi()
 
 			ind_config = indicator_config()
-			macd = Divergence(parameters = ind_parameters, config = ind_config)
+			rsi = Divergence(parameters = ind_parameters, config = ind_config)
 
 			try:
 
-				signal, signaltype, indicator = macd.divergence(
+				signal, signaltype, indicator = rsi.divergence(
 																sigtype = signaltype,
 																sigpriority = signalpriority,
-																indicator = macd_calc,
-																column_div = chromosome[chrom_counter]['MACD_column_div'],
-																ind_name = 'macd',
+																indicator = rsi_calc,
+																column_div = 'rsi',
+																ind_name = 'rsi',
 																dataset_5M = dataset_5M,
 																dataset_1H = dataset_1H,
 																symbol = symbol,
 																flaglearn = chromosome[chrom_counter]['islearned'],
 																flagtest = True
 																)
+
+				if chromosome[chrom_counter]['isborn'] == True:
+					divergence_out_corr = pd.DataFrame(np.ones(signal.index[-1]))
+					divergence_out_corr['rsi'] = np.nan
+					divergence_out_corr['low'] = np.nan
+					divergence_out_corr['high'] = np.nan
+
+					counter_corr = 0
+					for corr_idx in signal.index:
+						divergence_out_corr['rsi'][counter_corr] = signal.indicator_front[corr_idx]
+						divergence_out_corr['rsi'][counter_corr + 1] = signal.indicator_back[corr_idx]
+
+						divergence_out_corr['low'][counter_corr] = signal.low_front[corr_idx]
+						divergence_out_corr['low'][counter_corr + 1] = signal.low_back[corr_idx]
+
+						divergence_out_corr['high'][counter_corr] = signal.high_front[corr_idx]
+						divergence_out_corr['high'][counter_corr + 1] = signal.high_back[corr_idx]
+
+						counter_corr += 2
+
+					divergence_out_corr = divergence_out_corr.dropna()
+					divergence_out_corr = divergence_out_corr.drop(columns = [0])
+
+					number_divergence = len(divergence_out_corr.index)/1000
+
+					divergence_out_corr = divergence_out_corr.corr()
+
+					chromosome[chrom_counter].update(
+													{
+														'corr': -((divergence_out_corr['rsi'][2] * divergence_out_corr['rsi'][1] * number_divergence) ** (1/3)),
+													}
+													)
+					if (
+						divergence_out_corr['rsi'][2] > 0 and
+						divergence_out_corr['rsi'][1] > 0
+						):
+						chromosome[chrom_counter]['corr'] = -chromosome[chrom_counter]['corr']
+
+					chromosome[chrom_counter].update(
+													{
+														'corr_low': divergence_out_corr['rsi'][1],
+														'corr_high': divergence_out_corr['rsi'][2],
+													}
+													)
+
+					if chromosome[chrom_counter]['corr'] >= max_corr:
+						signal = pd.DataFrame()
+						signal_output = pd.DataFrame()
+						learning_output_now = pd.DataFrame()
+						learning_output_before = pd.DataFrame()
+
 				chromosome[chrom_counter]['isborn'] = False
 
 			except Exception as ex:
@@ -1077,7 +1242,7 @@ class MACD:
 				learning_output_now = pd.DataFrame()
 				learning_output_before = pd.DataFrame()
 
-			#print('siiiiiiignaaaaaal ====> ', len(signal['index']))
+			# print('siiiiiiignaaaaaal ====> ', len(signal['index']))
 
 			if signal.empty == True:
 				chromosome[chrom_counter]['isborn'] = False
@@ -1108,10 +1273,10 @@ class MACD:
 			ind_parameters.elements['dataset_5M'] = dataset_5M
 			ind_parameters.elements['dataset_1H'] = dataset_1H
 
-			macd_tester = Tester(parameters = ind_parameters, config = ind_config)
+			rsi_tester = Tester(parameters = ind_parameters, config = ind_config)
 			try:
 
-				signal_output, learning_output_now = macd_tester.RunGL(
+				signal_output, learning_output_now = rsi_tester.RunGL(
 																	signal = signal, 
 																	sigtype = signaltype, 
 																	flaglearn = chromosome[chrom_counter]['islearned'], 
@@ -1129,6 +1294,9 @@ class MACD:
 				signal_output = pd.DataFrame()
 				learning_output_now = pd.DataFrame()
 				learning_output_before = pd.DataFrame()
+
+			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+			# 	print(learning_output_now)
 
 			if (
 				signal_output.empty == True or
@@ -1149,7 +1317,7 @@ class MACD:
 											chrom_counter = chrom_counter
 											)
 
-				chromosome, macd_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
+				chromosome, rsi_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																							work = 'fucker_0',
 																							signaltype = signaltype,
 																							signalpriority = signalpriority,
@@ -1373,7 +1541,8 @@ class MACD:
 
 			elif (
 				learning_output_now['score'][0] < max_score_gl * 0.99 and
-				chromosome[chrom_counter]['islearned'] == True
+				chromosome[chrom_counter]['islearned'] == True and
+				bad_score_counter >= 4
 				):
 
 				chromosome[chrom_counter]['isborn'] = False
@@ -1390,7 +1559,7 @@ class MACD:
 											chrom_counter = chrom_counter
 											)
 
-				chromosome, macd_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
+				chromosome, rsi_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																							work = 'fucker_0',
 																							signaltype = signaltype,
 																							signalpriority = signalpriority,
@@ -1410,12 +1579,11 @@ class MACD:
 				):
 				break
 
-
 			if bad_flag == True:
 
 				if bad_score_counter < 4:
 
-					chromosome, macd_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
+					chromosome, rsi_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																									work = 'fucker_1',
 																									scoresdataframe = learning_output_now,
 																									signaltype = signaltype,
@@ -1432,7 +1600,7 @@ class MACD:
 						bad_score_counter_2 >= 3
 						):
 						
-						chromosome, macd_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
+						chromosome, rsi_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																									work = 'fucker_2',
 																									signaltype = signaltype,
 																									signalpriority = signalpriority,
@@ -1447,7 +1615,7 @@ class MACD:
 						bad_score_counter_2 = 0
 
 					else:
-						chromosome, macd_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
+						chromosome, rsi_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																										work = 'fucker_3',
 																										signaltype = signaltype,
 																										signalpriority = signalpriority,
@@ -1470,7 +1638,7 @@ class MACD:
 
 				print('Group Sex Start')
 
-				chromosome, macd_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
+				chromosome, rsi_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																									work = 'group_sex',
 																									signaltype = signaltype,
 																									signalpriority = signalpriority,
@@ -1532,7 +1700,7 @@ class MACD:
 			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 			# 	print(best_chromosome)
 
-			path_superhuman = macd_config.cfg['path_superhuman'] + signalpriority + '/' + signaltype + '/'
+			path_superhuman = rsi_config.cfg['path_superhuman'] + signalpriority + path_slash + signaltype + path_slash
 			if not os.path.exists(path_superhuman):
 				os.makedirs(path_superhuman)
 
@@ -1542,27 +1710,19 @@ class MACD:
 			best_chromosome.to_csv(path_superhuman + symbol + '.csv')
 		#//////////////////////
 
-	def calculator_macd(self):
+	def calculator_rsi(self):
 
 		symbol = self.elements['symbol']
 		apply_to = self.elements[__class__.__name__ + '_apply_to']
-		macd_read = ind.macd(
+		rsi_read = ind.rsi(
 							self.elements['dataset_5M'][symbol][apply_to],
-							fast = self.elements[__class__.__name__ + '_fast'],
-							slow = self.elements[__class__.__name__ + '_slow'],
-							signal = self.elements[__class__.__name__ + '_signal']
+							length = self.elements[__class__.__name__ + '_length']
 							)
 
-		column_macds = macd_read.columns[2]
-		column_macd = macd_read.columns[0]
-		column_macdh = macd_read.columns[1]
-
-		macd = pd.DataFrame(
+		rsi = pd.DataFrame(
 							{
-								'macds': macd_read[column_macds],
-								'macd': macd_read[column_macd],
-								'macdh': macd_read[column_macdh],
+								'rsi': rsi_read,
 							}
 							).dropna(inplace = False)
 		
-		return macd
+		return rsi
