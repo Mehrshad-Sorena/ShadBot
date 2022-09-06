@@ -240,9 +240,9 @@ def basket_manager_stochastic_div(symbols,symbol,my_money,signal, account_name):
 	else:
 		lot = lot
 
-	#print(lot)
-	#print(vol_traded_max)
-	#print(symbol_position)
+	# print(lot)
+	# print(vol_traded_max)
+	# print(vol_traded)
 	if ((vol_traded + lot) > vol_traded_max):
 		# *** No Money ***
 		return False
