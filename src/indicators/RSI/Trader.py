@@ -1,18 +1,23 @@
-from Mt5_LoginGetData import LoginGetData as getdata
-from carrier import carrier_buy, carrier_sell
-from .BascketManager import basket_manager_macd_div
+from src.utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
+from src.utils.Tools.carrier import carrier_buy, carrier_sell
+from .BascketManager import basket_manager_rsi_div
 from datetime import datetime
-from forex_news import news
-import MetaTrader5 as mt5
+from src.utils.ForexNews.forex_news import news
+
+try:
+	import MetaTrader5 as mt5
+except Exception as ex:
+	print(ex)
+	
 import pandas as pd
 import numpy as np
 import json
 import time
 import os
 
-from macd_Parameters import Parameters as MACDParameters
-from macd_Config import Config as MACDConfig
-from macd_MACD import MACD
+from src.indicators.RSI.Parameters import Parameters as RSIParameters
+from src.indicators.RSI.Config import Config as RSIConfig
+from src.indicators.RSI.RSI import RSI
 
 
 
@@ -46,7 +51,7 @@ def get_all_deta_online(symbol, account_name):
 	return symbol_data_5M, symbol_data_1H, symbol, money
 
 
-def trader_macd_div(
+def trader_rsi_div(
 					symbol_data_5M,
 					symbol_data_1H,
 					symbol,
@@ -113,21 +118,21 @@ def trader_macd_div(
 			news()
 
 
-		macd_parameters = MACDParameters()
-		macd_config = MACDConfig()
+		rsi_parameters = RSIParameters()
+		rsi_config = RSIConfig()
 
-		macd_parameters.elements['dataset_5M'] = symbol_data_5M
-		macd_parameters.elements['dataset_1H'] = symbol_data_1H
-		macd_parameters.elements['symbol'] = sym.name
+		rsi_parameters.elements['dataset_5M'] = symbol_data_5M
+		rsi_parameters.elements['dataset_1H'] = symbol_data_1H
+		rsi_parameters.elements['symbol'] = sym.name
 
-		macd = MACD(parameters = macd_parameters, config = macd_config)
-		signal, tp, st = macd.LastSignal(
-										dataset_5M = macd_parameters.elements['dataset_5M'], 
-										dataset_1H = macd_parameters.elements['dataset_1H'], 
+		rsi = RSI(parameters = rsi_parameters, config = rsi_config)
+		signal, tp, st = rsi.LastSignal(
+										dataset_5M = rsi_parameters.elements['dataset_5M'], 
+										dataset_1H = rsi_parameters.elements['dataset_1H'], 
 										symbol = sym.name,
 										)
 
-		lot = basket_manager_macd_div(symbols=symbol,symbol=sym.name,my_money=money,signal=signal, account_name = account_name)
+		lot = basket_manager_rsi_div(symbols=symbol,symbol=sym.name,my_money=money,signal=signal, account_name = account_name)
 
 		if lot > 0.09: lot = 0.09
 		if 0 < lot < 0.01: lot = 0.01
@@ -158,30 +163,30 @@ def trader_macd_div(
 				signal == 'buy_primary' or
 				signal == 'buy_secondry'
 				):
-				carrier_buy(symbol=sym.name,lot=lot,st=st,tp=tp,comment='macd div'+signal,magic=time.time_ns())
+				carrier_buy(symbol=sym.name,lot=lot,st=st,tp=tp,comment='rsi div'+signal,magic=time.time_ns())
 			elif (
 				signal == 'sell_primary' or
 				signal == 'sell_secondry'
 				):
-				carrier_sell(symbol=sym.name,lot=lot,st=st,tp=tp,comment='macd div'+signal,magic=time.time_ns())
+				carrier_sell(symbol=sym.name,lot=lot,st=st,tp=tp,comment='rsi div'+signal,magic=time.time_ns())
 			elif signal == 'no_trade':
 				continue
 		else:
 			continue
 	return
 
-def trader_task_macd_div(symbol, account_name):
-	try:
-		print('****************** Start *************************')
+def trader_task_rsi_div(symbol, account_name):
+	if True:#try:
+		print('****************** Start RSI *************************')
 		symbol_data_5M,symbol_data_1H,symbol,money = get_all_deta_online(symbol = symbol, account_name = account_name)
-		trader_macd_div(
+		trader_rsi_div(
 						symbol_data_5M = symbol_data_5M,
 						symbol_data_1H = symbol_data_1H,
 						symbol = symbol,
 						money = money,
 						account_name = account_name
 						)
-		print('****************** Finish *************************')
-	except Exception as ex:
-		print('===== Trader Error ===> ',ex)
+		print('****************** Finish RSI *************************')
+	else:#except Exception as ex:
+		print('===== Trader Error RSI ===> ',ex)
 	return
