@@ -416,8 +416,8 @@ class Optimizers():
 
 			dive_column = random.choice(['StochAstic_k', 'StochAstic_d'])
 
-			while stochastic_parameters.elements['StochAstic_k'] + 2 >= stochastic_parameters.elements['StochAstic_d']:
-				stochastic_parameters.elements['StochAstic_k'] = randint(2, 500)
+			while stochastic_parameters.elements['StochAstic_d'] + 2 >= stochastic_parameters.elements['StochAstic_k']:
+				stochastic_parameters.elements['StochAstic_k'] = randint(2, 900)
 				stochastic_parameters.elements['StochAstic_d'] = randint(2 , 900)
 
 			repeat_counter = 0
@@ -464,8 +464,8 @@ class Optimizers():
 
 					dive_column = random.choice(['macd', 'macds', 'macdh'])
 
-					while stochastic_parameters.elements['StochAstic_k'] + 2 >= stochastic_parameters.elements['StochAstic_d']:
-						stochastic_parameters.elements['StochAstic_k'] = randint(2, 300)
+					while stochastic_parameters.elements['StochAstic_d'] + 2 >= stochastic_parameters.elements['StochAstic_k']:
+						stochastic_parameters.elements['StochAstic_k'] = randint(2, 700)
 						stochastic_parameters.elements['StochAstic_d'] = randint(2 , 700)
 
 					repeat_checker_now = np.where(
