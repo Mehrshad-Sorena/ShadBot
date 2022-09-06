@@ -18,7 +18,7 @@ elif 'linux' in sys.platform:
 
 
 levrage_now = 100
-risk_lot_now = 0.02
+risk_lot_now = 0.01
 
 #******************************** Find Max Score ********************************************
  
