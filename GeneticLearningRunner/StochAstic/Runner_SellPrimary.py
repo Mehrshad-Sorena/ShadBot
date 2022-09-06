@@ -1,7 +1,7 @@
 from src.utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
-from src.indicators.MACD.Parameters import Parameters
-from src.indicators.MACD.Config import Config
-from src.indicators.MACD.MACD import MACD
+from src.indicators.StochAstic.Parameters import Parameters
+from src.indicators.StochAstic.Config import Config
+from src.indicators.StochAstic.StochAstic import StochAstic
 import pandas as pd
 from src.utils.Divergence.Parameters import Parameters as IndicatorParameters
 from src.utils.Divergence.Config import Config as IndicatorConfig
@@ -31,30 +31,30 @@ def Run():
 	optimizers.dataset = parameters.elements['dataset_5M'].copy()
 	optimizers.timeframe = '5M'
 
-	optimizers.MacdOptimizer()
+	optimizers.StochAsticOptimizer()
 
-	macd = MACD(parameters = parameters, config = config)
-	macd_calc = macd.Genetic(
-							dataset_5M = parameters.elements['dataset_5M'], 
-							dataset_1H = parameters.elements['dataset_1H'], 
-							symbol = 'XAUUSD_i',
-							signaltype = 'sell', 
-							signalpriority = 'primary', 
-							num_turn = 40
-							)
+	stochastic = StochAstic(parameters = parameters, config = config)
+	stochastic_calc = stochastic.Genetic(
+										dataset_5M = parameters.elements['dataset_5M'], 
+										dataset_1H = parameters.elements['dataset_1H'], 
+										symbol = 'XAUUSD_i',
+										signaltype = 'sell', 
+										signalpriority = 'primary', 
+										num_turn = 40
+										)
 
 	for turn in range(0,4):
-		macd_calc = macd.GetPermit(
-								dataset_5M = parameters.elements['dataset_5M'],
-								dataset_1H = parameters.elements['dataset_1H'], 
-								symbol = 'XAUUSD_i',
-								signaltype = 'sell',
-								signalpriority = 'primary',
-								flag_savepic = False
-								)
+		stochastic_calc = stochastic.GetPermit(
+											dataset_5M = parameters.elements['dataset_5M'],
+											dataset_1H = parameters.elements['dataset_1H'], 
+											symbol = 'XAUUSD_i',
+											signaltype = 'sell',
+											signalpriority = 'primary',
+											flag_savepic = False
+											)
 
 		if (
-			macd_calc['draw_down'][0] <= 7 &
-			macd_calc['permit'][0] == True
+			stochastic_calc['draw_down'][0] <= 7 &
+			stochastic_calc['permit'][0] == True
 			): 
 			break
