@@ -151,7 +151,7 @@ class Optimizers():
 
 			dive_column = random.choice(['macd', 'macds', 'macdh'])
 
-			while macd_parameters.elements['MACD' + '_fast'] >= macd_parameters.elements['MACD' + '_slow'] + 10:
+			while macd_parameters.elements['MACD' + '_fast'] + 10 >= macd_parameters.elements['MACD' + '_slow']:
 				macd_parameters.elements['MACD' + '_fast'] = randint(2, 300)
 				macd_parameters.elements['MACD' + '_slow'] = randint(2 , 700)
 
@@ -388,10 +388,10 @@ class Optimizers():
 
 		for i in range(self.turn):
 			stochastic_parameters.elements['StochAstic_mamod'] = random.choice([
-																		'sma',
-																		'ema',
-																		'wma',
-																		])
+																				'sma',
+																				'ema',
+																				'wma',
+																				])
 			stochastic_parameters.elements['StochAstic_k'] = randint(2, 500)
 			stochastic_parameters.elements['StochAstic_d'] = randint(2 , 900)
 			stochastic_parameters.elements['StochAstic_smooth_k'] = randint(2 , 50)
@@ -403,34 +403,34 @@ class Optimizers():
 			#////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-			dive_column = random.choice(['macd', 'macds', 'macdh'])
+			dive_column = random.choice(['StochAstic_k', 'StochAstic_d'])
 
-			while stochastic_parameters.elements['MACD' + '_fast'] >= stochastic_parameters.elements['MACD' + '_slow'] + 10:
-				stochastic_parameters.elements['MACD' + '_fast'] = randint(2, 300)
-				stochastic_parameters.elements['MACD' + '_slow'] = randint(2 , 700)
+			while stochastic_parameters.elements['StochAstic_k'] + 2 >= stochastic_parameters.elements['StochAstic_d']:
+				stochastic_parameters.elements['StochAstic_k'] = randint(2, 500)
+				stochastic_parameters.elements['StochAstic_d'] = randint(2 , 900)
 
 			repeat_counter = 0
 			if output.dropna().empty == False:
 
 				repeat_checker_now = np.where(
-											(macd_parameters.elements['MACD' + '_fast'] == output['MACD_fast'].values) &
-											(macd_parameters.elements['MACD' + '_slow'] == output['MACD_slow'].values) &
-											(macd_parameters.elements['MACD' + '_signal'] == output['MACD_signal'].values) &
+											(stochastic_parameters.elements['StochAstic_k'] == output['StochAstic_k'].values) &
+											(stochastic_parameters.elements['MACD' + '_slow'] == output['MACD_slow'].values) &
+											(stochastic_parameters.elements['MACD' + '_signal'] == output['MACD_signal'].values) &
 											(ind_params.elements['Divergence' + '_diff_extereme'] == output['Divergence_diff_extereme'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output['Divergence_num_exteremes_min'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output['Divergence_num_exteremes_max'].values) &
-											(macd_parameters.elements['MACD' + '_apply_to'] == output['MACD_apply_to'].values) &
+											(stochastic_parameters.elements['MACD' + '_apply_to'] == output['MACD_apply_to'].values) &
 											(dive_column == output['MACD_column_div'].values)
 										)[0]
 
 				repeat_checker_before = np.where(
-											(macd_parameters.elements['MACD' + '_fast'] == output_read['MACD_fast'].values) &
-											(macd_parameters.elements['MACD' + '_slow'] == output_read['MACD_slow'].values) &
-											(macd_parameters.elements['MACD' + '_signal'] == output_read['MACD_signal'].values) &
+											(stochastic_parameters.elements['StochAstic_k'] == output_read['StochAstic_k'].values) &
+											(stochastic_parameters.elements['MACD' + '_slow'] == output_read['MACD_slow'].values) &
+											(stochastic_parameters.elements['MACD' + '_signal'] == output_read['MACD_signal'].values) &
 											(ind_params.elements['Divergence' + '_diff_extereme'] == output_read['Divergence_diff_extereme'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output_read['Divergence_num_exteremes_min'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output_read['Divergence_num_exteremes_max'].values) &
-											(macd_parameters.elements['MACD' + '_apply_to'] == output_read['MACD_apply_to'].values) &
+											(stochastic_parameters.elements['MACD' + '_apply_to'] == output_read['MACD_apply_to'].values) &
 											(dive_column == output_read['MACD_column_div'].values)
 										)[0]
 
@@ -438,19 +438,19 @@ class Optimizers():
 						len(repeat_checker_now) > 0 or
 						len(repeat_checker_before) >0
 						):
-					macd_parameters.elements['MACD' + '_apply_to'] = random.choice([
-																				'open',
-																				'close',
-																				'low',
-																				'high',
-																				'HL/2',
-																				'HLC/3',
-																				'HLCC/4',
-																				'OHLC/4'
-																				])
-					macd_parameters.elements['MACD' + '_fast'] = randint(2, 300)
-					macd_parameters.elements['MACD' + '_slow'] = randint(2 , 700)
-					macd_parameters.elements['MACD' + '_signal'] = randint(2 , 50)
+					stochastic_parameters.elements['MACD' + '_apply_to'] = random.choice([
+																						'open',
+																						'close',
+																						'low',
+																						'high',
+																						'HL/2',
+																						'HLC/3',
+																						'HLCC/4',
+																						'OHLC/4'
+																						])
+					stochastic_parameters.elements['StochAstic_k'] = randint(2, 500)
+					stochastic_parameters.elements['MACD' + '_slow'] = randint(2 , 900)
+					stochastic_parameters.elements['MACD' + '_signal'] = randint(2 , 50)
 
 					ind_params.elements['Divergence' + '_diff_extereme'] = randint(1 , 6)
 					ind_params.elements['Divergence' + '_num_exteremes_min'] = randint(2 , 250)
@@ -458,47 +458,47 @@ class Optimizers():
 
 					dive_column = random.choice(['macd', 'macds', 'macdh'])
 
-					while macd_parameters.elements['MACD' + '_fast'] >= macd_parameters.elements['MACD' + '_slow'] + 10:
-						macd_parameters.elements['MACD' + '_fast'] = randint(2, 300)
-						macd_parameters.elements['MACD' + '_slow'] = randint(2 , 700)
+					while stochastic_parameters.elements['StochAstic_k'] + 2 >= stochastic_parameters.elements['MACD' + '_slow']:
+						stochastic_parameters.elements['StochAstic_k'] = randint(2, 300)
+						stochastic_parameters.elements['MACD' + '_slow'] = randint(2 , 700)
 
 					repeat_checker_now = np.where(
-											(macd_parameters.elements['MACD' + '_fast'] == output['MACD_fast'].values) &
-											(macd_parameters.elements['MACD' + '_slow'] == output['MACD_slow'].values) &
-											(macd_parameters.elements['MACD' + '_signal'] == output['MACD_signal'].values) &
+											(stochastic_parameters.elements['StochAstic_k'] == output['StochAstic_k'].values) &
+											(stochastic_parameters.elements['MACD' + '_slow'] == output['MACD_slow'].values) &
+											(stochastic_parameters.elements['MACD' + '_signal'] == output['MACD_signal'].values) &
 											(ind_params.elements['Divergence' + '_diff_extereme'] == output['Divergence_diff_extereme'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output['Divergence_num_exteremes_min'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output['Divergence_num_exteremes_max'].values) &
-											(macd_parameters.elements['MACD' + '_apply_to'] == output['MACD_apply_to'].values) &
+											(stochastic_parameters.elements['MACD' + '_apply_to'] == output['MACD_apply_to'].values) &
 											(dive_column == output['MACD_column_div'].values)
 										)[0]
 
 					repeat_checker_before = np.where(
-												(macd_parameters.elements['MACD' + '_fast'] == output_read['MACD_fast'].values) &
-												(macd_parameters.elements['MACD' + '_slow'] == output_read['MACD_slow'].values) &
-												(macd_parameters.elements['MACD' + '_signal'] == output_read['MACD_signal'].values) &
+												(stochastic_parameters.elements['StochAstic_k'] == output_read['StochAstic_k'].values) &
+												(stochastic_parameters.elements['MACD' + '_slow'] == output_read['MACD_slow'].values) &
+												(stochastic_parameters.elements['MACD' + '_signal'] == output_read['MACD_signal'].values) &
 												(ind_params.elements['Divergence' + '_diff_extereme'] == output_read['Divergence_diff_extereme'].values) &
 												(ind_params.elements['Divergence' + '_num_exteremes_min'] == output_read['Divergence_num_exteremes_min'].values) &
 												(ind_params.elements['Divergence' + '_num_exteremes_max'] == output_read['Divergence_num_exteremes_max'].values) &
-												(macd_parameters.elements['MACD' + '_apply_to'] == output_read['MACD_apply_to'].values) &
+												(stochastic_parameters.elements['MACD' + '_apply_to'] == output_read['MACD_apply_to'].values) &
 												(dive_column == output_read['MACD_column_div'].values)
 											)[0]
 
-					if repeat_counter >= len(output_read['MACD_fast'].dropna().index): break
+					if repeat_counter >= len(output_read['StochAstic_k'].dropna().index): break
 					repeat_counter += 1
 				
 
-			output['MACD_apply_to'][i] = macd_parameters.elements['MACD' + '_apply_to']
-			output['MACD_fast'][i] = macd_parameters.elements['MACD' + '_fast']
-			output['MACD_slow'][i] = macd_parameters.elements['MACD' + '_slow']
-			output['MACD_signal'][i] = macd_parameters.elements['MACD' + '_signal']
+			output['MACD_apply_to'][i] = stochastic_parameters.elements['MACD' + '_apply_to']
+			output['StochAstic_k'][i] = stochastic_parameters.elements['StochAstic_k']
+			output['MACD_slow'][i] = stochastic_parameters.elements['MACD' + '_slow']
+			output['MACD_signal'][i] = stochastic_parameters.elements['MACD' + '_signal']
 			output['MACD_column_div'][i] = dive_column
 			output['frequency'][i] = freq_time
 
-			macd_parameters.elements['dataset_5M'] = self.dataset
-			macd_parameters.elements['dataset_1H'] = self.dataset
+			stochastic_parameters.elements['dataset_5M'] = self.dataset
+			stochastic_parameters.elements['dataset_1H'] = self.dataset
 
-			macd = MACD(parameters = macd_parameters, config = macd_config)
+			macd = MACD(parameters = stochastic_parameters, config = macd_config)
 			macd_calc = macd.calculator_macd()
 
 
@@ -509,8 +509,8 @@ class Optimizers():
 															indicator = macd_calc,
 															column_div = dive_column,
 															ind_name = 'macd',
-															dataset_5M = macd_parameters.elements['dataset_' + self.timeframe],
-															dataset_1H = macd_parameters.elements['dataset_' + self.timeframe],
+															dataset_5M = stochastic_parameters.elements['dataset_' + self.timeframe],
+															dataset_1H = stochastic_parameters.elements['dataset_' + self.timeframe],
 															symbol = self.symbol,
 															flaglearn = False,
 															flagtest = True
