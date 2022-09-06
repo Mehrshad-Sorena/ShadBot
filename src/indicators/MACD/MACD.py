@@ -300,6 +300,7 @@ class MACD:
 															)
 			else:
 				lst_idx_buy_primary = 0
+				signal_buy_primary = pd.DataFrame()
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")
@@ -355,6 +356,7 @@ class MACD:
 															)
 			else:
 				signal_buy_secondry = 0
+				signal_buy_secondry = pd.DataFrame()
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")
@@ -409,6 +411,7 @@ class MACD:
 															)
 			else:
 				lst_idx_sell_primary = 0
+				signal_sell_primary = pd.DataFrame()
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")
@@ -463,6 +466,7 @@ class MACD:
 															)
 			else:
 				lst_idx_sell_secondry = 0
+				signal_sell_secondry = pd.DataFrame()
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")
