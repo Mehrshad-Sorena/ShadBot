@@ -2,10 +2,17 @@ import threading
 from .Config import Config as ConfigOptimizers
 from src.utils.Divergence.Parameters import Parameters as indicator_parameters
 from src.utils.Divergence.Config import Config as indicator_config
-from src.indicators.MACD.MACD import MACD
+
 from src.utils.Divergence.Divergence import Divergence
+
 from src.indicators.MACD.Parameters import Parameters as MACDParameters
 from src.indicators.MACD.Config import Config as MACDConfig
+from src.indicators.MACD.MACD import MACD
+
+from src.indicators.StochAstic.Parameters import Parameters as StochAsticParameters
+from src.indicators.StochAstic.Config import Config as StochAsticConfig
+from src.indicators.StochAstic.StochAstic import StochAstic
+
 from progress.bar import Bar
 import pandas as pd
 import numpy as np
@@ -414,43 +421,38 @@ class Optimizers():
 
 				repeat_checker_now = np.where(
 											(stochastic_parameters.elements['StochAstic_k'] == output['StochAstic_k'].values) &
-											(stochastic_parameters.elements['MACD' + '_slow'] == output['MACD_slow'].values) &
-											(stochastic_parameters.elements['MACD' + '_signal'] == output['MACD_signal'].values) &
+											(stochastic_parameters.elements['StochAstic_d'] == output['StochAstic_d'].values) &
+											(stochastic_parameters.elements['StochAstic_smooth_k'] == output['StochAstic_smooth_k'].values) &
 											(ind_params.elements['Divergence' + '_diff_extereme'] == output['Divergence_diff_extereme'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output['Divergence_num_exteremes_min'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output['Divergence_num_exteremes_max'].values) &
-											(stochastic_parameters.elements['MACD' + '_apply_to'] == output['MACD_apply_to'].values) &
-											(dive_column == output['MACD_column_div'].values)
+											(stochastic_parameters.elements['StochAstic_mamod'] == output['StochAstic_mamod'].values) &
+											(dive_column == output['StochAstic_column_div'].values)
 										)[0]
 
 				repeat_checker_before = np.where(
 											(stochastic_parameters.elements['StochAstic_k'] == output_read['StochAstic_k'].values) &
-											(stochastic_parameters.elements['MACD' + '_slow'] == output_read['MACD_slow'].values) &
-											(stochastic_parameters.elements['MACD' + '_signal'] == output_read['MACD_signal'].values) &
+											(stochastic_parameters.elements['StochAstic_d'] == output_read['StochAstic_d'].values) &
+											(stochastic_parameters.elements['StochAstic_smooth_k'] == output_read['StochAstic_smooth_k'].values) &
 											(ind_params.elements['Divergence' + '_diff_extereme'] == output_read['Divergence_diff_extereme'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output_read['Divergence_num_exteremes_min'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output_read['Divergence_num_exteremes_max'].values) &
-											(stochastic_parameters.elements['MACD' + '_apply_to'] == output_read['MACD_apply_to'].values) &
-											(dive_column == output_read['MACD_column_div'].values)
+											(stochastic_parameters.elements['StochAstic_mamod'] == output_read['StochAstic_mamod'].values) &
+											(dive_column == output_read['StochAstic_column_div'].values)
 										)[0]
 
 				while (
 						len(repeat_checker_now) > 0 or
 						len(repeat_checker_before) >0
 						):
-					stochastic_parameters.elements['MACD' + '_apply_to'] = random.choice([
-																						'open',
-																						'close',
-																						'low',
-																						'high',
-																						'HL/2',
-																						'HLC/3',
-																						'HLCC/4',
-																						'OHLC/4'
+					stochastic_parameters.elements['StochAstic_mamod'] = random.choice([
+																						'sma',
+																						'ema',
+																						'wma',
 																						])
 					stochastic_parameters.elements['StochAstic_k'] = randint(2, 500)
-					stochastic_parameters.elements['MACD' + '_slow'] = randint(2 , 900)
-					stochastic_parameters.elements['MACD' + '_signal'] = randint(2 , 50)
+					stochastic_parameters.elements['StochAstic_d'] = randint(2 , 900)
+					stochastic_parameters.elements['StochAstic_smooth_k'] = randint(2 , 50)
 
 					ind_params.elements['Divergence' + '_diff_extereme'] = randint(1 , 6)
 					ind_params.elements['Divergence' + '_num_exteremes_min'] = randint(2 , 250)
@@ -458,75 +460,75 @@ class Optimizers():
 
 					dive_column = random.choice(['macd', 'macds', 'macdh'])
 
-					while stochastic_parameters.elements['StochAstic_k'] + 2 >= stochastic_parameters.elements['MACD' + '_slow']:
+					while stochastic_parameters.elements['StochAstic_k'] + 2 >= stochastic_parameters.elements['StochAstic_d']:
 						stochastic_parameters.elements['StochAstic_k'] = randint(2, 300)
-						stochastic_parameters.elements['MACD' + '_slow'] = randint(2 , 700)
+						stochastic_parameters.elements['StochAstic_d'] = randint(2 , 700)
 
 					repeat_checker_now = np.where(
 											(stochastic_parameters.elements['StochAstic_k'] == output['StochAstic_k'].values) &
-											(stochastic_parameters.elements['MACD' + '_slow'] == output['MACD_slow'].values) &
-											(stochastic_parameters.elements['MACD' + '_signal'] == output['MACD_signal'].values) &
+											(stochastic_parameters.elements['StochAstic_d'] == output['StochAstic_d'].values) &
+											(stochastic_parameters.elements['StochAstic_smooth_k'] == output['StochAstic_smooth_k'].values) &
 											(ind_params.elements['Divergence' + '_diff_extereme'] == output['Divergence_diff_extereme'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_min'] == output['Divergence_num_exteremes_min'].values) &
 											(ind_params.elements['Divergence' + '_num_exteremes_max'] == output['Divergence_num_exteremes_max'].values) &
-											(stochastic_parameters.elements['MACD' + '_apply_to'] == output['MACD_apply_to'].values) &
-											(dive_column == output['MACD_column_div'].values)
+											(stochastic_parameters.elements['StochAstic_mamod'] == output['StochAstic_mamod'].values) &
+											(dive_column == output['StochAstic_column_div'].values)
 										)[0]
 
 					repeat_checker_before = np.where(
 												(stochastic_parameters.elements['StochAstic_k'] == output_read['StochAstic_k'].values) &
-												(stochastic_parameters.elements['MACD' + '_slow'] == output_read['MACD_slow'].values) &
-												(stochastic_parameters.elements['MACD' + '_signal'] == output_read['MACD_signal'].values) &
+												(stochastic_parameters.elements['StochAstic_d'] == output_read['StochAstic_d'].values) &
+												(stochastic_parameters.elements['StochAstic_smooth_k'] == output_read['StochAstic_smooth_k'].values) &
 												(ind_params.elements['Divergence' + '_diff_extereme'] == output_read['Divergence_diff_extereme'].values) &
 												(ind_params.elements['Divergence' + '_num_exteremes_min'] == output_read['Divergence_num_exteremes_min'].values) &
 												(ind_params.elements['Divergence' + '_num_exteremes_max'] == output_read['Divergence_num_exteremes_max'].values) &
-												(stochastic_parameters.elements['MACD' + '_apply_to'] == output_read['MACD_apply_to'].values) &
-												(dive_column == output_read['MACD_column_div'].values)
+												(stochastic_parameters.elements['StochAstic_mamod'] == output_read['StochAstic_mamod'].values) &
+												(dive_column == output_read['StochAstic_column_div'].values)
 											)[0]
 
 					if repeat_counter >= len(output_read['StochAstic_k'].dropna().index): break
 					repeat_counter += 1
 				
 
-			output['MACD_apply_to'][i] = stochastic_parameters.elements['MACD' + '_apply_to']
+			output['StochAstic_mamod'][i] = stochastic_parameters.elements['StochAstic_mamod']
 			output['StochAstic_k'][i] = stochastic_parameters.elements['StochAstic_k']
-			output['MACD_slow'][i] = stochastic_parameters.elements['MACD' + '_slow']
-			output['MACD_signal'][i] = stochastic_parameters.elements['MACD' + '_signal']
-			output['MACD_column_div'][i] = dive_column
+			output['StochAstic_d'][i] = stochastic_parameters.elements['StochAstic_d']
+			output['StochAstic_smooth_k'][i] = stochastic_parameters.elements['StochAstic_smooth_k']
+			output['StochAstic_column_div'][i] = dive_column
 			output['frequency'][i] = freq_time
 
 			stochastic_parameters.elements['dataset_5M'] = self.dataset
 			stochastic_parameters.elements['dataset_1H'] = self.dataset
 
-			macd = MACD(parameters = stochastic_parameters, config = macd_config)
-			macd_calc = macd.calculator_macd()
+			stochastic = StochAstic(parameters = stochastic_parameters, config = stochastic_config)
+			stochastic_calc = stochastic.calculator_StochAstic()
 
 
-			macd = Divergence(parameters = ind_params, config = ind_config)
-			signal, signaltype, indicator = macd.divergence(
-															sigtype = self.sigtype,
-															sigpriority = self.sigpriority,
-															indicator = macd_calc,
-															column_div = dive_column,
-															ind_name = 'macd',
-															dataset_5M = stochastic_parameters.elements['dataset_' + self.timeframe],
-															dataset_1H = stochastic_parameters.elements['dataset_' + self.timeframe],
-															symbol = self.symbol,
-															flaglearn = False,
-															flagtest = True
-															)
+			stochastic = Divergence(parameters = ind_params, config = ind_config)
+			signal, signaltype, indicator = stochastic.divergence(
+																sigtype = self.sigtype,
+																sigpriority = self.sigpriority,
+																indicator = stochastic_calc,
+																column_div = dive_column,
+																ind_name = 'stochastic',
+																dataset_5M = stochastic_parameters.elements['dataset_' + self.timeframe],
+																dataset_1H = stochastic_parameters.elements['dataset_' + self.timeframe],
+																symbol = self.symbol,
+																flaglearn = False,
+																flagtest = True
+																)
 			bar.next()
 
 			if signal.empty == True: continue
 			divergence_out = pd.DataFrame(np.ones(signal.index[-1]))
-			divergence_out['macd'] = np.nan
+			divergence_out['stochastic'] = np.nan
 			divergence_out['low'] = np.nan
 			divergence_out['high'] = np.nan
 
 			counter = 0
 			for elm in signal.index:
-				divergence_out['macd'][counter] = signal.indicator_front[elm]
-				divergence_out['macd'][counter + 1] = signal.indicator_back[elm]
+				divergence_out['stochastic'][counter] = signal.indicator_front[elm]
+				divergence_out['stochastic'][counter + 1] = signal.indicator_back[elm]
 
 				divergence_out['low'][counter] = signal.low_front[elm]
 				divergence_out['low'][counter + 1] = signal.low_back[elm]
@@ -543,16 +545,16 @@ class Optimizers():
 
 			divergence_out = divergence_out.corr()
 
-			output['score'][i] = -((divergence_out['macd'][2] * divergence_out['macd'][1] * number_divergence) ** (1/3))
+			output['score'][i] = -((divergence_out['stochastic'][2] * divergence_out['stochastic'][1] * number_divergence) ** (1/3))
 
 			if (
-				divergence_out['macd'][2] > 0 and
-				divergence_out['macd'][1] > 0
+				divergence_out['stochastic'][2] > 0 and
+				divergence_out['stochastic'][1] > 0
 				):
 				output['score'][i] = -output['score'][i]
 
-			output['corr_low'][i] = divergence_out['macd'][1]
-			output['corr_high'][i] = divergence_out['macd'][2]
+			output['corr_low'][i] = divergence_out['stochastic'][1]
+			output['corr_high'][i] = divergence_out['stochastic'][2]
 			output['Divergence_diff_extereme'][i] = ind_params.elements['Divergence' + '_diff_extereme']
 			output['Divergence_num_exteremes_min'][i] = ind_params.elements['Divergence' + '_num_exteremes_min']
 			output['Divergence_num_exteremes_max'][i] = ind_params.elements['Divergence' + '_num_exteremes_max']
@@ -568,6 +570,6 @@ class Optimizers():
 		output.dropna().sort_values(by = ['score'], ascending = False).to_csv(path)
 
 		print()
-		print('MACD Optimizer ', self.sigtype, ' ', self.sigpriority, ' ', self.timeframe, ' is Finished')
+		print('StochAstic Optimizer ', self.sigtype, ' ', self.sigpriority, ' ', self.timeframe, ' is Finished')
 
 		return output.dropna().sort_values(by = ['score'], ascending = False)
