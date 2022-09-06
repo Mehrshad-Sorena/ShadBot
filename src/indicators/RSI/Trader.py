@@ -176,7 +176,7 @@ def trader_rsi_div(
 	return
 
 def trader_task_rsi_div(symbol, account_name):
-	if True:#try:
+	try:
 		print('****************** Start RSI *************************')
 		symbol_data_5M,symbol_data_1H,symbol,money = get_all_deta_online(symbol = symbol, account_name = account_name)
 		trader_rsi_div(
@@ -187,6 +187,6 @@ def trader_task_rsi_div(symbol, account_name):
 						account_name = account_name
 						)
 		print('****************** Finish RSI *************************')
-	else:#except Exception as ex:
+	except Exception as ex:
 		print('===== Trader Error RSI ===> ',ex)
 	return
