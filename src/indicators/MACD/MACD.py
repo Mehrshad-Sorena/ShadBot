@@ -1122,7 +1122,7 @@ class MACD:
 			# print()
 			# print('================== Num =========> ', len(chromosome_output))
 			# print('================== Num Chroms ======> ', chrom_counter)
-			# print('================== All Chorms ======> ', all_chorms)
+			print('================== All Chorms ======> ', all_chorms)
 			# print('================== Flag Learn ======> ', chromosome[chrom_counter]['islearned'])
 			# print('================== Chorm Reseter ===> ',chorm_reset_counter)
 			# print('===== bad score counter ========> ',bad_score_counter)
@@ -1149,7 +1149,8 @@ class MACD:
 				all_chorms += 1
 				continue
 
-			if all_chorms >= int(num_turn): break
+			# if all_chorms >= int(num_turn): break
+			if all_chorms >= 10: break
 			all_chorms += 1
 
 
