@@ -28,7 +28,7 @@ def Run():
 	optimizers.sigpriority = 'secondry'
 	optimizers.sigtype = 'sell'
 	optimizers.turn = 100
-	optimizers.dataset = parameters.elements['dataset_5M']
+	optimizers.dataset = parameters.elements['dataset_5M'].copy()
 	optimizers.timeframe = '5M'
 
 	optimizers.MacdOptimizer()
