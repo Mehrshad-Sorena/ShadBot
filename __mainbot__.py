@@ -48,8 +48,8 @@ def Run():
 	minute_news = '10'
 	hour_news = '00,12'
 
-	trader_macd_div_threaded()
-	trader_rsi_div_threaded()
+	# trader_macd_div_threaded()
+	# trader_rsi_div_threaded()
 	trader_stochastic_div_threaded()
 
 	scheduler_trader_macd_div.add_job(func=trader_macd_div_threaded, trigger='cron', day_of_week=days, hour='00-23', minute=minute_trader, timezone='UTC')
