@@ -1,11 +1,11 @@
-from .Config import Config as MACDConfig
-from indicator_Parameters import Parameters as IndicatorParameters
+from .Config import Config as StochAsticConfig
+from src.utils.Divergence.Parameters import Parameters as IndicatorParameters
 from scipy.stats import foldnorm, dweibull, rayleigh, expon, nakagami, norm
 from fitter import Fitter, get_common_distributions, get_distributions
 from sklearn.cluster import KMeans
-from pr_Parameters import Parameters as PRParameters
-from pr_Config import Config as PRConfig
-from .Parameters import Parameters as MACDParameters
+from src.utils.ProtectResist.PRMethod.Parameters import Parameters as PRParameters
+from src.utils.ProtectResist.PRMethod.Config import Config as PRConfig
+from .Parameters import Parameters as StochAsticParameters
 from .ParameterLimits import ParameterLimits as Limits
 from random import randint
 import random
@@ -13,30 +13,34 @@ import pandas as pd
 import os
 import sys
 import numpy as np
-from timer import stTime
+from src.utils.Tools.timer import stTime
 import warnings
+
+import sys
+
+
+if 'win' in sys.platform:
+	path_slash = '\\'
+elif 'linux' in sys.platform:
+	path_slash = '/'
+
 warnings.filterwarnings("ignore")
 
 limits = Limits()
 
 
-apply_to_list = [
-					'open',
-					'close',
-					'low',
-					'high',
-					'HL/2',
-					'HLC/3',
-					'HLCC/4',
-					'OHLC/4'
-					]
+mamod_list = [
+				'sma',
+				'ema',
+				'wma',
+			]
 
 Chromosome_Accepted_List = [
-							'MACD_apply_to',
-							'MACD_fast',
-							'MACD_slow',
-							'MACD_signal',
-							'MACD_column_div',
+							'StochAstic_k',
+							'StochAstic_d',
+							'StochAstic_smooth_k',
+							'StochAstic_mamod',
+							'StochAstic_column_div',
 							'Divergence_num_exteremes_min',
 							'Divergence_num_exteremes_max',
 							'Divergence_diff_extereme',
@@ -117,7 +121,7 @@ Chromosome_Accepted_List = [
 
 #Functions:
 
-#MACDChromosomeInitializer()
+#StochAsticChromosomeInitializer()
 #DivergenceChromosomeInitializer()
 #ProtectResistChromosomeInitializer()
 
@@ -155,12 +159,38 @@ class Chromosome:
 			alpha = 0.4
 			):
 
-		macd_parameters = MACDParameters()
+		stochastic_parameters = StochAsticParameters()
 
 		pr_parameters = PRParameters()
 		pr_config = PRConfig()
 
 		ind_parameters = IndicatorParameters()
+
+		stochastic_config = StochAsticConfig()
+		optimizer_params = pd.read_csv(
+										stochastic_config.cfg['path_optimized_params'] + 
+										signalpriority + path_slash + 
+										signaltype + path_slash + 
+										'5M' + path_slash + 
+										symbol + '.csv'
+										)
+
+		limits.elements['StochAstic_k_upper'] = int(optimizer_params['StochAstic_k'].iloc[-1] * 1.2)
+		limits.elements['StochAstic_k_lower'] = int(optimizer_params['StochAstic_k'].iloc[-1] * 0.8)
+
+		limits.elements['StochAstic_d_upper'] = int(optimizer_params['StochAstic_d'].iloc[-1] * 1.2)
+		limits.elements['StochAstic_d_lower'] = int(optimizer_params['StochAstic_d'].iloc[-1] * 0.8)
+
+		limits.elements['StochAstic_smooth_k_upper'] = int(optimizer_params['StochAstic_smooth_k'].iloc[-1] * 1.2)
+		limits.elements['StochAstic_smooth_k_lower'] = int(optimizer_params['StochAstic_smooth_k'].iloc[-1] * 0.8)
+
+		if signaltype == 'buy':
+			limits.elements['Divergence_num_exteremes_min_upper'] = int(optimizer_params['Divergence_num_exteremes_min'].iloc[-1] * 1.2)
+			limits.elements['Divergence_num_exteremes_min_lower'] = int(optimizer_params['Divergence_num_exteremes_min'].iloc[-1] * 0.8)
+
+		elif signaltype == 'sell':
+			limits.elements['Divergence_num_exteremes_max_upper'] = int(optimizer_params['Divergence_num_exteremes_max'].iloc[-1] * 1.2)
+			limits.elements['Divergence_num_exteremes_max_lower'] = int(optimizer_params['Divergence_num_exteremes_max'].iloc[-1] * 0.8)
 
 		#Select Which Work is Be Done:
 
@@ -279,12 +309,12 @@ class Chromosome:
 				if ind_elm == elm:
 					ind_parameters.elements[ind_elm] = Chromosome[chrom_counter][elm]
 
-			for macd_elm in macd_parameters.elements.keys():
-				if macd_elm == elm:
-					macd_parameters.elements[macd_elm] = Chromosome[chrom_counter][elm]
+			for stoch_elm in stochastic_parameters.elements.keys():
+				if stoch_elm == elm:
+					stochastic_parameters.elements[stoch_elm] = Chromosome[chrom_counter][elm]
 		#//////////////////////////////////////
 
-		return Chromosome, macd_parameters, ind_parameters, pr_parameters, pr_config
+		return Chromosome, stochastic_parameters, ind_parameters, pr_parameters, pr_config
 
 
 	def Initializer(
@@ -295,9 +325,9 @@ class Chromosome:
 					number_chromos = 5
 					):
 		#************************** initialize Values ******************************************************
-		macdconfig = MACDConfig()
-		path_society = macdconfig.cfg['path_society'] + signalpriority + '/' + signaltype + '/'
-		path_superhuman = macdconfig.cfg['path_superhuman'] + signalpriority + '/' + signaltype + '/'
+		stochasticconfig = StochAsticConfig()
+		path_society = stochasticconfig.cfg['path_society'] + signalpriority + path_slash + signaltype + path_slash
+		path_superhuman = stochasticconfig.cfg['path_superhuman'] + signalpriority + path_slash + signaltype + path_slash
 
 		Chromosome_vares = dict()
 
@@ -329,9 +359,9 @@ class Chromosome:
 
 				Chromosome_vares[i] = dict({})
 
-				macd_parameters = self.MACDChromosomeInitializer()
+				stochastic_parameters = self.StochAsticChromosomeInitializer()
 
-				Chromosome_vares[i].update(macd_parameters.elements)
+				Chromosome_vares[i].update(stochastic_parameters.elements)
 
 				del Chromosome_vares[i]['symbol']
 				del Chromosome_vares[i]['st_percent_up']
@@ -398,8 +428,8 @@ class Chromosome:
 				symbol,
 				):
 
-		macdconfig = MACDConfig()
-		path_society = macdconfig.cfg['path_society'] + signalpriority + '/' + signaltype + '/'
+		stochasticconfig = StochAsticConfig()
+		path_society = stochasticconfig.cfg['path_society'] + signalpriority + path_slash + signaltype + path_slash
 
 		Chromosome_vares = dict()
 
@@ -407,9 +437,9 @@ class Chromosome:
 
 		Chromosome_vares[chrom_counter] = dict({})
 
-		macd_parameters = self.MACDChromosomeInitializer()
+		stochastic_parameters = self.StochAsticChromosomeInitializer()
 
-		Chromosome_vares[chrom_counter].update(macd_parameters.elements)
+		Chromosome_vares[chrom_counter].update(stochastic_parameters.elements)
 
 		del Chromosome_vares[chrom_counter]['symbol']
 		del Chromosome_vares[chrom_counter]['st_percent_up']
@@ -466,8 +496,8 @@ class Chromosome:
 						number_dead_chromos = 0
 						):
 
-		macd_config = MACDConfig()
-		path_graveyard = macd_config.cfg['path_graveyard'] + signalpriority + '/' + signaltype + '/'
+		stochastic_config = StochAsticConfig()
+		path_graveyard = stochastic_config.cfg['path_graveyard'] + signalpriority + path_slash + signaltype + path_slash
 
 		if (
 			Chromosome[chrom_counter]['isborn'] == False and
@@ -511,6 +541,8 @@ class Chromosome:
 																				]
 																	)
 
+			# print(GL_result_checking.columns)
+
 			dead_counter = 0
 
 			chor = dict(Chromosome[chrom_counter])
@@ -524,6 +556,8 @@ class Chromosome:
 			del chor['corr']
 			del chor['corr_high']
 			del chor['corr_low']
+
+			# print(chor.keys())
 
 
 
@@ -810,25 +844,25 @@ class Chromosome:
 		return ind_parameters
 
 
-	def MACDChromosomeInitializer(self):
+	def StochAsticChromosomeInitializer(self):
 		
-		macd_parameters = MACDParameters()
+		stochastic_parameters = StochAsticParameters()
 
-		macd_parameters.elements['MACD' + '_apply_to'] = random.choice(apply_to_list)
+		stochastic_parameters.elements['StochAstic_mamod'] = random.choice(mamod_list)
 
-		macd_parameters.elements['MACD' + '_fast'] = randint(limits.elements['MACD' + '_fast_lower'], limits.elements['MACD' + '_fast_upper'])
-		macd_parameters.elements['MACD' + '_slow'] = randint(limits.elements['MACD' + '_slow_lower'], limits.elements['MACD' + '_slow_upper'])
+		stochastic_parameters.elements['StochAstic_k'] = randint(limits.elements['StochAstic_k_lower'], limits.elements['StochAstic_k_upper'])
+		stochastic_parameters.elements['StochAstic_d'] = randint(limits.elements['StochAstic_d_lower'], limits.elements['StochAstic_d_upper'])
 
-		while macd_parameters.elements['MACD' + '_fast'] >= macd_parameters.elements['MACD' + '_slow']:
-			macd_parameters.elements['MACD' + '_fast'] = randint(limits.elements['MACD' + '_fast_lower'], limits.elements['MACD' + '_fast_upper'])
-			macd_parameters.elements['MACD' + '_slow'] = randint(limits.elements['MACD' + '_slow_lower'], limits.elements['MACD' + '_slow_upper'])
+		while stochastic_parameters.elements['StochAstic_k'] >= stochastic_parameters.elements['StochAstic_d']:
+			stochastic_parameters.elements['StochAstic_k'] = randint(limits.elements['StochAstic_k_lower'], limits.elements['StochAstic_k_upper'])
+			stochastic_parameters.elements['StochAstic_d'] = randint(limits.elements['StochAstic_d_lower'], limits.elements['StochAstic_d_upper'])
 
 
-		macd_parameters.elements['MACD' + '_signal'] = randint(limits.elements['MACD' + '_signal_lower'], limits.elements['MACD' + '_signal_upper'])
+		stochastic_parameters.elements['StochAstic_smooth_k'] = randint(limits.elements['StochAstic_smooth_k_lower'], limits.elements['StochAstic_smooth_k_upper'])
 
-		macd_parameters.elements['MACD' + '_column_div'] = random.choice(['macd', 'macds', 'macdh'])
+		stochastic_parameters.elements['StochAstic' + '_column_div'] = random.choice(['StochAstic_k', 'StochAstic_d'])
 
-		return macd_parameters
+		return stochastic_parameters
 
 
 	#@stTime
@@ -840,8 +874,8 @@ class Chromosome:
 						symbol
 						):
 		
-		macdconfig = MACDConfig()
-		path_society = macdconfig.cfg['path_society'] + signalpriority + '/' + signaltype + '/'
+		stochasticconfig = StochAsticConfig()
+		path_society = stochasticconfig.cfg['path_society'] + signalpriority + path_slash + signaltype + path_slash
 
 		if os.path.exists(path_society + symbol + '.csv'):
 			os.remove(path_society + symbol + '.csv')
@@ -867,7 +901,7 @@ class Chromosome:
 				symbol
 				):
 
-		Chromosome[chrom_counter]['MACD_apply_to'] = random.choice(apply_to_list)
+		Chromosome[chrom_counter]['StochAstic_mamod'] = random.choice(mamod_list)
 		Chromosome[chrom_counter]['BestFinder_alpha'] = randint(limits.elements['BestFinder_alpha_lower'], limits.elements['BestFinder_alpha_upper'])/100
 		Chromosome[chrom_counter]['BestFinder_alpha_low'] = randint(limits.elements['BestFinder_alpha_low_lower'], limits.elements['BestFinder_alpha_low_upper'])/100
 		Chromosome[chrom_counter]['BestFinder_alpha_high'] = randint(limits.elements['BestFinder_alpha_high_lower'], limits.elements['BestFinder_alpha_high_upper'])/100
@@ -906,14 +940,14 @@ class Chromosome:
 		Chromosome[chrom_counter]['tp_percent_min'] = randint(self.elements['tp_percent_down'], self.elements['tp_percent_up'])/100
 		Chromosome[chrom_counter]['tp_percent_max'] = randint(self.elements['tp_percent_down'], self.elements['tp_percent_up'])/100
 
-		fast_period = randint(limits.elements['MACD_fast_lower'], limits.elements['MACD_fast_upper'])
-		while Chromosome[chrom_counter]['MACD_slow'] < fast_period:
-			fast_period = randint(limits.elements['MACD_fast_lower'], limits.elements['MACD_fast_upper'])
+		k_period = randint(limits.elements['StochAstic_k_lower'], limits.elements['StochAstic_k_upper'])
+		while Chromosome[chrom_counter]['StochAstic_d'] < k_period:
+			k_period = randint(limits.elements['StochAstic_k_lower'], limits.elements['StochAstic_k_upper'])
 			
 		
-		Chromosome[chrom_counter]['MACD_apply_to'] = random.choice(apply_to_list)
-		Chromosome[chrom_counter]['MACD_fast'] = fast_period
-		Chromosome[chrom_counter]['MACD_signal'] = randint(limits.elements['MACD_signal_lower'], limits.elements['MACD_signal_upper'])
+		Chromosome[chrom_counter]['StochAstic_mamod'] = random.choice(mamod_list)
+		Chromosome[chrom_counter]['StochAstic_k'] = k_period
+		Chromosome[chrom_counter]['StochAstic_smooth_k'] = randint(limits.elements['StochAstic_smooth_k_lower'], limits.elements['StochAstic_smooth_k_upper'])
 		Chromosome[chrom_counter]['BestFinder_alpha'] = randint(limits.elements['BestFinder_alpha_lower'], limits.elements['BestFinder_alpha_upper'])/100
 		Chromosome[chrom_counter]['BestFinder_alpha_low'] = randint(limits.elements['BestFinder_alpha_low_lower'], limits.elements['BestFinder_alpha_low_upper'])/100
 		Chromosome[chrom_counter]['BestFinder_alpha_high'] = randint(limits.elements['BestFinder_alpha_high_lower'], limits.elements['BestFinder_alpha_high_upper'])/100
@@ -950,8 +984,8 @@ class Chromosome:
 		Chromosome[chrom_counter]['tp_percent_min'] = randint(self.elements['tp_percent_down'], self.elements['tp_percent_up'])/100
 		Chromosome[chrom_counter]['tp_percent_max'] = randint(self.elements['tp_percent_down'], self.elements['tp_percent_up'])/100
 
-		Chromosome[chrom_counter]['MACD_signal'] = randint(limits.elements['MACD_signal_lower'], limits.elements['MACD_signal_upper'])
-		Chromosome[chrom_counter]['MACD_apply_to'] = random.choice(apply_to_list)
+		Chromosome[chrom_counter]['StochAstic_smooth_k'] = randint(limits.elements['StochAstic_smooth_k_lower'], limits.elements['StochAstic_smooth_k_upper'])
+		Chromosome[chrom_counter]['StochAstic_mamod'] = random.choice(mamod_list)
 
 		Chromosome[chrom_counter]['BestFinder_alpha'] = randint(limits.elements['BestFinder_alpha_lower'], limits.elements['BestFinder_alpha_upper'])/100
 		Chromosome[chrom_counter]['BestFinder_alpha_low'] = randint(limits.elements['BestFinder_alpha_low_lower'], limits.elements['BestFinder_alpha_low_upper'])/100
@@ -1117,9 +1151,9 @@ class Chromosome:
 
 	def LimitChecker(self, Chromosome):
 
-		while Chromosome['MACD' + '_fast'] >= Chromosome['MACD' + '_slow']:
-			Chromosome['MACD' + '_fast'] = randint(4, 800)
-			Chromosome['MACD' + '_slow'] = randint(4, 1500)
+		while Chromosome['StochAstic_k'] >= Chromosome['StochAstic_d']:
+			Chromosome['StochAstic_k'] = randint(4, 800)
+			Chromosome['StochAstic_d'] = randint(4, 1500)
 
 		while Chromosome['TrendLines' + '_length_mid_5M'] >= Chromosome['TrendLines' + '_length_long_5M']:
 			Chromosome['TrendLines' + '_length_long_5M'] = randint(10, 1000)
@@ -1203,7 +1237,7 @@ class Chromosome:
 
 	def ParameterOptimizer(self, path_elites_chromosome, alpha):
 
-		macd_config = MACDConfig()
+		stochastic_config = StochAsticConfig()
 
 		if os.path.exists(path_elites_chromosome):
 
@@ -1212,17 +1246,17 @@ class Chromosome:
 		upper = 0
 		lower = 2
 
-		MACD_fast = self.Finder(chromosome = chromosome, apply_to = 'MACD_fast', alpha = alpha)
-		limits.elements['MACD_fast_upper'] = round(MACD_fast['interval'][upper])
-		limits.elements['MACD_fast_lower'] = int(MACD_fast['interval'][lower])
+		StochAstic_k = self.Finder(chromosome = chromosome, apply_to = 'StochAstic_k', alpha = alpha)
+		limits.elements['StochAstic_k_upper'] = round(StochAstic_k['interval'][upper])
+		limits.elements['StochAstic_k_lower'] = int(StochAstic_k['interval'][lower])
 
-		MACD_slow = self.Finder(chromosome = chromosome, apply_to = 'MACD_slow', alpha = alpha)
-		limits.elements['MACD_slow_upper'] = round(MACD_slow['interval'][upper])
-		limits.elements['MACD_slow_lower'] = int(MACD_slow['interval'][lower])
+		StochAstic_d = self.Finder(chromosome = chromosome, apply_to = 'StochAstic_d', alpha = alpha)
+		limits.elements['StochAstic_d_upper'] = round(StochAstic_d['interval'][upper])
+		limits.elements['StochAstic_d_lower'] = int(StochAstic_d['interval'][lower])
 
-		MACD_signal = self.Finder(chromosome = chromosome, apply_to = 'MACD_signal', alpha = alpha)
-		limits.elements['MACD_signal_upper'] = round(MACD_signal['interval'][upper])
-		limits.elements['MACD_signal_lower'] = int(MACD_signal['interval'][lower])
+		StochAstic_smooth_k = self.Finder(chromosome = chromosome, apply_to = 'StochAstic_smooth_k', alpha = alpha)
+		limits.elements['StochAstic_smooth_k_upper'] = round(StochAstic_smooth_k['interval'][upper])
+		limits.elements['StochAstic_smooth_k_lower'] = int(StochAstic_smooth_k['interval'][lower])
 
 		Divergence_num_exteremes_min = self.Finder(chromosome = chromosome, apply_to = 'Divergence_num_exteremes_min', alpha = alpha)
 		limits.elements['Divergence_num_exteremes_min_upper'] = round(Divergence_num_exteremes_min['interval'][upper])
