@@ -1,9 +1,4 @@
-from GeneticLearningRunner.StochAstic import (
-											Runner_BuyPrimary,
-											Runner_BuySecondry,
-											Runner_SellPrimary,
-											Runner_SellSecondry,
-											)
+from GeneticLearningRunner.StochAstic import Runner_BuyPrimary
 # from src.indicators.MACD import GetPermit_HowToUse
 
 Runner_BuyPrimary.Run()
