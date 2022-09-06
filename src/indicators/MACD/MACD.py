@@ -1079,6 +1079,8 @@ class MACD:
 		learning_interval_counter = 0
 		learn_counter = 1
 
+		bad_flag = False
+
 		bar = Bar(signaltype + ' ' + signalpriority, max = int(num_turn))
 
 		for i in range(len(chromosome)):
