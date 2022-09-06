@@ -1,4 +1,4 @@
-from Mt5_LoginGetData import LoginGetData as getdata
+from src.utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
 from .Parameters import Parameters
 from .Config import Config
 from .MACD import MACD
@@ -23,16 +23,16 @@ config = Config()
 parameters.elements['dataset_5M'], parameters.elements['dataset_1H'] = loging.readall(symbol = 'XAUUSD_i', number_5M = 'all', number_1H = 'all')
 
 parameters.elements['symbol'] = 'XAUUSD_i'
-parameters.elements['MACD_apply_to'] = 'close'
+parameters.elements['RSI_apply_to'] = 'close'
 
-#print(parameters.elements['dataset_1H']['ETHUSD_i'])
+print(parameters.elements['dataset_1H']['XAUUSD_i'])
 
-macd = MACD(parameters = parameters, config = config)
-macd_calc = macd.GetPermit(
+rsi = RSI(parameters = parameters, config = config)
+rsi_calc = rsi.GetPermit(
 							dataset_5M = parameters.elements['dataset_5M'],
 							dataset_1H = parameters.elements['dataset_1H'], 
 							symbol = 'XAUUSD_i',
-							signaltype = 'sell',
-							signalpriority = 'secondry',
+							signaltype = 'buy',
+							signalpriority = 'primary',
 							flag_savepic = False
 						)

@@ -1,6 +1,7 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from OnlineBot.MACD import bot as MACDBOT
 from OnlineBot.StochAstic import bot as StochAsticBOT
+from OnlineBot.RSI import bot as RSIBOT
 import threading
 import schedule
 import time
@@ -12,6 +13,7 @@ except ImportError:
 
 scheduler_trader_macd_div = AsyncIOScheduler()
 scheduler_trader_stochastic_div = AsyncIOScheduler()
+scheduler_trader_rsi_div = AsyncIOScheduler()
 scheduler_news = AsyncIOScheduler()
 
 account_name = 'mohipc'
@@ -25,6 +27,11 @@ def trader_macd_div_threaded():
 
 def trader_stochastic_div_threaded():
     job_thread = threading.Thread(target=StochAsticBOT.Run, args = [symbol, account_name])
+    job_thread.start()
+    job_thread.join()
+
+def trader_rsi_div_threaded():
+    job_thread = threading.Thread(target=RSIBOT.Run, args = [symbol, account_name])
     job_thread.start()
     job_thread.join()
 
@@ -46,10 +53,14 @@ def Run():
 
 	scheduler_trader_macd_div.add_job(func=trader_macd_div_threaded, trigger='cron', day_of_week=days, hour='00-23', minute=minute_trader, timezone='UTC')
 	scheduler_trader_stochastic_div.add_job(func=trader_stochastic_div_threaded, trigger='cron', day_of_week=days, hour='00-23', minute=minute_trader, timezone='UTC')
+	scheduler_trader_rsi_div.add_job(func=trader_rsi_div_threaded, trigger='cron', day_of_week=days, hour='00-23', minute=minute_trader, timezone='UTC')
+
 	scheduler_news.add_job(func=news_threaded, trigger='cron', day_of_week='mon-fri', hour=hour_news, minute=minute_news, timezone='UTC')
 	# Start the scheduler
 	scheduler_trader_macd_div.start()
 	scheduler_trader_stochastic_div.start()
+	scheduler_trader_rsi_div.start()
+
 	scheduler_news.start()
 
 	try:
