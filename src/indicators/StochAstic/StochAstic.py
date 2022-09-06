@@ -1076,6 +1076,8 @@ class StochAstic:
 		score = max_score_gl
 		score_for_reset = 0
 
+		bad_flag = False
+
 		learning_interval_counter = 0
 		learn_counter = 1
 
