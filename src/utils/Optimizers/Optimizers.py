@@ -204,7 +204,7 @@ class Optimizers():
 
 					dive_column = random.choice(['macd', 'macds', 'macdh'])
 
-					while macd_parameters.elements['MACD' + '_fast'] >= macd_parameters.elements['MACD' + '_slow'] + 10:
+					while macd_parameters.elements['MACD' + '_fast'] + 10 >= macd_parameters.elements['MACD' + '_slow']:
 						macd_parameters.elements['MACD' + '_fast'] = randint(2, 300)
 						macd_parameters.elements['MACD' + '_slow'] = randint(2 , 700)
 
