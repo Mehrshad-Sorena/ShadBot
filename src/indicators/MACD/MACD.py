@@ -1149,8 +1149,8 @@ class MACD:
 				all_chorms += 1
 				continue
 
-			if all_chorms >= int(num_turn): break
-			# if all_chorms >= 10: break
+			# if all_chorms >= int(num_turn): break
+			if all_chorms >= 30: break
 			all_chorms += 1
 
 
