@@ -177,7 +177,7 @@ def trader_macd_div(
 
 def trader_task_macd_div(symbol, account_name):
 	try:
-		print('****************** Start *************************')
+		print('****************** Start MACD *************************')
 		symbol_data_5M,symbol_data_1H,symbol,money = get_all_deta_online(symbol = symbol, account_name = account_name)
 		trader_macd_div(
 						symbol_data_5M = symbol_data_5M,
@@ -186,7 +186,7 @@ def trader_task_macd_div(symbol, account_name):
 						money = money,
 						account_name = account_name
 						)
-		print('****************** Finish *************************')
+		print('****************** Finish MACD *************************')
 	except Exception as ex:
 		print('===== Trader Error MACD ===> ',ex)
 	return
