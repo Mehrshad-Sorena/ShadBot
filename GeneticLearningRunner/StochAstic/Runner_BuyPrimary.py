@@ -36,23 +36,23 @@ def Run():
 
 	stochastic = StochAstic(parameters = parameters, config = config)
 	stochastic_calc = stochastic.Genetic(
-							dataset_5M = parameters.elements['dataset_5M'], 
-							dataset_1H = parameters.elements['dataset_1H'], 
-							symbol = 'XAUUSD_i',
-							signaltype = 'buy', 
-							signalpriority = 'primary', 
-							num_turn = 40
-							)
+										dataset_5M = parameters.elements['dataset_5M'], 
+										dataset_1H = parameters.elements['dataset_1H'], 
+										symbol = 'XAUUSD_i',
+										signaltype = 'buy', 
+										signalpriority = 'primary', 
+										num_turn = 40
+										)
 
 	for turn in range(0,4):
 		stochastic_calc = stochastic.GetPermit(
-								dataset_5M = parameters.elements['dataset_5M'],
-								dataset_1H = parameters.elements['dataset_1H'], 
-								symbol = 'XAUUSD_i',
-								signaltype = 'buy',
-								signalpriority = 'primary',
-								flag_savepic = False
-								)
+											dataset_5M = parameters.elements['dataset_5M'],
+											dataset_1H = parameters.elements['dataset_1H'], 
+											symbol = 'XAUUSD_i',
+											signaltype = 'buy',
+											signalpriority = 'primary',
+											flag_savepic = False
+											)
 
 		if (
 			stochastic_calc['draw_down'][0] <= 7 &

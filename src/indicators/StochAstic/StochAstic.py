@@ -477,10 +477,10 @@ class StochAstic:
 
 		#*****************************
 
-		print('lst_idx_buy_primary = ', lst_idx_buy_primary)
-		print('lst_idx_buy_secondry = ', lst_idx_buy_secondry)
-		print('lst_idx_sell_primary = ', lst_idx_sell_primary)
-		print('lst_idx_sell_secondry = ', lst_idx_sell_secondry)
+		print('lst_idx_buy_primary stochastic = ', lst_idx_buy_primary)
+		print('lst_idx_buy_secondry stochastic = ', lst_idx_buy_secondry)
+		print('lst_idx_sell_primary stochastic = ', lst_idx_sell_primary)
+		print('lst_idx_sell_secondry stochastic = ', lst_idx_sell_secondry)
 		print('len data = ', len(dataset_5M[symbol]['close']) - 1)
 
 		#***** Last Signal:
@@ -492,7 +492,7 @@ class StochAstic:
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) <= 6
 			):
 
-			print('======> last signal buy primary ',symbol)
+			print('======> last signal buy primary stochastic ',symbol)
 			print('dataset length: ',len(dataset_5M[symbol]['close']))
 			print('last index: ',lst_idx_buy_primary)
 			
@@ -576,7 +576,7 @@ class StochAstic:
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) <= 6
 			):
 
-			print('======> last signal buy secondry ',symbol)
+			print('======> last signal buy secondry stochastic ',symbol)
 			print('dataset length: ',len(dataset_5M[symbol]['close']))
 			print('last index: ',lst_idx_buy_secondry)
 			
@@ -660,7 +660,7 @@ class StochAstic:
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) <= 6
 			):
 
-			print('======> last signal sell primary ',symbol)
+			print('======> last signal sell primary stochastic ',symbol)
 			print('dataset length: ',len(dataset_5M[symbol]['close']))
 			print('last index: ',lst_idx_sell_primary)
 			
@@ -738,7 +738,7 @@ class StochAstic:
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) <= 6
 			):
 
-			print('======> last signal sell secondry ',symbol)
+			print('======> last signal sell secondry stochastic ',symbol)
 			print('dataset length: ',len(dataset_5M[symbol]['close']))
 			print('last index: ',lst_idx_sell_secondry)
 
@@ -1041,7 +1041,7 @@ class StochAstic:
 		max_score_gl = 5
 
 
-		print('================================ START Genetic ',signaltype,' ===> ',symbol,' ',signalpriority)
+		print('================================ START Genetic StochAstic ',signaltype,' ===> ',symbol,' ',signalpriority)
 		print('\n')
 
 		learning_output_before = pd.DataFrame()
