@@ -1,3 +1,4 @@
+
 class ParameterLimits:
 
 	def __new__(cls, *args, **kwargs):
@@ -11,14 +12,14 @@ class ParameterLimits:
 
 							#Chromosome Limit Parameters:
 
-							'MACD_fast_upper': 500,#144,#800,
-							'MACD_fast_lower': 2,
+							'StochAstic_k_upper': 500,#500,#144,#800,
+							'StochAstic_k_lower': 2,
 
-							'MACD_slow_upper': 500,#312,#1500,
-							'MACD_slow_lower': 2,
+							'StochAstic_d_upper': 500,#312,#1500,
+							'StochAstic_d_lower': 2,
 
-							'MACD_signal_upper': 50,
-							'MACD_signal_lower': 2,
+							'StochAstic_smooth_k_upper': 50,
+							'StochAstic_smooth_k_lower': 2,
 							
 							'Divergence_num_exteremes_min_upper': 400,#250,
 							'Divergence_num_exteremes_min_lower': 2,
