@@ -197,6 +197,10 @@ class Chromosome:
 			limits.elements['Divergence_num_exteremes_max_upper'] = int(optimizer_params['Divergence_num_exteremes_max'].iloc[-1] * 1.2)
 			limits.elements['Divergence_num_exteremes_max_lower'] = int(optimizer_params['Divergence_num_exteremes_max'].iloc[-1] * 0.8)
 
+		print(limits.elements['MACD_fast_upper'])
+
+		print(limits.elements['MACD_slow_upper'])
+
 		#Select Which Work is Be Done:
 
 		if work == 'Optimize':
