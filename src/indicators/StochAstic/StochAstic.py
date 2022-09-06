@@ -300,6 +300,7 @@ class StochAstic:
 															)
 			else:
 				lst_idx_buy_primary = 0
+				signal_buy_primary = pd.DataFrame()
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")
@@ -354,7 +355,9 @@ class StochAstic:
 															flagtest = True
 															)
 			else:
-				signal_buy_secondry = 0
+				signal_buy_secondry = pd.DataFrame()
+				lst_idx_buy_secondry = 0
+
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")
@@ -364,7 +367,7 @@ class StochAstic:
 			lst_idx_buy_secondry = int(signal_buy_secondry['index'].iloc[-1])
 
 		else:
-			signal_buy_secondry = 0
+			lst_idx_buy_secondry = 0
 
 		#*****************************
 
@@ -409,6 +412,7 @@ class StochAstic:
 															)
 			else:
 				lst_idx_sell_primary = 0
+				signal_sell_primary = pd.DataFrame()
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")
@@ -463,6 +467,7 @@ class StochAstic:
 															)
 			else:
 				lst_idx_sell_secondry = 0
+				signal_sell_secondry = pd.DataFrame()
 
 		except Exception as ex:
 			print(f"LastSignal {signaltype} {signalpriority}: {ex}")

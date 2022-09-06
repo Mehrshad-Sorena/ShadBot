@@ -177,7 +177,7 @@ def trader_stochastic_div(
 
 def trader_task_stochastic_div(symbol, account_name):
 	try:
-		print('****************** Start *************************')
+		print('****************** Start StochAstic *************************')
 		symbol_data_5M,symbol_data_1H,symbol,money = get_all_deta_online(symbol = symbol, account_name = account_name)
 		trader_stochastic_div(
 						symbol_data_5M = symbol_data_5M,
@@ -186,7 +186,7 @@ def trader_task_stochastic_div(symbol, account_name):
 						money = money,
 						account_name = account_name
 						)
-		print('****************** Finish *************************')
+		print('****************** Finish StochAstic *************************')
 	except Exception as ex:
 		print('===== Trader StochAstic Error ===> ',ex)
 	return
