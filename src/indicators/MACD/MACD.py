@@ -1575,7 +1575,6 @@ class MACD:
 				):
 				break
 
-			print(bad_flag)
 			if bad_flag == True:
 
 				if bad_score_counter < 4:
