@@ -1,1 +1,4 @@
-from . import MACD
+from . import (
+				MACD,
+				StochAstic,
+				)
