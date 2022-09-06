@@ -853,7 +853,7 @@ class Chromosome:
 		stochastic_parameters.elements['StochAstic_k'] = randint(limits.elements['StochAstic_k_lower'], limits.elements['StochAstic_k_upper'])
 		stochastic_parameters.elements['StochAstic_d'] = randint(limits.elements['StochAstic_d_lower'], limits.elements['StochAstic_d_upper'])
 
-		while stochastic_parameters.elements['StochAstic_k'] >= stochastic_parameters.elements['StochAstic_d']:
+		while stochastic_parameters.elements['StochAstic_d'] >= stochastic_parameters.elements['StochAstic_k']:
 			stochastic_parameters.elements['StochAstic_k'] = randint(limits.elements['StochAstic_k_lower'], limits.elements['StochAstic_k_upper'])
 			stochastic_parameters.elements['StochAstic_d'] = randint(limits.elements['StochAstic_d_lower'], limits.elements['StochAstic_d_upper'])
 
@@ -941,7 +941,7 @@ class Chromosome:
 		Chromosome[chrom_counter]['tp_percent_max'] = randint(self.elements['tp_percent_down'], self.elements['tp_percent_up'])/100
 
 		k_period = randint(limits.elements['StochAstic_k_lower'], limits.elements['StochAstic_k_upper'])
-		while Chromosome[chrom_counter]['StochAstic_d'] < k_period:
+		while Chromosome[chrom_counter]['StochAstic_d'] >= k_period:
 			k_period = randint(limits.elements['StochAstic_k_lower'], limits.elements['StochAstic_k_upper'])
 			
 		
@@ -1151,8 +1151,8 @@ class Chromosome:
 
 	def LimitChecker(self, Chromosome):
 
-		while Chromosome['StochAstic_k'] >= Chromosome['StochAstic_d']:
-			Chromosome['StochAstic_k'] = randint(4, 800)
+		while Chromosome['StochAstic_d'] >= Chromosome['StochAstic_k']:
+			Chromosome['StochAstic_k'] = randint(4, 1500)
 			Chromosome['StochAstic_d'] = randint(4, 1500)
 
 		while Chromosome['TrendLines' + '_length_mid_5M'] >= Chromosome['TrendLines' + '_length_long_5M']:
