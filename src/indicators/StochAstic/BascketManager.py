@@ -1,15 +1,27 @@
-from Mt5_LoginGetData import LoginGetData as getdata
-from MetaTrader5 import *
-import MetaTrader5 as mt5
-from .Config import Config as MACDConfig
+from src.utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
+try:
+	from MetaTrader5 import *
+	import MetaTrader5 as mt5
+except Exception as ex:
+	print(ex)
+from .Config import Config as StochAsticConfig
 import pandas as pd
 import os
 
+import sys
+
+
+if 'win' in sys.platform:
+	path_slash = '\\'
+elif 'linux' in sys.platform:
+	path_slash = '/'
+
+
 levrage_now = 100
-risk_lot_now = 0.02
+risk_lot_now = 0.01
 
 #******************************** Find Max Score ********************************************
-
+ 
 def find_max_score(account_name):
 
 	loging = getdata()
@@ -18,16 +30,16 @@ def find_max_score(account_name):
 	loging.login()
 	symbols = loging.get_symbols()
 
-	macd_config = MACDConfig()
+	stochastic_config = StochAsticConfig()
 
 	score_list = []
 	for sym in symbols:
 		
-		buy_path_primary = macd_config.cfg['path_superhuman'] + 'primary' + '/' + 'buy' + '/' + sym.name + '.csv'
-		buy_path_secondry = macd_config.cfg['path_superhuman'] + 'secondry' + '/' + 'buy' + '/' + sym.name + '.csv'
+		buy_path_primary = stochastic_config.cfg['path_superhuman'] + 'primary' + path_slash + 'buy' + path_slash + sym.name + '.csv'
+		buy_path_secondry = stochastic_config.cfg['path_superhuman'] + 'secondry' + path_slash + 'buy' + path_slash + sym.name + '.csv'
 
-		sell_path_primary = macd_config.cfg['path_superhuman'] + 'primary' + '/' + 'sell' + '/' + sym.name + '.csv'
-		sell_path_secondry = macd_config.cfg['path_superhuman'] + 'secondry' + '/' + 'sell' + '/' + sym.name + '.csv'
+		sell_path_primary = stochastic_config.cfg['path_superhuman'] + 'primary' + path_slash + 'sell' + path_slash + sym.name + '.csv'
+		sell_path_secondry = stochastic_config.cfg['path_superhuman'] + 'secondry' + path_slash + 'sell' + path_slash + sym.name + '.csv'
 
 		if os.path.exists(buy_path_primary):
 			buy_data_primary = pd.read_csv(buy_path_primary)
@@ -54,13 +66,13 @@ def find_max_score(account_name):
 
 def lot_checker(my_money,symbol,signal, account_name,risk_lot=0.02,levrage=100):
 
-	macd_config = MACDConfig()
+	stochastic_config = StochAsticConfig()
 
-	buy_path_primary = macd_config.cfg['path_superhuman'] + 'primary' + '/' + 'buy' + '/' + symbol + '.csv'
-	buy_path_secondry = macd_config.cfg['path_superhuman'] + 'secondry' + '/' + 'buy' + '/' + symbol + '.csv'
+	buy_path_primary = stochastic_config.cfg['path_superhuman'] + 'primary' + path_slash + 'buy' + path_slash + symbol + '.csv'
+	buy_path_secondry = stochastic_config.cfg['path_superhuman'] + 'secondry' + path_slash + 'buy' + path_slash + symbol + '.csv'
 
-	sell_path_primary = macd_config.cfg['path_superhuman'] + 'primary' + '/' + 'sell' + '/' + symbol + '.csv'
-	sell_path_secondry = macd_config.cfg['path_superhuman'] + 'secondry' + '/' + 'sell' + '/' + symbol + '.csv'
+	sell_path_primary = stochastic_config.cfg['path_superhuman'] + 'primary' + path_slash + 'sell' + path_slash + symbol + '.csv'
+	sell_path_secondry = stochastic_config.cfg['path_superhuman'] + 'secondry' + path_slash + 'sell' + path_slash + symbol + '.csv'
 
 	lot = 0
 
@@ -194,7 +206,7 @@ def position_checker(signal,symbol):
 
 #********************************* Basket Manager *****************************************************
 
-def basket_manager_macd_div(symbols,symbol,my_money,signal, account_name):
+def basket_manager_stochastic_div(symbols,symbol,my_money,signal, account_name):
 
 	vol_traded = 0
 
