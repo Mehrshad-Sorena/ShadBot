@@ -13,11 +13,9 @@ class Parameters:
 							
 							#*********** Divergence:
 
-							'MACD' + '_apply_to': 'close',
+							'RSI' + '_apply_to': 'close',
 
-							'MACD' + '_fast': 12,
-							'MACD' + '_slow': 26,
-							'MACD' + '_signal': 9,
+							'RSI' + '_length': 12,
 
 							#///////////////////////
 
