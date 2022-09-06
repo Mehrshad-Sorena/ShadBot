@@ -552,7 +552,6 @@ class Chromosome:
 			del chor['corr_low']
 
 
-
 			check = np.where(GL_result_checking == chor)[0]
 			check_numbers = np.bincount(check)
 
@@ -840,7 +839,7 @@ class Chromosome:
 		
 		rsi_parameters = RSIParameters()
 
-		rsi_parameters.elements['rsi' + '_apply_to'] = random.choice(apply_to_list)
+		rsi_parameters.elements['RSI' + '_apply_to'] = random.choice(apply_to_list)
 
 		rsi_parameters.elements['RSI' + '_length'] = randint(limits.elements['RSI' + '_length_lower'], limits.elements['RSI' + '_length_upper'])
 
