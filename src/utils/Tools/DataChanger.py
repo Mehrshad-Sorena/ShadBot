@@ -43,6 +43,7 @@ class DataChanger:
 		if (loc_end_5M > length_5M):
 			cut_first = int(loc_end_5M) - length_5M
 
+
 		dataset_pr_5M = dataset_5M.truncate(before=cut_first, after=int(loc_end_5M-1), axis=None, copy=True).reset_index(drop=True)
 
 		location_1H = -1
