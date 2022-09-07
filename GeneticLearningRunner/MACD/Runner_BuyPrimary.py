@@ -35,27 +35,37 @@ def Run():
 	#parameters.elements['dataset_5M'], parameters.elements['dataset_1H'] = loging.readall(symbol = 'XAUUSD_i', number_5M = 'all', number_1H = 'all')
 
 	macd = MACD(parameters = parameters, config = config)
-	macd_calc = macd.Genetic(
-							dataset_5M = parameters.elements['dataset_5M'], 
-							dataset_1H = parameters.elements['dataset_1H'], 
-							symbol = 'XAUUSD_i',
-							signaltype = 'buy', 
-							signalpriority = 'primary', 
-							num_turn = 40
-							)
 
-	for turn in range(0,4):
-		macd_calc = macd.GetPermit(
-								dataset_5M = parameters.elements['dataset_5M'],
+	try:
+		macd_calc = macd.Genetic(
+								dataset_5M = parameters.elements['dataset_5M'], 
 								dataset_1H = parameters.elements['dataset_1H'], 
 								symbol = 'XAUUSD_i',
-								signaltype = 'buy',
-								signalpriority = 'primary',
-								flag_savepic = False
+								signaltype = 'buy', 
+								signalpriority = 'primary', 
+								num_turn = 40
 								)
 
-		if (
-			macd_calc['draw_down'][0] <= 7 &
-			macd_calc['permit'][0] == True
-			): 
-			break
+	except Exception as ex:
+		print('MACD ERROR: ', ex)
+
+	for turn in range(0,4):
+
+		try:
+			macd_calc = macd.GetPermit(
+									dataset_5M = parameters.elements['dataset_5M'],
+									dataset_1H = parameters.elements['dataset_1H'], 
+									symbol = 'XAUUSD_i',
+									signaltype = 'buy',
+									signalpriority = 'primary',
+									flag_savepic = False
+									)
+
+			if (
+				macd_calc['draw_down'][0] <= 7 &
+				macd_calc['permit'][0] == True
+				): 
+				break
+
+		except Exception as ex:
+			print('MACD GetPermit ERROR: ', ex)

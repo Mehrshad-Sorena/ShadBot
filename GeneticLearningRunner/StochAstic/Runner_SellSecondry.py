@@ -34,27 +34,33 @@ def Run():
 	optimizers.StochAsticOptimizer()
 
 	stochastic = StochAstic(parameters = parameters, config = config)
-	stochastic_calc = stochastic.Genetic(
-										dataset_5M = parameters.elements['dataset_5M'], 
-										dataset_1H = parameters.elements['dataset_1H'], 
-										symbol = 'XAUUSD_i',
-										signaltype = 'sell', 
-										signalpriority = 'secondry', 
-										num_turn = 40
-										)
-
-	for turn in range(0,4):
-		stochastic_calc = stochastic.GetPermit(
-											dataset_5M = parameters.elements['dataset_5M'],
+	try:
+		stochastic_calc = stochastic.Genetic(
+											dataset_5M = parameters.elements['dataset_5M'], 
 											dataset_1H = parameters.elements['dataset_1H'], 
 											symbol = 'XAUUSD_i',
-											signaltype = 'sell',
-											signalpriority = 'secondry',
-											flag_savepic = False
+											signaltype = 'sell', 
+											signalpriority = 'secondry', 
+											num_turn = 40
 											)
+	except Exception as ex:
+		print('StochAstic ERROR: ', ex)
 
-		if (
-			stochastic_calc['draw_down'][0] <= 7 &
-			stochastic_calc['permit'][0] == True
-			): 
-			break
+	for turn in range(0,4):
+		try:
+			stochastic_calc = stochastic.GetPermit(
+												dataset_5M = parameters.elements['dataset_5M'],
+												dataset_1H = parameters.elements['dataset_1H'], 
+												symbol = 'XAUUSD_i',
+												signaltype = 'sell',
+												signalpriority = 'secondry',
+												flag_savepic = False
+												)
+
+			if (
+				stochastic_calc['draw_down'][0] <= 7 &
+				stochastic_calc['permit'][0] == True
+				): 
+				break
+		except Exception as ex:
+			print('StochAstic GetPermit ERROR: ', ex)
