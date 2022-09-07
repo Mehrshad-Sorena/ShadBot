@@ -35,27 +35,36 @@ def Run():
 	#parameters.elements['dataset_5M'], parameters.elements['dataset_1H'] = loging.readall(symbol = 'XAUUSD_i', number_5M = 'all', number_1H = 'all')
 
 	rsi = RSI(parameters = parameters, config = config)
-	rsi_calc = rsi.Genetic(
-							dataset_5M = parameters.elements['dataset_5M'], 
-							dataset_1H = parameters.elements['dataset_1H'], 
-							symbol = 'XAUUSD_i',
-							signaltype = 'buy', 
-							signalpriority = 'primary', 
-							num_turn = 40
-							)
 
-	for turn in range(0,4):
-		rsi_calc = rsi.GetPermit(
-								dataset_5M = parameters.elements['dataset_5M'],
+	try:
+		rsi_calc = rsi.Genetic(
+								dataset_5M = parameters.elements['dataset_5M'], 
 								dataset_1H = parameters.elements['dataset_1H'], 
 								symbol = 'XAUUSD_i',
-								signaltype = 'buy',
-								signalpriority = 'primary',
-								flag_savepic = False
+								signaltype = 'buy', 
+								signalpriority = 'primary', 
+								num_turn = 40
 								)
 
-		if (
-			rsi_calc['draw_down'][0] <= 7 &
-			rsi_calc['permit'][0] == True
-			): 
-			break
+	except Exception as ex:
+		print('RSI ERROR: ', ex)
+
+	for turn in range(0,4):
+		try:
+			rsi_calc = rsi.GetPermit(
+									dataset_5M = parameters.elements['dataset_5M'],
+									dataset_1H = parameters.elements['dataset_1H'], 
+									symbol = 'XAUUSD_i',
+									signaltype = 'buy',
+									signalpriority = 'primary',
+									flag_savepic = False
+									)
+
+			if (
+				rsi_calc['draw_down'][0] <= 7 &
+				rsi_calc['permit'][0] == True
+				): 
+				break
+
+		except Exception as ex:
+			print('RSI GetPermit ERROR: ', ex)
