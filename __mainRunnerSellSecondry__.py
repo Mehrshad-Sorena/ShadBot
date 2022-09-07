@@ -3,5 +3,5 @@ from GeneticLearningRunner.StochAstic import Runner_SellSecondry as StochAsticRu
 from GeneticLearningRunner.RSI import Runner_SellSecondry as RSIRunner
 
 MACDRunner.Run()
-# StochAsticRunner.Run()
-# RSIRunner.Run()
+StochAsticRunner.Run()
+RSIRunner.Run()

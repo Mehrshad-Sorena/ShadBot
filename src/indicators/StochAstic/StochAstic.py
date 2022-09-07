@@ -921,7 +921,7 @@ class StochAstic:
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
-															flaglearn = GL_Results['islearned'][0],
+															flaglearn = False,#GL_Results['islearned'][0],
 															flagtest = True
 															)
 			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
@@ -1182,7 +1182,7 @@ class StochAstic:
 																dataset_5M = dataset_5M,
 																dataset_1H = dataset_1H,
 																symbol = symbol,
-																flaglearn = chromosome[chrom_counter]['islearned'],
+																flaglearn = False,#chromosome[chrom_counter]['islearned'],
 																flagtest = True
 																)
 
@@ -1239,13 +1239,13 @@ class StochAstic:
 				chromosome[chrom_counter]['isborn'] = False
 
 			except Exception as ex:
-				# print('Divergence Error: ',ex)
+				print('Divergence Error: ',ex)
 				signal = pd.DataFrame()
 				signal_output = pd.DataFrame()
 				learning_output_now = pd.DataFrame()
 				learning_output_before = pd.DataFrame()
 
-			# print('siiiiiiignaaaaaal ====> ', len(signal['index']))
+			# print('siiiiiiignaaaaaal ====> ', signal)
 
 			if signal.empty == True:
 				chromosome[chrom_counter]['isborn'] = False
@@ -1261,7 +1261,6 @@ class StochAstic:
 											Chromosome = chromosome,
 											chrom_counter = chrom_counter
 											)
-
 				chromosome, StochAstic_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																							work = 'fucker_0',
 																							signaltype = signaltype,
@@ -1298,8 +1297,8 @@ class StochAstic:
 				learning_output_now = pd.DataFrame()
 				learning_output_before = pd.DataFrame()
 
-			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-			# 	print(learning_output_now)
+			with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+				print(learning_output_now)
 
 			if (
 				signal_output.empty == True or

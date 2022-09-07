@@ -167,30 +167,39 @@ class Chromosome:
 		ind_parameters = IndicatorParameters()
 
 		stochastic_config = StochAsticConfig()
-		optimizer_params = pd.read_csv(
-										stochastic_config.cfg['path_optimized_params'] + 
-										signalpriority + path_slash + 
-										signaltype + path_slash + 
-										'5M' + path_slash + 
-										symbol + '.csv'
-										)
 
-		limits.elements['StochAstic_k_upper'] = int(optimizer_params['StochAstic_k'].iloc[-1] * 1.2)
-		limits.elements['StochAstic_k_lower'] = int(optimizer_params['StochAstic_k'].iloc[-1] * 0.8)
+		if os.path.exists(
+							stochastic_config.cfg['path_optimized_params'] + 
+							signalpriority + path_slash + 
+							signaltype + path_slash + 
+							'5M' + path_slash + 
+							symbol + '.csv'
+							):
 
-		limits.elements['StochAstic_d_upper'] = int(optimizer_params['StochAstic_d'].iloc[-1] * 1.2)
-		limits.elements['StochAstic_d_lower'] = int(optimizer_params['StochAstic_d'].iloc[-1] * 0.8)
+			optimizer_params = pd.read_csv(
+											stochastic_config.cfg['path_optimized_params'] + 
+											signalpriority + path_slash + 
+											signaltype + path_slash + 
+											'5M' + path_slash + 
+											symbol + '.csv'
+											)
 
-		limits.elements['StochAstic_smooth_k_upper'] = int(optimizer_params['StochAstic_smooth_k'].iloc[-1] * 1.2)
-		limits.elements['StochAstic_smooth_k_lower'] = int(optimizer_params['StochAstic_smooth_k'].iloc[-1] * 0.8)
+			limits.elements['StochAstic_k_upper'] = int(optimizer_params['StochAstic_k'].iloc[-1] * 1.2)
+			limits.elements['StochAstic_k_lower'] = int(optimizer_params['StochAstic_k'].iloc[-1] * 0.8)
 
-		if signaltype == 'buy':
-			limits.elements['Divergence_num_exteremes_min_upper'] = int(optimizer_params['Divergence_num_exteremes_min'].iloc[-1] * 1.2)
-			limits.elements['Divergence_num_exteremes_min_lower'] = int(optimizer_params['Divergence_num_exteremes_min'].iloc[-1] * 0.8)
+			limits.elements['StochAstic_d_upper'] = int(optimizer_params['StochAstic_d'].iloc[-1] * 1.2)
+			limits.elements['StochAstic_d_lower'] = int(optimizer_params['StochAstic_d'].iloc[-1] * 0.8)
 
-		elif signaltype == 'sell':
-			limits.elements['Divergence_num_exteremes_max_upper'] = int(optimizer_params['Divergence_num_exteremes_max'].iloc[-1] * 1.2)
-			limits.elements['Divergence_num_exteremes_max_lower'] = int(optimizer_params['Divergence_num_exteremes_max'].iloc[-1] * 0.8)
+			limits.elements['StochAstic_smooth_k_upper'] = int(optimizer_params['StochAstic_smooth_k'].iloc[-1] * 1.2)
+			limits.elements['StochAstic_smooth_k_lower'] = int(optimizer_params['StochAstic_smooth_k'].iloc[-1] * 0.8)
+
+			if signaltype == 'buy':
+				limits.elements['Divergence_num_exteremes_min_upper'] = int(optimizer_params['Divergence_num_exteremes_min'].iloc[-1] * 1.2)
+				limits.elements['Divergence_num_exteremes_min_lower'] = int(optimizer_params['Divergence_num_exteremes_min'].iloc[-1] * 0.8)
+
+			elif signaltype == 'sell':
+				limits.elements['Divergence_num_exteremes_max_upper'] = int(optimizer_params['Divergence_num_exteremes_max'].iloc[-1] * 1.2)
+				limits.elements['Divergence_num_exteremes_max_lower'] = int(optimizer_params['Divergence_num_exteremes_max'].iloc[-1] * 0.8)
 
 		#Select Which Work is Be Done:
 
