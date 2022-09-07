@@ -920,7 +920,7 @@ class MACD:
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
-															flaglearn = GL_Results['islearned'][0],
+															flaglearn = False,#GL_Results['islearned'][0],
 															flagtest = True
 															)
 			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
@@ -1181,7 +1181,7 @@ class MACD:
 																dataset_5M = dataset_5M,
 																dataset_1H = dataset_1H,
 																symbol = symbol,
-																flaglearn = chromosome[chrom_counter]['islearned'],
+																flaglearn = False,#chromosome[chrom_counter]['islearned'],
 																flagtest = True
 																)
 
