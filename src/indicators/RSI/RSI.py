@@ -1179,7 +1179,7 @@ class RSI:
 																dataset_5M = dataset_5M,
 																dataset_1H = dataset_1H,
 																symbol = symbol,
-																flaglearn = chromosome[chrom_counter]['islearned'],
+																flaglearn = False,#chromosome[chrom_counter]['islearned'],
 																flagtest = True
 																)
 
