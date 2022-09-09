@@ -40,9 +40,10 @@ class Tester:
 
 							})
 	#@stTime
-	def RunGL(self, signal, sigtype, flaglearn, flagtest, pr_parameters, pr_config, indicator = '', flag_savepic = False):
+	def RunGL(self, dataset_5M_real, signal, sigtype, flaglearn, flagtest, pr_parameters, pr_config, indicator = '', flag_savepic = False):
 
 		signal = self.ProfitFlagFinder(
+										dataset_5M_real = dataset_5M_real,
 										signal = signal, 
 										sigtype = sigtype, 
 										flaglearn = flaglearn, 
@@ -60,7 +61,7 @@ class Tester:
 		return signal, scores
 
 	
-	def ProfitFlagFinder(self, signal, sigtype, flaglearn, flagtest, pr_parameters, pr_config, indicator = '', flag_savepic = False):
+	def ProfitFlagFinder(self, dataset_5M_real, signal, sigtype, flaglearn, flagtest, pr_parameters, pr_config, indicator = '', flag_savepic = False):
 
 		#*************************************************************
 		# Bayad Maghadir Baraye Params Va Config As func baraye PR dar GA , Learner daryaft beshan
@@ -86,6 +87,7 @@ class Tester:
 
 		# print(signals)
 		signals = pr_Runner.run(
+								dataset_5M_real = dataset_5M_real,
 								dataset_5M = self.elements['dataset_5M'][self.elements['symbol']], 
 								dataset_1H = self.elements['dataset_1H'][self.elements['symbol']],
 								signals_index = signals,
