@@ -214,7 +214,6 @@ class BestFinder:
 								tol=0.0001
 								)
 
-
 			high = self.elements['dataset_' + timeframe].high
 			low = self.elements['dataset_' + timeframe].low
 
@@ -344,6 +343,7 @@ class BestFinder:
 
 		except Exception as ex:
 			dist_items = ''
+			f = ''
 
 		return dist_items, f
 
