@@ -57,17 +57,48 @@ class NoiseCanceller:
 		'Complex Gaussian wavelets', 'Shannon wavelets', 
 		'Frequency B-Spline wavelets', 'Complex Morlet wavelets']
 
+		wavelet = "haar"
+		scale = 0.00008
+		coefficients = pywt.wavedec(dataset[applyto].dropna(), wavelet, mode='per')
+		coefficients[1:] = [pywt.threshold(i, value = scale*dataset[applyto].mean(), mode='soft') for i in coefficients[1:]]
+		reconstructed_signal_haar = pywt.waverec(coefficients, wavelet, mode='per')
+
 		wavelet = "db6"
-		for i, scale in enumerate([.1, .5]):
+		scale = 0.00008
+		coefficients = pywt.wavedec(dataset[applyto].dropna(), wavelet, mode='per')
+		coefficients[1:] = [pywt.threshold(i, value = scale*dataset[applyto].mean(), mode='soft') for i in coefficients[1:]]
+		reconstructed_signal_db6 = pywt.waverec(coefficients, wavelet, mode='per')
 
-			coefficients = pywt.wavedec(dataset[applyto].dropna(), wavelet, mode='per')
-			coefficients[1:] = [pywt.threshold(i, value=scale*dataset[applyto].max(), mode='soft') for i in coefficients[1:]]
 
-			reconstructed_signal = pywt.waverec(coefficients, wavelet, mode='per')
+		wavelet = "dmey"#dmey
+		scale = 0.00128
+		coefficients = pywt.wavedec(dataset[applyto].dropna(), wavelet, mode='per')
+		coefficients[1:] = [pywt.threshold(i, value = scale*dataset[applyto].mean(), mode='soft') for i in coefficients[1:]]
+		reconstructed_signal_dmey = pywt.waverec(coefficients, wavelet, mode='per')
 
-			dataset['close_5m'].plot(color="b", alpha=0.5, label='original signal', lw=2, 
-			title=f'Threshold Scale: {scale:.1f}')
-			pd.Series(reconstructed_signal, index = range((len(dataset[applyto].index) - len(dataset[applyto].dropna().index))-1 , len(dataset[applyto].index))).plot(c='k', 
-			label='DWT smoothing}', linewidth=1)
+		reconstructed_signal = (reconstructed_signal_haar * reconstructed_signal_dmey * reconstructed_signal_db6) ** (1/3)
 
-			plt.show()
+		# dataset[applyto].plot(color="b", alpha=0.5, label='original signal', lw=2, 
+		# title=f'Threshold Scale: {scale:.1f}')
+
+		# pd.Series(reconstructed_signal_haar, index = range((len(dataset[applyto].index) - len(dataset[applyto].dropna().index))-1 , len(dataset[applyto].index))).plot(c='r', 
+		# label='DWT smoothing}', linewidth=1)
+		# pd.Series(reconstructed_signal_db6, index = range((len(dataset[applyto].index) - len(dataset[applyto].dropna().index))-1 , len(dataset[applyto].index))).plot(c='orange', 
+		# label='DWT smoothing}', linewidth=1)
+		# pd.Series(reconstructed_signal_dmey, index = range((len(dataset[applyto].index) - len(dataset[applyto].dropna().index))-1 , len(dataset[applyto].index))).plot(c='k', 
+		# label='DWT smoothing}', linewidth=1)
+		# pd.Series(reconstructed_signal, index = range((len(dataset[applyto].index) - len(dataset[applyto].dropna().index))-1 , len(dataset[applyto].index))).plot(c='g', 
+		# label='DWT smoothing}', linewidth=1)
+
+		# plt.show()
+
+		dataset['WaveletSmoothed' + applyto] = np.nan
+
+		reconstructed_signal = pd.DataFrame(reconstructed_signal, columns = [applyto])
+		reconstructed_signal = reconstructed_signal.reindex(index = dataset[applyto].index).shift((len(dataset[applyto].index) - len(dataset[applyto].dropna().index)))
+		
+		dataset['WaveletSmoothed' + applyto] = reconstructed_signal
+		dataset[applyto] = dataset['WaveletSmoothed' + applyto]
+		dataset = dataset.drop(columns = ['WaveletSmoothed' + applyto])
+
+		return dataset[applyto]
