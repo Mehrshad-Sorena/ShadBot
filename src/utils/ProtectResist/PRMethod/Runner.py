@@ -219,7 +219,7 @@ class Runner:
 
 	#This Function Calculate Tp And St With Above Function And Out Best Tp And St With Best_Extreme_Finder:
 	#@stTime
-	def start(self,dataset_5M, dataset_1H, loc_end_5M, sigtype, flaglearn, flagtest, signals, indicator = '', flag_savepic = False):
+	def start(self,dataset_5M_real, dataset_5M, dataset_1H, loc_end_5M, sigtype, flaglearn, flagtest, signals, indicator = '', flag_savepic = False):
 
 		if (
 			self.elements['Tester_money'] <= 4 and
@@ -367,7 +367,7 @@ class Runner:
 			#//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			#***************** Concatenate All of Extremes That Finded **************************
-
+			# print(extreme_5M['extreme'])
 			exterm_point = pd.DataFrame(
 										np.concatenate(
 													(
@@ -441,7 +441,7 @@ class Runner:
 											loc_end_5M = loc_end_5M
 											)
 			except Exception as ex:
-				#print('PR Runner Error: ', ex)
+				# print('PR Runner Error: ', ex)
 				extereme = pd.DataFrame(
 										{
 										'high_upper': np.nan,
@@ -498,6 +498,7 @@ class Runner:
 			):
 			tester = Tester(parameters = self)
 			extereme = tester.FlagFinderBuy(
+											dataset_5M_real = dataset_5M_real,
 											dataset_5M = dataset_5M, 
 											extereme = extereme, 
 											flaglearn = flaglearn, 
@@ -526,6 +527,7 @@ class Runner:
 
 			tester = Tester(parameters = self)
 			extereme = tester.FlagFinderSell(
+											dataset_5M_real = dataset_5M_real,
 											dataset_5M = dataset_5M, 
 											extereme = extereme, 
 											flaglearn = flaglearn, 
@@ -549,7 +551,7 @@ class Runner:
 		return extereme.values[0]
 	#/////////////////////////////
 
-	def run(self, signals_index, dataset_5M, dataset_1H, sigtype, flaglearn, flagtest, signals , indicator = '', flag_savepic = False):
+	def run(self, dataset_5M_real, signals_index, dataset_5M, dataset_1H, sigtype, flaglearn, flagtest, signals , indicator = '', flag_savepic = False):
 		if flagtest == False:
 			pr = signals_index.apply(
 								lambda x: pd.Series(
@@ -575,6 +577,7 @@ class Runner:
 			pr = signals_index.apply(
 								lambda x: pd.Series(
 													self.start(
+																dataset_5M_real = dataset_5M_real,
 																dataset_5M = dataset_5M, 
 																dataset_1H = dataset_1H,
 																loc_end_5M = x['index'],
