@@ -372,7 +372,7 @@ class Tester:
 		
 		spred = self.elements['Tester_spred']
 
-		dataset_5M_real = dataset_5M_real['XAUUSD_i'].copy(deep = True)
+		dataset_5M_real = dataset_5M_real.copy(deep = True)
 
 		diff_pr_top = (((extereme['high_upper'][loc_end_5M]) - dataset_5M['high'][loc_end_5M])/dataset_5M['high'][loc_end_5M]) * 100
 		diff_pr_down = ((dataset_5M['low'][loc_end_5M] - (extereme['low_lower'][loc_end_5M]))/dataset_5M['low'][loc_end_5M]) * 100
