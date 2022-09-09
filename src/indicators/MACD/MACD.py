@@ -887,7 +887,7 @@ class MACD:
 
 
 
-	def GetPermit(self,dataset_5M, dataset_1H, symbol, signaltype, signalpriority, flag_savepic):
+	def GetPermit(self, dataset_5M_real, dataset_5M, dataset_1H, symbol, signaltype, signalpriority, flag_savepic):
 
 		GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters, pr_config = self.ParameterReader(
 									 																				symbol = symbol, 
@@ -898,14 +898,19 @@ class MACD:
 		ind_config = indicator_config()
 		macd = Divergence(parameters = ind_parameters, config = ind_config)
 
-		ind_parameters.elements['dataset_5M'] = dataset_5M
-		ind_parameters.elements['dataset_1H'] = dataset_1H
+		# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+		# 	print(dataset_5M[symbol].head(20))
+
+		ind_parameters.elements['dataset_5M'] = dataset_5M.copy()
+		ind_parameters.elements['dataset_1H'] = dataset_1H.copy()
 		macd_tester = Tester(parameters = ind_parameters, config = ind_config)
 
 		self.elements = macd_parameters.elements
-		self.elements['dataset_5M'] = dataset_5M
-		self.elements['dataset_1H'] = dataset_1H
+		self.elements['dataset_5M'] = dataset_5M.copy()
+		# self.elements['dataset_5M'][symbol] = dataset_5M[symbol].copy(deep = True)
+		self.elements['dataset_1H'] = dataset_1H.copy()
 		self.elements['symbol'] = symbol
+
 
 		macd_calc = self.calculator_macd()
 
@@ -920,7 +925,7 @@ class MACD:
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
-															flaglearn = False,#GL_Results['islearned'][0],
+															flaglearn = GL_Results['islearned'][0],
 															flagtest = True
 															)
 			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
@@ -933,6 +938,7 @@ class MACD:
 			# pr_parameters.elements['tp_percent_max'] = 0.3
 
 			signal_output, learning_output = macd_tester.RunGL(
+																dataset_5M_real = dataset_5M_real,
 																signal = signal, 
 																sigtype = signaltype, 
 																flaglearn = GL_Results['islearned'][0], 
@@ -948,8 +954,8 @@ class MACD:
 			signal_output = pd.DataFrame()
 			learning_output = pd.DataFrame()
 
-		# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-		# 	print('signals = ', signal_output)
+		with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+			print('signals = ', signal_output['money'])
 
 		with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 			print(learning_output)
@@ -993,7 +999,7 @@ class MACD:
 		return GL_Results
 
 
-	def Genetic(self, dataset_5M, dataset_1H, symbol, signaltype, signalpriority, num_turn):
+	def Genetic(self, dataset_5M_real, dataset_5M, dataset_1H, symbol, signaltype, signalpriority, num_turn):
 
 		if symbol == 'ETHUSD_i':
 			self.elements['st_percent_up'] = 2000
@@ -1040,9 +1046,9 @@ class MACD:
 		if os.path.exists(path_superhuman + symbol + '.csv'):
 			max_score_gl = pd.read_csv(path_superhuman + symbol + '.csv')['score'][0]
 		else:
-			max_score_gl = 5
+			max_score_gl = 20
 
-		max_score_gl = 5
+		max_score_gl = 20
 
 
 		print('================================ START Genetic MACD ',signaltype,' ===> ',symbol,' ',signalpriority)
@@ -1061,10 +1067,10 @@ class MACD:
 			max_corr = chromosome_output['corr'].min()/3
 
 			if num_turn <= len(learning_result['score']):
-				num_turn = (len(learning_result['score'])) + 2
+				num_turn = (len(learning_result['score'])) + 4
 
 				if len(chromosome_output) >= num_turn:
-					num_turn = len(chromosome_output) + 2
+					num_turn = len(chromosome_output) + 4
 
 		else:
 			learning_result = pd.DataFrame()
@@ -1133,6 +1139,11 @@ class MACD:
 			# print('================== Chorm Reseter ===> ',chorm_reset_counter)
 			# print('===== bad score counter ========> ',bad_score_counter)
 			# print('===== bad score counter 2 ======> ',bad_score_counter_2)
+
+			# print('===== max_tp ======> ',chromosome[chrom_counter]['tp_percent_max'])
+			# print('===== min_tp ======> ',chromosome[chrom_counter]['tp_percent_min'])
+			# print('===== max_st ======> ',chromosome[chrom_counter]['st_percent_max'])
+			# print('===== min_st ======> ',chromosome[chrom_counter]['st_percent_min'])
 			# print()
 			bar.next()
 
@@ -1161,8 +1172,8 @@ class MACD:
 
 
 			self.elements = macd_parameters.elements
-			self.elements['dataset_5M'] = dataset_5M
-			self.elements['dataset_1H'] = dataset_1H
+			self.elements['dataset_5M'] = dataset_5M.copy()
+			self.elements['dataset_1H'] = dataset_1H.copy()
 			self.elements['symbol'] = symbol
 
 			macd_calc = self.calculator_macd()
@@ -1181,7 +1192,7 @@ class MACD:
 																dataset_5M = dataset_5M,
 																dataset_1H = dataset_1H,
 																symbol = symbol,
-																flaglearn = False,#chromosome[chrom_counter]['islearned'],
+																flaglearn = chromosome[chrom_counter]['islearned'],
 																flagtest = True
 																)
 
@@ -1236,6 +1247,7 @@ class MACD:
 						learning_output_before = pd.DataFrame()
 
 				chromosome[chrom_counter]['isborn'] = False
+				# print('siiiiiiignaaaaaal ====> ', len(signal['index']))
 
 			except Exception as ex:
 				# print('Divergence Error: ',ex)
@@ -1244,7 +1256,6 @@ class MACD:
 				learning_output_now = pd.DataFrame()
 				learning_output_before = pd.DataFrame()
 
-			# print('siiiiiiignaaaaaal ====> ', len(signal['index']))
 
 			if signal.empty == True:
 				chromosome[chrom_counter]['isborn'] = False
@@ -1272,13 +1283,14 @@ class MACD:
 																							)
 				continue
 
-			ind_parameters.elements['dataset_5M'] = dataset_5M
-			ind_parameters.elements['dataset_1H'] = dataset_1H
+			ind_parameters.elements['dataset_5M'] = dataset_5M.copy()
+			ind_parameters.elements['dataset_1H'] = dataset_1H.copy()
 
 			macd_tester = Tester(parameters = ind_parameters, config = ind_config)
 			try:
 
 				signal_output, learning_output_now = macd_tester.RunGL(
+																	dataset_5M_real = dataset_5M_real,
 																	signal = signal, 
 																	sigtype = signaltype, 
 																	flaglearn = chromosome[chrom_counter]['islearned'], 
@@ -1299,6 +1311,7 @@ class MACD:
 
 			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 			# 	print(learning_output_now)
+			# 	print()
 
 			if (
 				signal_output.empty == True or
@@ -1339,7 +1352,6 @@ class MACD:
 			if (
 				chromosome[chrom_counter]['islearned'] == False
 				):
-
 				bad_flag = True
 				bad_score_counter += 1
 				learning_output_before = learning_output_now
@@ -1473,7 +1485,6 @@ class MACD:
 				score_for_reset = learning_output_now['score'][0]
 				chromosome[chrom_counter]['islearned'] = (flag_learn_tp_percent_max & flag_learn_tp_percent_min & flag_learn_st_percent_max & flag_learn_st_percent_min)
 
-
 			elif (
 				learning_output_now['score'][0] >= max_score_gl * 0.99 and
 				chromosome[chrom_counter]['islearned'] == True
@@ -1576,6 +1587,33 @@ class MACD:
 				bad_score_counter_2 = 0
 				continue
 
+			else:
+				chromosome[chrom_counter]['islearned'] = False
+				bad_flag = True
+				bad_score_counter += 1
+				learning_output_before = learning_output_now
+
+				if learning_output_now['max_st'][0] > 0.09: 
+					chromosome[chrom_counter]['st_percent_max'] = learning_output_now['max_st'][0]
+				else:
+					chromosome[chrom_counter]['st_percent_max'] = learning_output_now['max_st_pr'][0]
+
+				if learning_output_now['min_st'][0] > 0.08: 
+					chromosome[chrom_counter]['st_percent_min'] = learning_output_now['min_st'][0]
+				else:
+					chromosome[chrom_counter]['st_percent_min'] = learning_output_now['mean_st_pr'][0]
+
+				if learning_output_now['max_tp'][0] > 0.27: 
+					chromosome[chrom_counter]['tp_percent_max'] = learning_output_now['max_tp'][0]
+				else:
+					chromosome[chrom_counter]['tp_percent_max'] = learning_output_now['max_tp_pr'][0]
+
+				if learning_output_now['min_tp'][0] > 0.24: 
+					chromosome[chrom_counter]['tp_percent_min'] = learning_output_now['min_tp'][0]
+				else:
+					chromosome[chrom_counter]['tp_percent_min'] = learning_output_now['mean_tp_pr'][0]
+
+
 			if (
 				len(chromosome_output) >= int(num_turn)
 				):
@@ -1583,7 +1621,7 @@ class MACD:
 
 			if bad_flag == True:
 
-				if bad_score_counter < 4:
+				if bad_score_counter < 5:
 
 					chromosome, macd_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																									work = 'fucker_1',
