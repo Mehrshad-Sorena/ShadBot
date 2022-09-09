@@ -888,7 +888,7 @@ class StochAstic:
 
 
 
-	def GetPermit(self,dataset_5M, dataset_1H, symbol, signaltype, signalpriority, flag_savepic):
+	def GetPermit(self, dataset_5M_real, dataset_5M, dataset_1H, symbol, signaltype, signalpriority, flag_savepic):
 
 		GL_Results, path_superhuman, StochAstic_parameters, ind_parameters, pr_parameters, pr_config = self.ParameterReader(
 									 																				symbol = symbol, 
@@ -921,7 +921,7 @@ class StochAstic:
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
-															flaglearn = False,#GL_Results['islearned'][0],
+															flaglearn = GL_Results['islearned'][0],
 															flagtest = True
 															)
 			# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
@@ -934,6 +934,7 @@ class StochAstic:
 			# pr_parameters.elements['tp_percent_max'] = 0.3
 
 			signal_output, learning_output = StochAstic_tester.RunGL(
+																dataset_5M_real = dataset_5M_real,
 																signal = signal, 
 																sigtype = signaltype, 
 																flaglearn = GL_Results['islearned'][0], 
@@ -994,7 +995,7 @@ class StochAstic:
 		return GL_Results
 
 
-	def Genetic(self, dataset_5M, dataset_1H, symbol, signaltype, signalpriority, num_turn):
+	def Genetic(self, dataset_5M_real, dataset_5M, dataset_1H, symbol, signaltype, signalpriority, num_turn):
 
 		if symbol == 'ETHUSD_i':
 			self.elements['st_percent_up'] = 2000
@@ -1041,9 +1042,9 @@ class StochAstic:
 		if os.path.exists(path_superhuman + symbol + '.csv'):
 			max_score_gl = pd.read_csv(path_superhuman + symbol + '.csv')['score'][0]
 		else:
-			max_score_gl = 5
+			max_score_gl = 20
 
-		max_score_gl = 5
+		max_score_gl = 20
 
 
 		print('================================ START Genetic StochAstic ',signaltype,' ===> ',symbol,' ',signalpriority)
@@ -1182,7 +1183,7 @@ class StochAstic:
 																dataset_5M = dataset_5M,
 																dataset_1H = dataset_1H,
 																symbol = symbol,
-																flaglearn = False,#chromosome[chrom_counter]['islearned'],
+																flaglearn = chromosome[chrom_counter]['islearned'],
 																flagtest = True
 																)
 
@@ -1279,6 +1280,7 @@ class StochAstic:
 			try:
 
 				signal_output, learning_output_now = StochAstic_tester.RunGL(
+																	dataset_5M_real = dataset_5M_real,
 																	signal = signal, 
 																	sigtype = signaltype, 
 																	flaglearn = chromosome[chrom_counter]['islearned'], 
@@ -1576,6 +1578,32 @@ class StochAstic:
 				bad_score_counter_2 = 0
 				continue
 
+			else:
+				chromosome[chrom_counter]['islearned'] = False
+				bad_flag = True
+				bad_score_counter += 1
+				learning_output_before = learning_output_now
+
+				if learning_output_now['max_st'][0] > 0.09: 
+					chromosome[chrom_counter]['st_percent_max'] = learning_output_now['max_st'][0]
+				else:
+					chromosome[chrom_counter]['st_percent_max'] = learning_output_now['max_st_pr'][0]
+
+				if learning_output_now['min_st'][0] > 0.08: 
+					chromosome[chrom_counter]['st_percent_min'] = learning_output_now['min_st'][0]
+				else:
+					chromosome[chrom_counter]['st_percent_min'] = learning_output_now['mean_st_pr'][0]
+
+				if learning_output_now['max_tp'][0] > 0.27: 
+					chromosome[chrom_counter]['tp_percent_max'] = learning_output_now['max_tp'][0]
+				else:
+					chromosome[chrom_counter]['tp_percent_max'] = learning_output_now['max_tp_pr'][0]
+
+				if learning_output_now['min_tp'][0] > 0.24: 
+					chromosome[chrom_counter]['tp_percent_min'] = learning_output_now['min_tp'][0]
+				else:
+					chromosome[chrom_counter]['tp_percent_min'] = learning_output_now['mean_tp_pr'][0]
+
 			if (
 				len(chromosome_output) >= int(num_turn)
 				):
@@ -1583,7 +1611,7 @@ class StochAstic:
 
 			if bad_flag == True:
 
-				if bad_score_counter < 4:
+				if bad_score_counter < 5:
 
 					chromosome, StochAstic_parameters, ind_parameters, pr_parameters, pr_config = chrom.Get(
 																									work = 'fucker_1',
