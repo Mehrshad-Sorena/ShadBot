@@ -954,8 +954,8 @@ class MACD:
 			signal_output = pd.DataFrame()
 			learning_output = pd.DataFrame()
 
-		with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-			print('signals = ', signal_output['money'])
+		# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+		# 	print('signals = ', signal_output['money'])
 
 		with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 			print(learning_output)
