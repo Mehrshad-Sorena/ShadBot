@@ -8,7 +8,11 @@ class NoiseCanceller:
 
 	def __init__(self):
 
-		pass
+		#Noise Wavelet:
+		self.scale_haar = 0.00008
+		self.scale_db6 = 0.00008
+		self.scale_dmey = 0.00128
+		#///////////////////////////
 
 
 	def NoiseKalmanFilter(self, dataset, applyto):
@@ -31,20 +35,21 @@ class NoiseCanceller:
 		(smoothed_state_means, smoothed_state_covariances) = kf.smooth(filtered_state_means)
 
 		# state_means, _ = kf.filter(dataset[applyto].dropna())
-
-		dataset['KalmanSmoothed' + applyto] = np.nan
+		dataset_output = dataset.copy(deep = True)
+		dataset_output['KalmanSmoothed' + applyto] = np.nan
 		smoothed_state_means = pd.DataFrame(smoothed_state_means, columns = [applyto])
 		smoothed_state_means = smoothed_state_means.reindex(index = dataset[applyto].index).shift((len(dataset[applyto].index) - len(dataset[applyto].dropna().index)))
-		dataset['KalmanSmoothed' + applyto] = smoothed_state_means
-		dataset[applyto] = dataset['KalmanSmoothed' + applyto]
-		dataset = dataset.drop(columns = ['KalmanSmoothed' + applyto])
+		dataset_output['KalmanSmoothed' + applyto] = smoothed_state_means
+		
+		dataset_output[applyto] = dataset_output['KalmanSmoothed' + applyto]
+		dataset_output = dataset_output.drop(columns = ['KalmanSmoothed' + applyto])
 
 		# plt.plot(dataset[applyto].index[50:-1], dataset[applyto][50:-1], c = 'r')
 		#plt.plot(dataset[applyto].index[250:-1], filtered_state_means[250:-1], c = 'b')
 		# plt.plot(dataset[applyto].index[250:-1], smoothed_state_means[250:-1], c = 'g')
 		# plt.show()
 
-		return dataset[applyto]
+		return dataset_output[applyto]
 
 	def NoiseWavelet(self, dataset, applyto):
 
@@ -58,22 +63,19 @@ class NoiseCanceller:
 		'Frequency B-Spline wavelets', 'Complex Morlet wavelets']
 
 		wavelet = "haar"
-		scale = 0.00008
 		coefficients = pywt.wavedec(dataset[applyto].dropna(), wavelet, mode='per')
-		coefficients[1:] = [pywt.threshold(i, value = scale*dataset[applyto].mean(), mode='soft') for i in coefficients[1:]]
+		coefficients[1:] = [pywt.threshold(i, value = self.scale_haar*dataset[applyto].mean(), mode='soft') for i in coefficients[1:]]
 		reconstructed_signal_haar = pywt.waverec(coefficients, wavelet, mode='per')
 
 		wavelet = "db6"
-		scale = 0.00008
 		coefficients = pywt.wavedec(dataset[applyto].dropna(), wavelet, mode='per')
-		coefficients[1:] = [pywt.threshold(i, value = scale*dataset[applyto].mean(), mode='soft') for i in coefficients[1:]]
+		coefficients[1:] = [pywt.threshold(i, value = self.scale_db6*dataset[applyto].mean(), mode='soft') for i in coefficients[1:]]
 		reconstructed_signal_db6 = pywt.waverec(coefficients, wavelet, mode='per')
 
 
-		wavelet = "dmey"#dmey
-		scale = 0.00128
+		wavelet = "dmey"
 		coefficients = pywt.wavedec(dataset[applyto].dropna(), wavelet, mode='per')
-		coefficients[1:] = [pywt.threshold(i, value = scale*dataset[applyto].mean(), mode='soft') for i in coefficients[1:]]
+		coefficients[1:] = [pywt.threshold(i, value = self.scale_dmey*dataset[applyto].mean(), mode='soft') for i in coefficients[1:]]
 		reconstructed_signal_dmey = pywt.waverec(coefficients, wavelet, mode='per')
 
 		reconstructed_signal = (reconstructed_signal_haar * reconstructed_signal_dmey * reconstructed_signal_db6) ** (1/3)
