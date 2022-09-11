@@ -1,19 +1,47 @@
 import pandas as pd
-import seaborn as sns
-from pathlib import Path
-import requests
-from io import BytesIO
-from zipfile import ZipFile, BadZipFile
-import pandas_datareader.data as web
+# import seaborn as sns
+# from pathlib import Path
+# import requests
+# from io import BytesIO
+# from zipfile import ZipFile, BadZipFile
+# import pandas_datareader.data as web
 # from talib import RSI, BBANDS, MACD, CCI, EMA, SMA, STOCH
+from statsmodels.tsa.deterministic import CalendarFourier, DeterministicProcess
 import pandas_ta as ind
 import numpy as np
 import matplotlib.pyplot as plt
+
+from src.indicators.MACD.Config import Config as MACDConfig
+from src.indicators.MACD.Parameters import Parameters as MACDParameters
+from src.indicators.MACD.MACD import MACD
+
+from src.indicators.StochAstic.Config import Config as StochAsticConfig
+from src.indicators.StochAstic.Parameters import Parameters as StochAsticParameters
+from src.indicators.StochAstic.StochAstic import StochAstic
+
+from src.indicators.RSI.Config import Config as RSIConfig
+from src.indicators.RSI.Parameters import Parameters as RSIParameters
+from src.indicators.RSI.RSI import RSI
+
+from src.utils.Divergence.Divergence import Divergence
+from src.utils.Divergence.Parameters import Parameters as indicator_parameters
+from src.utils.Divergence.Config import Config as indicator_config
+
+import sys
+import os
+
+if 'win' in sys.platform:
+	path_slash = '\\'
+elif 'linux' in sys.platform:
+	path_slash = '/'
+
 
 
 class FeatureEngineering:
 
 	def __init__(self):
+
+		self.symbol = 'XAUUSD_i'
 		
 		self.lags = [1, 2, 3, 6, 9, 12, 24, 48]
 		self.timelags = [1, 2, 3, 6, 9, 12, 24, 48]
@@ -119,6 +147,8 @@ class FeatureEngineering:
 		dataset_5m = dataset_5M.copy(deep = True)
 		dataset_5m.index = dataset_5m['time']
 
+		# print(dataset_5m)
+
 		dataset = pd.DataFrame()
 		dataset = dataset.assign(
 								close_5m = dataset_5m['close'],
@@ -151,13 +181,28 @@ class FeatureEngineering:
 								time_1h = dataset_1h['time'],
 								)
 
-		dataset.index = range(0 , len(dataset['close_5m']))
+		# dataset.index = range(0 , len(dataset['close_5m']))
 
 		return dataset
 
 
-	def FourierCreation():
-		pass
+	def FourierCreation(self, dataset):
+
+		fourier = CalendarFourier(freq="T", order=100)  # 10 sin/cos pairs for "A"nnual seasonality
+		print(fourier)
+
+		dp = DeterministicProcess(
+								    index = dataset.index,
+								    constant = True,               # dummy feature for bias (y-intercept)
+								    order = 1,                     # trend (order 1 means linear)
+								    seasonal = False,               # weekly seasonality (indicators)
+								    drop = True,                   # drop terms to avoid collinearity
+								)
+
+		print('dpppp ==== > ', dp)
+
+		X = dp.in_sample()  # create features for dates in tunnel.index
+		print('insample = ', X)
 
 
 	def LagCreation(self, dataset):
@@ -214,11 +259,14 @@ class FeatureEngineering:
 		return dataset
 
 
-	def TimeCreation(self, dataset):
+	def TimeCreationPattern(self, dataset):
 
-		times = dataset.index.get_level_values('time_5m')
-		dataset['hour'] = times.hour
-		dataset['minute'] = times.minute
+		DaysOfWeek = ['Monday', 'Tuesday', 'Thursday', 'Wednesday', 'Friday']
+
+		for day in DaysOfWeek:
+
+			dataset['pattern_day_' + day] = np.nan
+			dataset['pattern_day_' + day] = dataset['time_5m'].apply(lambda x: 1 if x.day_name() == day else np.nan)
 
 		return dataset
 
@@ -545,6 +593,10 @@ class FeatureEngineering:
 
 				dataset[f'pattern_5m_{counter}'] = cdl_patterns_5m[pattern]
 
+				dataset[f'pattern_5m_{counter}'] = dataset[f'pattern_5m_{counter}'].apply(
+																lambda x: 'buy' if x == 100 else ('sell' if x == -100 else np.nan)
+																)
+
 				counter += 1
 
 		if self.config_pattern_1h == True:
@@ -565,9 +617,316 @@ class FeatureEngineering:
 
 				dataset[f'pattern_1h_{counter}'] = cdl_patterns_1h[pattern]
 
+				dataset[f'pattern_1h_{counter}'] = dataset[f'pattern_1h_{counter}'].apply(
+																lambda x: 'buy' if x == 100 else ('sell' if x == -100 else np.nan)
+																)
+
 				counter += 1
 
 		return dataset
+
+	#//////////////////////////////////////////////
+
+	def AlphaDivergencePatternAndFactorOsilator(self, dataset, dataset_5M, dataset_1H):
+
+		signalpriority = ['primary', 'secondry', 'primary', 'secondry']
+		signaltype = ['buy' , 'sell', 'sell' , 'buy']
+		timeframes = ['5M' , '1H']
+		indicator_names = ['macd', 'stochastic', 'rsi']
+
+		for ind_name in indicator_names:
+			for timfrm in timeframes:
+				for sigpriority, sigtype in zip(signalpriority, signaltype):
+
+					# dataset['pattern_' + ind_name + '_div_' + timfrm + '_' + sigtype + '_' + sigpriority] = np.nan
+
+					if timfrm == '1H':
+						ind_parameters, ind_config, div_parameters, div_config = self.AlphaFactorDivergenceParameterReader(
+																															signalpriority = sigpriority,
+																															signaltype = sigtype,
+																															timeframe = timfrm,
+																															dataset = dataset_1H,
+																															indicator_name = ind_name
+																															)
+					elif timfrm == '5M':
+						ind_parameters, ind_config, div_parameters, div_config = self.AlphaFactorDivergenceParameterReader(
+																															signalpriority = sigpriority,
+																															signaltype = sigtype,
+																															timeframe = timfrm,
+																															dataset = dataset_5M,
+																															indicator_name = ind_name
+																															)
+
+					#Add MACD Calculate Params AS Alpha Factor To Dataset:
+					if ind_name == 'macd':
+
+						dataset['macd_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
+						dataset['macds_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
+						dataset['macdh_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
+
+						ind = MACD(parameters = ind_parameters, config = ind_config)
+						ind_calc = ind.calculator_macd()
+
+						if timfrm == '5M':
+							ind_calc['time'] = dataset_5M[self.symbol]['time']
+							ind_calc['index'] = ind_calc.index
+							ind_calc.index = ind_calc['time']
+
+						elif timfrm == '1H':
+							ind_calc['time'] = dataset_1H[self.symbol]['time']
+							ind_calc['index'] = ind_calc.index
+							ind_calc.index = ind_calc['time']
+
+						dataset['macd_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = ind_calc['macd']
+						dataset['macds_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = ind_calc['macds']
+						dataset['macdh_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = ind_calc['macdh']
+
+						ind_calc.index = ind_calc['index']
+
+						column_div = ind_parameters.elements['MACD_column_div']
+					#///////////////////////////////////////
+
+					#Add StochAstic Calculate Params AS Alpha Factor To Dataset:
+					elif ind_name == 'stochastic':
+
+						dataset['StochAstic_d_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
+						dataset['StochAstic_k_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
+
+						ind = StochAstic(parameters = ind_parameters, config = ind_config)
+						ind_calc = ind.calculator_StochAstic()
+
+						if timfrm == '5M':
+							ind_calc['time'] = dataset_5M[self.symbol]['time']
+							ind_calc['index'] = ind_calc.index
+							ind_calc.index = ind_calc['time']
+
+						elif timfrm == '1H':
+							ind_calc['time'] = dataset_1H[self.symbol]['time']
+							ind_calc['index'] = ind_calc.index
+							ind_calc.index = ind_calc['time']
+
+
+						dataset['StochAstic_d_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = ind_calc['StochAstic_d']
+						dataset['StochAstic_k_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = ind_calc['StochAstic_k']
+
+						ind_calc.index = ind_calc['index']
+
+						column_div = ind_parameters.elements['StochAstic_column_div']
+					#//////////////////////////////////////////////////////////
+
+					#Add RSI Calculate Params AS Alpha Factor To Dataset:
+					elif ind_name == 'rsi':
+
+						dataset['rsi_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
+
+						ind = RSI(parameters = ind_parameters, config = ind_config)
+						ind_calc = ind.calculator_rsi()
+
+						if timfrm == '5M':
+							ind_calc['time'] = dataset_5M[self.symbol]['time']
+							ind_calc['index'] = ind_calc.index
+							ind_calc.index = ind_calc['time']
+
+						elif timfrm == '1H':
+							ind_calc['time'] = dataset_1H[self.symbol]['time']
+							ind_calc['index'] = ind_calc.index
+							ind_calc.index = ind_calc['time']
+
+						dataset['rsi_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = ind_calc['rsi']
+
+						ind_calc.index = ind_calc['index']
+
+						column_div = 'rsi'
+					#////////////////////////////////////////////////////////////
+
+
+
+					divergence = Divergence(parameters = div_parameters, config = div_config)
+
+					if timfrm == '1H':
+						signal, _, _ = divergence.divergence(
+															sigtype = sigtype,
+															sigpriority = sigpriority,
+															indicator = ind_calc,
+															column_div = column_div,
+															ind_name = ind_name,
+															dataset_5M = dataset_1H,
+															dataset_1H = dataset_1H,
+															symbol = self.symbol,
+															flaglearn = False,
+															flagtest = False
+															)
+
+						signal = signal.drop_duplicates(subset = ['time_low_front'])
+						signal.index = signal['time_low_front']
+
+						dataset['pattern_' + ind_name + '_div_' + '1h_' + sigtype + '_' + sigpriority] = signal['signal']
+
+
+					elif timfrm == '5M':
+						signal, _, _ = divergence.divergence(
+															sigtype = sigtype,
+															sigpriority = sigpriority,
+															indicator = ind_calc,
+															column_div = column_div,
+															ind_name = ind_name,
+															dataset_5M = dataset_5M,
+															dataset_1H = dataset_5M,
+															symbol = self.symbol,
+															flaglearn = False,
+															flagtest = False
+															)
+
+						signal = signal.drop_duplicates(subset = ['time_low_front'])
+						signal.index = signal['time_low_front']
+
+						dataset['pattern_' + ind_name + '_div_' + '5m_' + sigtype + '_' + sigpriority] = signal['signal']
+
+		return dataset
+
+
+	def AlphaFactorDivergenceParameterReader(
+											self,
+											signalpriority,
+											signaltype,
+											timeframe = '5M',
+											dataset = pd.DataFrame(),
+											indicator_name = 'macd'
+											):
+
+		if indicator_name == 'macd':
+
+			macd_config = MACDConfig()
+			macd_parameters = MACDParameters()
+			ind_config = indicator_config()
+			ind_parameters = indicator_parameters()
+
+			if os.path.exists(
+								macd_config.cfg['path_optimized_params'] + 
+								signalpriority + path_slash + 
+								signaltype + path_slash + 
+								timeframe + path_slash + 
+								self.symbol + '.csv'
+							):
+
+				macd_optimizer_params = pd.read_csv(
+													macd_config.cfg['path_optimized_params'] + 
+													signalpriority + path_slash + 
+													signaltype + path_slash + 
+													timeframe + path_slash + 
+													self.symbol + '.csv'
+													)
+
+				ind_parameters.elements['Divergence_num_exteremes_min'] = int(macd_optimizer_params['Divergence_num_exteremes_min'].iloc[-1])
+				ind_parameters.elements['Divergence_num_exteremes_max'] = int(macd_optimizer_params['Divergence_num_exteremes_max'].iloc[-1])
+				ind_parameters.elements['Divergence_diff_extereme'] = int(macd_optimizer_params['Divergence_diff_extereme'].iloc[-1])
+
+				ind_parameters.elements['dataset_5M'] = dataset
+				ind_parameters.elements['dataset_1H'] = dataset
+
+				macd_parameters.elements['MACD_apply_to'] = macd_optimizer_params['MACD_apply_to'].iloc[-1]
+				macd_parameters.elements['MACD_fast'] = int(macd_optimizer_params['MACD_fast'].iloc[-1])
+				macd_parameters.elements['MACD_slow'] = int(macd_optimizer_params['MACD_slow'].iloc[-1])
+				macd_parameters.elements['MACD_signal'] = int(macd_optimizer_params['MACD_signal'].iloc[-1])
+				macd_parameters.elements['MACD_column_div'] = macd_optimizer_params['MACD_column_div'].iloc[-1]
+
+				macd_parameters.elements['dataset_5M'] = dataset
+				macd_parameters.elements['dataset_1H'] = dataset
+				macd_parameters.elements['symbol'] = self.symbol
+
+			else:
+				return False
+
+			return macd_parameters, macd_config, ind_parameters, ind_config
+
+		elif indicator_name == 'stochastic':
+
+			stochastic_config = StochAsticConfig()
+			stochastic_parameters = StochAsticParameters()
+			ind_config = indicator_config()
+			ind_parameters = indicator_parameters()
+
+			if os.path.exists(
+								stochastic_config.cfg['path_optimized_params'] + 
+								signalpriority + path_slash + 
+								signaltype + path_slash + 
+								timeframe + path_slash + 
+								self.symbol + '.csv'
+							):
+
+				stochastic_optimizer_params = pd.read_csv(
+														stochastic_config.cfg['path_optimized_params'] + 
+														signalpriority + path_slash + 
+														signaltype + path_slash + 
+														timeframe + path_slash + 
+														self.symbol + '.csv'
+														)
+
+				ind_parameters.elements['Divergence_num_exteremes_min'] = int(stochastic_optimizer_params['Divergence_num_exteremes_min'].iloc[-1])
+				ind_parameters.elements['Divergence_num_exteremes_max'] = int(stochastic_optimizer_params['Divergence_num_exteremes_max'].iloc[-1])
+				ind_parameters.elements['Divergence_diff_extereme'] = int(stochastic_optimizer_params['Divergence_diff_extereme'].iloc[-1])
+
+				ind_parameters.elements['dataset_5M'] = dataset
+				ind_parameters.elements['dataset_1H'] = dataset
+
+				stochastic_parameters.elements['StochAstic_d'] = int(stochastic_optimizer_params['StochAstic_d'].iloc[-1])
+				stochastic_parameters.elements['StochAstic_k'] = int(stochastic_optimizer_params['StochAstic_k'].iloc[-1])
+				stochastic_parameters.elements['StochAstic_smooth_k'] = int(stochastic_optimizer_params['StochAstic_smooth_k'].iloc[-1])
+				stochastic_parameters.elements['StochAstic_column_div'] = stochastic_optimizer_params['StochAstic_column_div'].iloc[-1]
+				stochastic_parameters.elements['StochAstic_mamod'] = stochastic_optimizer_params['StochAstic_mamod'].iloc[-1]
+
+				stochastic_parameters.elements['dataset_5M'] = dataset
+				stochastic_parameters.elements['dataset_1H'] = dataset
+				stochastic_parameters.elements['symbol'] = self.symbol
+			else:
+				return False
+
+			return stochastic_parameters, stochastic_config, ind_parameters, ind_config
+
+		if indicator_name == 'rsi':
+
+			rsi_config = RSIConfig()
+			rsi_parameters = RSIParameters()
+			ind_config = indicator_config()
+			ind_parameters = indicator_parameters()
+
+			if os.path.exists(
+								rsi_config.cfg['path_optimized_params'] + 
+								signalpriority + path_slash + 
+								signaltype + path_slash + 
+								timeframe + path_slash + 
+								self.symbol + '.csv'
+							):
+
+				rsi_optimizer_params = pd.read_csv(
+													rsi_config.cfg['path_optimized_params'] + 
+													signalpriority + path_slash + 
+													signaltype + path_slash + 
+													timeframe + path_slash + 
+													self.symbol + '.csv'
+													)
+
+				ind_parameters.elements['Divergence_num_exteremes_min'] = int(rsi_optimizer_params['Divergence_num_exteremes_min'].iloc[-1])
+				ind_parameters.elements['Divergence_num_exteremes_max'] = int(rsi_optimizer_params['Divergence_num_exteremes_max'].iloc[-1])
+				ind_parameters.elements['Divergence_diff_extereme'] = int(rsi_optimizer_params['Divergence_diff_extereme'].iloc[-1])
+
+				ind_parameters.elements['dataset_5M'] = dataset
+				ind_parameters.elements['dataset_1H'] = dataset
+
+				rsi_parameters.elements['RSI_apply_to'] = rsi_optimizer_params['RSI_apply_to'].iloc[-1]
+				rsi_parameters.elements['RSI_length'] = int(rsi_optimizer_params['RSI_length'].iloc[-1])
+
+				rsi_parameters.elements['dataset_5M'] = dataset
+				rsi_parameters.elements['dataset_1H'] = dataset
+				rsi_parameters.elements['symbol'] = self.symbol
+
+			else:
+				return False
+
+			return rsi_parameters, rsi_config, ind_parameters, ind_config
+
+
+
 
 	#//////////////////////////////////////////////
 
