@@ -72,7 +72,7 @@ class Optimizers():
 
 	    period_time = (freq * pd.Timedelta(min_time))/pd.Timedelta("1Y")
 
-	    return round(freq)
+	    return round(freq), freqencies, spectrum
 
 
 	def MacdOptimizer(self):
@@ -88,7 +88,7 @@ class Optimizers():
 
 		self.dataset[self.symbol] = self.dataset[self.symbol].assign(index = self.dataset[self.symbol].index)
 
-		freq = self.FreqFinder(self.dataset[self.symbol].close)
+		freq, _, _ = self.FreqFinder(self.dataset[self.symbol].close)
 
 		if self.timeframe == '5M':
 			freq_time = str(5 * freq) + 'T'
@@ -343,7 +343,7 @@ class Optimizers():
 
 		self.dataset[self.symbol] = self.dataset[self.symbol].assign(index = self.dataset[self.symbol].index)
 
-		freq = self.FreqFinder(self.dataset[self.symbol].close)
+		freq, _, _ = self.FreqFinder(self.dataset[self.symbol].close)
 
 		if self.timeframe == '5M':
 			freq_time = str(5 * freq) + 'T'
@@ -592,7 +592,7 @@ class Optimizers():
 
 		self.dataset[self.symbol] = self.dataset[self.symbol].assign(index = self.dataset[self.symbol].index)
 
-		freq = self.FreqFinder(self.dataset[self.symbol].close)
+		freq, _, _ = self.FreqFinder(self.dataset[self.symbol].close)
 
 		if self.timeframe == '5M':
 			freq_time = str(5 * freq) + 'T'

@@ -38,6 +38,15 @@ def Run():
 	parameters.elements['dataset_5M']['XAUUSD_i']['HLCC/4'] = noise_canceller.NoiseWavelet(dataset = parameters.elements['dataset_5M']['XAUUSD_i'], applyto = 'HLCC/4')
 	parameters.elements['dataset_5M']['XAUUSD_i']['OHLC/4'] = noise_canceller.NoiseWavelet(dataset = parameters.elements['dataset_5M']['XAUUSD_i'], applyto = 'OHLC/4')
 
+	parameters.elements['dataset_1H']['XAUUSD_i']['close'] = noise_canceller.NoiseWavelet(dataset = parameters.elements['dataset_1H']['XAUUSD_i'], applyto = 'close')
+	parameters.elements['dataset_1H']['XAUUSD_i']['open'] = noise_canceller.NoiseWavelet(dataset = parameters.elements['dataset_1H']['XAUUSD_i'], applyto = 'open')
+	parameters.elements['dataset_1H']['XAUUSD_i']['high'] = noise_canceller.NoiseWavelet(dataset = parameters.elements['dataset_1H']['XAUUSD_i'], applyto = 'high')
+	parameters.elements['dataset_1H']['XAUUSD_i']['low'] = noise_canceller.NoiseWavelet(dataset = parameters.elements['dataset_1H']['XAUUSD_i'], applyto = 'low')
+	parameters.elements['dataset_1H']['XAUUSD_i']['HL/2'] = noise_canceller.NoiseWavelet(dataset = parameters.elements['dataset_1H']['XAUUSD_i'], applyto = 'HL/2')
+	parameters.elements['dataset_1H']['XAUUSD_i']['HLC/3'] = noise_canceller.NoiseWavelet(dataset = parameters.elements['dataset_1H']['XAUUSD_i'], applyto = 'HLC/3')
+	parameters.elements['dataset_1H']['XAUUSD_i']['HLCC/4'] = noise_canceller.NoiseWavelet(dataset = parameters.elements['dataset_1H']['XAUUSD_i'], applyto = 'HLCC/4')
+	parameters.elements['dataset_1H']['XAUUSD_i']['OHLC/4'] = noise_canceller.NoiseWavelet(dataset = parameters.elements['dataset_1H']['XAUUSD_i'], applyto = 'OHLC/4')
+
 	print('Data Ready .... ')
 	# sys.exit()
 
