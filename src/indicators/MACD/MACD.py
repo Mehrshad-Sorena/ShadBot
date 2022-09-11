@@ -19,6 +19,7 @@ from src.utils.Divergence.Divergence import Divergence
 from src.utils.Divergence.Tester import Tester
 
 from src.utils.ProtectResist.PRMethod.Runner import Runner
+from src.utils.Optimizers import NoiseCanceller
 
 import sys
 
@@ -253,6 +254,27 @@ class MACD:
 
 	@stTime
 	def LastSignal(self,dataset_5M, dataset_1H, symbol):
+
+		noise_canceller = NoiseCanceller.NoiseCanceller()
+		dataset_5M[symbol]['close'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'close')
+		dataset_5M[symbol]['open'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'open')
+		dataset_5M[symbol]['high'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'high')
+		dataset_5M[symbol]['low'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'low')
+		dataset_5M[symbol]['HL/2'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'HL/2')
+		dataset_5M[symbol]['HLC/3'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'HLC/3')
+		dataset_5M[symbol]['HLCC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'HLCC/4')
+		dataset_5M[symbol]['OHLC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'OHLC/4')
+
+		dataset_1H[symbol]['close'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'close')
+		dataset_1H[symbol]['open'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'open')
+		dataset_1H[symbol]['high'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'high')
+		dataset_1H[symbol]['low'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'low')
+		dataset_1H[symbol]['HL/2'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'HL/2')
+		dataset_1H[symbol]['HLC/3'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'HLC/3')
+		dataset_1H[symbol]['HLCC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'HLCC/4')
+		dataset_1H[symbol]['OHLC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'OHLC/4')
+
+
 
 		#BUY Primary:
 
@@ -493,7 +515,8 @@ class MACD:
 			lst_idx_buy_primary > lst_idx_sell_primary and
 			lst_idx_buy_primary > lst_idx_sell_secondry and
 			lst_idx_buy_primary >= lst_idx_buy_secondry and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) <= 6
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) <= 6 and
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) >= 3
 			):
 
 			print('======> last signal buy primary macd ',symbol)
@@ -577,7 +600,8 @@ class MACD:
 			lst_idx_buy_secondry > lst_idx_sell_primary and
 			lst_idx_buy_secondry > lst_idx_sell_secondry and
 			lst_idx_buy_secondry > lst_idx_buy_primary and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) <= 6
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) <= 6 and
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) >= 3
 			):
 
 			print('======> last signal buy secondry macd ',symbol)
@@ -661,7 +685,8 @@ class MACD:
 			lst_idx_sell_primary > lst_idx_buy_primary and
 			lst_idx_sell_primary >= lst_idx_sell_secondry and
 			lst_idx_sell_primary > lst_idx_buy_secondry and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) <= 6
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) <= 6 and
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 3
 			):
 
 			print('======> last signal sell primary macd ',symbol)
@@ -739,7 +764,8 @@ class MACD:
 			lst_idx_sell_secondry > lst_idx_buy_primary and
 			lst_idx_sell_secondry > lst_idx_sell_primary and
 			lst_idx_sell_secondry > lst_idx_buy_secondry and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) <= 6
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) <= 6 and
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 3
 			):
 
 			print('======> last signal sell secondry macd ',symbol)
