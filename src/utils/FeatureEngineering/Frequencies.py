@@ -1,6 +1,6 @@
-from .DatasetIO import DatasetIO
 from src.utils.Optimizers.Optimizers import Optimizers
 from src.utils.Optimizers import NoiseCanceller
+from .DatasetIO import DatasetIO
 from progress.bar import Bar
 import pandas as pd
 import numpy as np
@@ -17,18 +17,18 @@ import numpy as np
 
 class Frequencies():
 
-	def Finder(self, dataset, column, period_format, period_coef):
+	def Finder(self, dataset, column, period_format, period_coef, number_frequencies):
 
 		optimizer = Optimizers()
 		noise_canceller = NoiseCanceller.NoiseCanceller()
 
 		freq_time = str(period_coef) + period_format
-		freq = [np.nan, np.nan, np.nan, np.nan, np.nan]
+		freq = [np.nan] * number_frequencies
 		freq_out = 1
 		dataset_filterd = dataset.copy(deep = True)
 		dataset_filterd['freq'] = np.nan
 
-		for i in range(0, 5):
+		for i in range(0, number_frequencies):
 
 			if freq_out == 0: freq_out = 1
 
@@ -52,9 +52,9 @@ class Frequencies():
 		return freq
 
 
-	def Run(self, dataset, symbol):
+	def Run(self, dataset, symbol, number_frequencies):
 		
-		frequencies = pd.DataFrame(np.zeros(5))
+		frequencies = pd.DataFrame(np.zeros(number_frequencies))
 
 		bar = Bar(symbol + ' ' + 'Frequencies Finding: ', max = int(len(dataset.columns)))
 
@@ -80,7 +80,8 @@ class Frequencies():
 																					.copy(deep = True),
 															column = data_column, 
 															period_format = period_format, 
-															period_coef = period_coef
+															period_coef = period_coef,
+															number_frequencies = number_frequencies
 															)
 													)
 
@@ -93,14 +94,14 @@ class Frequencies():
 
 		return frequencies
 
-	def Get(self, dataset, symbol, mode):
+	def Get(self, dataset, symbol, mode, number_frequencies):
 
 		datasetio = DatasetIO()
 		frequencies = datasetio.Read(name = 'frequency', symbol = symbol)
 
 		if mode == 'Run':
 			datasetio.Delete(symbol = symbol, name = 'frequency')
-			return self.Run(dataset = dataset, symbol = symbol)
+			return self.Run(dataset = dataset, symbol = symbol, number_frequencies = number_frequencies)
 
 		elif mode == None:
 
@@ -108,4 +109,4 @@ class Frequencies():
 				return frequencies
 
 			else:
-				return self.Run(dataset = dataset, symbol = symbol)
+				return self.Run(dataset = dataset, symbol = symbol, number_frequencies = number_frequencies)
