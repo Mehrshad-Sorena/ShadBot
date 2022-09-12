@@ -1087,10 +1087,10 @@ class StochAstic:
 			max_corr = chromosome_output['corr'].min()/3
 
 			if num_turn <= len(learning_result['score']):
-				num_turn = (len(learning_result['score'])) + 2
+				num_turn = (len(learning_result['score'])) + 20
 
 				if len(chromosome_output) >= num_turn:
-					num_turn = len(chromosome_output) + 2
+					num_turn = len(chromosome_output) + 20
 
 		else:
 			learning_result = pd.DataFrame()
