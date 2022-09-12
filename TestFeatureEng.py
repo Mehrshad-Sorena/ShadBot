@@ -1,5 +1,5 @@
 from src.utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
-from src.utils.ProtectResist.MLMethod.FeatureEngineering import FeatureEngineering
+from src.utils.FeatureEngineering.FeatureEngineering import FeatureEngineering
 from src.utils.Optimizers.NoiseCanceller import NoiseCanceller
 import matplotlib.pyplot as plt
 import tensorflow as tf
@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore")
 
 loging = getdata()
 
-dataset_5M, dataset_1H = loging.readall(symbol = 'XAUUSD_i', number_5M = 'all', number_1H = 2000)
+dataset_5M, dataset_1H = loging.readall(symbol = 'XAUUSD_i', number_5M = 'all', number_1H = 'all')
 
 # print(dataset_5M['XAUUSD_i'].to_timestamp(freq=None, how='start', copy=True))
 
@@ -20,7 +20,19 @@ FE = FeatureEngineering()
 FE.symbol = 'XAUUSD_i'
 print('dataset geted')
 dataset = FE.DatasetCreation(dataset_5M = dataset_5M['XAUUSD_i'], dataset_1H = dataset_1H['XAUUSD_i'])
-dataset = FE.AlphaDivergencePatternAndFactorOsilator(dataset = dataset, dataset_5M = dataset_5M, dataset_1H = dataset_1H)
+# dataset = FE.AlphaDivergencePatternAndFactorOsilator(dataset = dataset, dataset_5M = dataset_5M, dataset_1H = dataset_1H)
+
+
+#*******************************************************************************************************
+# Frequencies Module:
+
+# from src.utils.FeatureEngineering.Frequencies import Frequencies
+
+# frequences = Frequencies()
+# frequences = frequences.Get(dataset = dataset, symbol = FE.symbol, mode = 'Run')
+# print(frequences)
+
+#/////////////////////////////////////////////////////////////////////////////////////
 
 # dataset = FE.AlphaCandlePatterns(dataset = dataset)
 # dataset = FE.AlphaFactorBBAND(dataset = dataset)
@@ -29,7 +41,7 @@ dataset = FE.AlphaDivergencePatternAndFactorOsilator(dataset = dataset, dataset_
 # dataset = FE.AlphaFactorIchimokou(dataset = dataset)
 
 #FE.FourierCreation(dataset = dataset.resample('20T').last())
-dataset = FE.TimeCreationPattern(dataset = dataset)
+# dataset = FE.TimeCreationPattern(dataset = dataset)
 
 # fft = tf.signal.rfft(dataset['close_5m'])
 
