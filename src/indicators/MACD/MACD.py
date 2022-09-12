@@ -516,7 +516,7 @@ class MACD:
 			lst_idx_buy_primary > lst_idx_sell_secondry and
 			lst_idx_buy_primary >= lst_idx_buy_secondry and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) >= 3
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) >= 2
 			):
 
 			print('======> last signal buy primary macd ',symbol)
@@ -601,7 +601,7 @@ class MACD:
 			lst_idx_buy_secondry > lst_idx_sell_secondry and
 			lst_idx_buy_secondry > lst_idx_buy_primary and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) >= 3
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) >= 2
 			):
 
 			print('======> last signal buy secondry macd ',symbol)
@@ -686,7 +686,7 @@ class MACD:
 			lst_idx_sell_primary >= lst_idx_sell_secondry and
 			lst_idx_sell_primary > lst_idx_buy_secondry and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 3
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 2
 			):
 
 			print('======> last signal sell primary macd ',symbol)
@@ -765,7 +765,7 @@ class MACD:
 			lst_idx_sell_secondry > lst_idx_sell_primary and
 			lst_idx_sell_secondry > lst_idx_buy_secondry and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 3
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 2
 			):
 
 			print('======> last signal sell secondry macd ',symbol)
