@@ -34,6 +34,19 @@ dataset = FE.DatasetCreation(dataset_5M = dataset_5M['XAUUSD_i'], dataset_1H = d
 
 #/////////////////////////////////////////////////////////////////////////////////////
 
+#*******************************************************************************************************
+# Fourier Feature Module:
+
+from src.utils.FeatureEngineering.FourierFeatures import FourierFeatures
+
+fourierfeatures = FourierFeatures()
+fourierfeatures = fourierfeatures.Get(dataset = dataset, symbol = FE.symbol, mode = 'Run', number_frequencies = 4)
+with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+	print(fourierfeatures)
+
+#/////////////////////////////////////////////////////////////////////////////////////
+
+
 # dataset = FE.AlphaCandlePatterns(dataset = dataset)
 # dataset = FE.AlphaFactorBBAND(dataset = dataset)
 # dataset = FE.AlphaFactorSMA(dataset = dataset)
