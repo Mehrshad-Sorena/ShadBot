@@ -219,7 +219,7 @@ class Runner:
 
 	#This Function Calculate Tp And St With Above Function And Out Best Tp And St With Best_Extreme_Finder:
 	#@stTime
-	def start(self,dataset_5M_real, dataset_5M, dataset_1H, loc_end_5M, sigtype, flaglearn, flagtest, signals, indicator = '', flag_savepic = False):
+	def start(self, dataset_5M, dataset_1H, loc_end_5M, sigtype, flaglearn, flagtest, signals, indicator = '', flag_savepic = False, dataset_5M_real = ''):
 
 		if (
 			self.elements['Tester_money'] <= 4 and
@@ -551,7 +551,7 @@ class Runner:
 		return extereme.values[0]
 	#/////////////////////////////
 
-	def run(self, dataset_5M_real, signals_index, dataset_5M, dataset_1H, sigtype, flaglearn, flagtest, signals , indicator = '', flag_savepic = False):
+	def run(self, signals_index, dataset_5M, dataset_1H, sigtype, flaglearn, flagtest, signals , indicator = '', flag_savepic = False, dataset_5M_real = ''):
 		if flagtest == False:
 			pr = signals_index.apply(
 								lambda x: pd.Series(
