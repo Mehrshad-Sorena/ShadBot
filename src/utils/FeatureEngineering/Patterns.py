@@ -5,6 +5,7 @@ from src.indicators.MACD.MACD import MACD
 from src.indicators.RSI.RSI import RSI
 from .DatasetIO import DatasetIO
 from progress.bar import Bar
+from .Config import Config
 import pandas_ta as ind
 import pandas as pd
 import numpy as np
@@ -49,7 +50,9 @@ class Patterns():
 											name = 'all'
 											)
 
-			bar = Bar(symbol + ' ' + 'Candle Patterns 5M Finding: ', max = int(len(cdl_patterns_5m.columns)))
+			bar_config = Config()
+			if bar_config.cfg['show_bar']:
+				bar = Bar(symbol + ' ' + 'Candle Patterns 5M Finding: ', max = int(len(cdl_patterns_5m.columns)))
 
 			counter = 0
 			for pattern in cdl_patterns_5m.columns:
@@ -59,8 +62,8 @@ class Patterns():
 				candle_patterns[f'pattern_5m_{counter}'] = candle_patterns[f'pattern_5m_{counter}'].apply(
 																	lambda x: 'buy' if x == 100 else ('sell' if x == -100 else np.nan)
 																	)
-
-				bar.next()
+				if bar_config.cfg['show_bar']:
+					bar.next()
 
 				counter += 1
 
@@ -74,7 +77,8 @@ class Patterns():
 											name = 'all'
 											)
 
-			bar = Bar(symbol + ' ' + 'Candle Patterns 1H Finding: ', max = int(len(cdl_patterns_5m.columns)))
+			if bar_config.cfg['show_bar']:
+				bar = Bar(symbol + ' ' + 'Candle Patterns 1H Finding: ', max = int(len(cdl_patterns_5m.columns)))
 
 			counter = 0
 			for pattern in cdl_patterns_1h.columns:
@@ -85,7 +89,8 @@ class Patterns():
 																lambda x: 'buy' if x == 100 else ('sell' if x == -100 else np.nan)
 																)
 
-				bar.next()
+				if bar_config.cfg['show_bar']:
+					bar.next()
 
 				counter += 1
 
@@ -98,7 +103,9 @@ class Patterns():
 
 		DaysOfWeek = ['Monday', 'Tuesday', 'Thursday', 'Wednesday', 'Friday']
 
-		bar = Bar(symbol + ' ' + 'Daily Patterns Finding: ', max = int(len(DaysOfWeek)))
+		bar_config = Config()
+		if bar_config.cfg['show_bar']:
+			bar = Bar(symbol + ' ' + 'Daily Patterns Finding: ', max = int(len(DaysOfWeek)))
 
 		daily_pattern = pd.DataFrame()
 
@@ -107,7 +114,8 @@ class Patterns():
 			daily_pattern['pattern_day_' + day] = np.nan
 			daily_pattern['pattern_day_' + day] = dataset['time_5m'].apply(lambda x: 1 if x.day_name() == day else np.nan)
 
-			bar.next()
+			if bar_config.cfg['show_bar']:
+				bar.next()
 
 		return daily_pattern
 	#//////////////////////
@@ -125,15 +133,17 @@ class Patterns():
 
 		divergence_pattern = pd.DataFrame(index = dataset.index)
 
-		bar = Bar(
-					symbol + ' ' + 'Daily Patterns Finding: ', 
-																max = int(
-																		len(signalpriority) * 
-																		len(signaltype) * 
-																		len(timeframes) * 
-																		len(indicator_names)
-																		)
-				)
+		bar_config = Config()
+		if bar_config.cfg['show_bar']:
+			bar = Bar(
+						symbol + ' ' + 'Daily Patterns Finding: ', 
+																	max = int(
+																			len(signalpriority) * 
+																			len(signaltype) * 
+																			len(timeframes) * 
+																			len(indicator_names)
+																			)
+					)
 
 		for ind_name in indicator_names:
 			for timfrm in timeframes:
@@ -276,7 +286,9 @@ class Patterns():
 
 						divergence_pattern['pattern_' + ind_name + '_div_' + '5m_' + sigtype + '_' + sigpriority] = signal['signal']
 
-					bar.next()
+					if bar_config.cfg['show_bar']:
+						bar.next()
+						
 		return divergence_pattern
 	#/////////////////////
 
@@ -287,8 +299,8 @@ class Patterns():
 		pattern = pd.DataFrame(index = dataset.index)
 
 		if self.CandlePatternFlag == True:
-				candle_pattern = self.CandlePatterns(dataset = dataset, symbol = symbol)
-				pattern = pattern.join(candle_pattern, how = 'right')
+			candle_pattern = self.CandlePatterns(dataset = dataset, symbol = symbol)
+			pattern = pattern.join(candle_pattern, how = 'right')
 
 		if self.DailyPatternFlag == True:
 			daily_pattern = self.DailyPatterns(dataset = dataset, symbol = symbol)

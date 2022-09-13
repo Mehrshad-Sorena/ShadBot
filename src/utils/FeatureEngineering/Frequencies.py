@@ -2,6 +2,7 @@ from src.utils.Optimizers.Optimizers import Optimizers
 from src.utils.Optimizers import NoiseCanceller
 from .DatasetIO import DatasetIO
 from progress.bar import Bar
+from .Config import Config
 import pandas as pd
 import numpy as np
 
@@ -56,7 +57,9 @@ class Frequencies():
 		
 		frequencies = pd.DataFrame(np.zeros(number_frequencies))
 
-		bar = Bar(symbol + ' ' + 'Frequencies Finding: ', max = int(len(dataset.columns)))
+		bar_config = Config()
+		if bar_config.cfg['show_bar']:
+			bar = Bar(symbol + ' ' + 'Frequencies Finding: ', max = int(len(dataset.columns)))
 
 		for data_column in dataset.columns:
 
@@ -84,8 +87,8 @@ class Frequencies():
 															number_frequencies = number_frequencies
 															)
 													)
-
-			bar.next()
+			if bar_config.cfg['show_bar']:
+				bar.next()
 
 		frequencies = frequencies.drop(columns = [0])
 
@@ -105,7 +108,7 @@ class Frequencies():
 		elif mode == None:
 
 			frequencies = datasetio.Read(name = 'frequency', symbol = symbol)
-			
+
 			if frequencies.empty == False:
 				return frequencies
 
