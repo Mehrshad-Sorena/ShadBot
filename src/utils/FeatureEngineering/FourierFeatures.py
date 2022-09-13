@@ -83,7 +83,6 @@ class FourierFeatures():
 	def Get(self, dataset, symbol, mode, number_frequencies):
 
 		datasetio = DatasetIO()
-		fourier_feature = datasetio.Read(name = 'fourier', symbol = symbol)
 
 		if mode == 'Run':
 			datasetio.Delete(symbol = symbol, name = 'fourier')
@@ -91,6 +90,8 @@ class FourierFeatures():
 
 		elif mode == None:
 
+			fourier_feature = datasetio.Read(name = 'fourier', symbol = symbol)
+			
 			if fourier_feature.empty == False:
 				return fourier_feature
 
