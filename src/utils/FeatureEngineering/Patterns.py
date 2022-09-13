@@ -174,10 +174,6 @@ class Patterns():
 					#Add MACD Calculate Params AS Alpha Factor To Dataset:
 					if ind_name == 'macd':
 
-						dataset['macd_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
-						dataset['macds_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
-						dataset['macdh_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
-
 						ind = MACD(parameters = ind_parameters, config = ind_config)
 						ind_calc = ind.calculator_macd()
 
@@ -199,9 +195,6 @@ class Patterns():
 					#Add StochAstic Calculate Params AS Alpha Factor To Dataset:
 					elif ind_name == 'stochastic':
 
-						dataset['StochAstic_d_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
-						dataset['StochAstic_k_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
-
 						ind = StochAstic(parameters = ind_parameters, config = ind_config)
 						ind_calc = ind.calculator_StochAstic()
 
@@ -222,8 +215,6 @@ class Patterns():
 
 					#Add RSI Calculate Params AS Alpha Factor To Dataset:
 					elif ind_name == 'rsi':
-
-						dataset['rsi_' + timfrm.lower() + '_' + sigtype + '_' + sigpriority] = np.nan
 
 						ind = RSI(parameters = ind_parameters, config = ind_config)
 						ind_calc = ind.calculator_rsi()
@@ -288,7 +279,7 @@ class Patterns():
 
 					if bar_config.cfg['show_bar']:
 						bar.next()
-						
+
 		return divergence_pattern
 	#/////////////////////
 
