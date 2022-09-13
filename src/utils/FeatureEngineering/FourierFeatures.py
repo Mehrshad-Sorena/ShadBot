@@ -1,6 +1,7 @@
 from .Frequencies import Frequencies
 from .DatasetIO import DatasetIO
 from progress.bar import Bar
+from .Config import Config
 import pandas as pd
 import numpy as np
 
@@ -53,7 +54,9 @@ class FourierFeatures():
 
 			frequencies = self.FreqReader(dataset = dataset, symbol = symbol, mode = 'Run')
 
-		bar = Bar(symbol + ' ' + 'Fourier Features Finding: ', max = int(len(dataset.columns)))
+		bar_config = Config()
+		if bar_config.cfg['show_bar']:
+			bar = Bar(symbol + ' ' + 'Fourier Features Finding: ', max = int(len(dataset.columns)))
 
 		fourier_feature = pd.DataFrame(np.zeros(len(dataset.index)))
 
@@ -70,7 +73,8 @@ class FourierFeatures():
 
 			fourier_feature = fourier_feature.join(feature_prepared, how = 'right')
 
-			bar.next()
+			if bar_config.cfg['show_bar']:
+				bar.next()
 		
 		fourier_feature = fourier_feature.drop(columns = [0])
 
