@@ -97,7 +97,6 @@ class Frequencies():
 	def Get(self, dataset, symbol, mode, number_frequencies):
 
 		datasetio = DatasetIO()
-		frequencies = datasetio.Read(name = 'frequency', symbol = symbol)
 
 		if mode == 'Run':
 			datasetio.Delete(symbol = symbol, name = 'frequency')
@@ -105,6 +104,8 @@ class Frequencies():
 
 		elif mode == None:
 
+			frequencies = datasetio.Read(name = 'frequency', symbol = symbol)
+			
 			if frequencies.empty == False:
 				return frequencies
 
