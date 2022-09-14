@@ -286,7 +286,7 @@ class MACD:
 
 		if not os.path.exists(path_superhuman + symbol + '.csv'): return 'no_trade', 0, 0
 
-		GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters_buy_primary, pr_config_buy_primary = self.ParameterReader(
+		GL_Results_buy_primary, path_superhuman, macd_parameters, ind_parameters, pr_parameters_buy_primary, pr_config_buy_primary = self.ParameterReader(
 												 																				symbol = symbol, 
 												 																				signaltype = signaltype, 
 												 																				signalpriority = signalpriority
@@ -300,24 +300,24 @@ class MACD:
 		self.elements['dataset_1H'] = dataset_1H
 		self.elements['symbol'] = symbol
 
-		macd_calc = self.calculator_macd()
+		macd_calc_buy_primary = self.calculator_macd()
 
 		signal_buy_primary = pd.DataFrame()
 
 		try:
 
-			if GL_Results['permit'][0] == True:
+			if GL_Results_buy_primary['permit'][0] == True:
 
 				signal_buy_primary, _, _ = macd.divergence(
 															sigtype = signaltype,
 															sigpriority = signalpriority,
-															indicator = macd_calc,
-															column_div = GL_Results['MACD_column_div'][0],
+															indicator = macd_calc_buy_primary,
+															column_div = GL_Results_buy_primary['MACD_column_div'][0],
 															ind_name = 'macd',
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
-															flaglearn = GL_Results['islearned'][0],
+															flaglearn = GL_Results_buy_primary['islearned'][0],
 															flagtest = True
 															)
 			else:
@@ -342,7 +342,7 @@ class MACD:
 		signaltype = 'buy'
 		signalpriority = 'secondry'
 
-		GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters_buy_secondry, pr_config_buy_secondry = self.ParameterReader(
+		GL_Results_buy_secondry, path_superhuman, macd_parameters, ind_parameters, pr_parameters_buy_secondry, pr_config_buy_secondry = self.ParameterReader(
 													 																				symbol = symbol, 
 													 																				signaltype = signaltype, 
 													 																				signalpriority = signalpriority
@@ -356,24 +356,24 @@ class MACD:
 		self.elements['dataset_1H'] = dataset_1H
 		self.elements['symbol'] = symbol
 
-		macd_calc = self.calculator_macd()
+		macd_calc_buy_secondry = self.calculator_macd()
 
 		signal_buy_secondry = pd.DataFrame()
 
 		try:
 
-			if GL_Results['permit'][0] == True:
+			if GL_Results_buy_secondry['permit'][0] == True:
 				
 				signal_buy_secondry, _, _ = macd.divergence(
 															sigtype = signaltype,
 															sigpriority = signalpriority,
-															indicator = macd_calc,
-															column_div = GL_Results['MACD_column_div'][0],
+															indicator = macd_calc_buy_secondry,
+															column_div = GL_Results_buy_secondry['MACD_column_div'][0],
 															ind_name = 'macd',
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
-															flaglearn = GL_Results['islearned'][0],
+															flaglearn = GL_Results_buy_secondry['islearned'][0],
 															flagtest = True
 															)
 			else:
@@ -398,7 +398,7 @@ class MACD:
 		signaltype = 'sell'
 		signalpriority = 'primary'
 
-		GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters_sell_primary, pr_config_sell_primary = self.ParameterReader(
+		GL_Results_sell_primary, path_superhuman, macd_parameters, ind_parameters, pr_parameters_sell_primary, pr_config_sell_primary = self.ParameterReader(
 													 																				symbol = symbol, 
 													 																				signaltype = signaltype, 
 													 																				signalpriority = signalpriority
@@ -412,23 +412,23 @@ class MACD:
 		self.elements['dataset_1H'] = dataset_1H
 		self.elements['symbol'] = symbol
 
-		macd_calc = self.calculator_macd()
+		macd_calc_sell_primary = self.calculator_macd()
 
 		signal_sell_primary = pd.DataFrame()
 
 		try:
-			if GL_Results['permit'][0] == True:
+			if GL_Results_sell_primary['permit'][0] == True:
 
 				signal_sell_primary, _, _ = macd.divergence(
 															sigtype = signaltype,
 															sigpriority = signalpriority,
-															indicator = macd_calc,
-															column_div = GL_Results['MACD_column_div'][0],
+															indicator = macd_calc_sell_primary,
+															column_div = GL_Results_sell_primary['MACD_column_div'][0],
 															ind_name = 'macd',
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
-															flaglearn = GL_Results['islearned'][0],
+															flaglearn = GL_Results_sell_primary['islearned'][0],
 															flagtest = True
 															)
 			else:
@@ -453,7 +453,7 @@ class MACD:
 		signaltype = 'sell'
 		signalpriority = 'secondry'
 
-		GL_Results, path_superhuman, macd_parameters, ind_parameters, pr_parameters_sell_secondry, pr_config_sell_secondry = self.ParameterReader(
+		GL_Results_sell_secondry, path_superhuman, macd_parameters, ind_parameters, pr_parameters_sell_secondry, pr_config_sell_secondry = self.ParameterReader(
 													 																				symbol = symbol, 
 													 																				signaltype = signaltype, 
 													 																				signalpriority = signalpriority
@@ -467,23 +467,23 @@ class MACD:
 		self.elements['dataset_1H'] = dataset_1H
 		self.elements['symbol'] = symbol
 
-		macd_calc = self.calculator_macd()
+		macd_calc_sell_secondry = self.calculator_macd()
 
 		signal_sell_secondry = pd.DataFrame()
 
 		try:
-			if GL_Results['permit'][0] == True:
+			if GL_Results_sell_secondry['permit'][0] == True:
 
 				signal_sell_secondry, _, _ = macd.divergence(
 															sigtype = signaltype,
 															sigpriority = signalpriority,
-															indicator = macd_calc,
-															column_div = GL_Results['MACD_column_div'][0],
+															indicator = macd_calc_sell_secondry,
+															column_div = GL_Results_sell_secondry['MACD_column_div'][0],
 															ind_name = 'macd',
 															dataset_5M = dataset_5M,
 															dataset_1H = dataset_1H,
 															symbol = symbol,
-															flaglearn = GL_Results['islearned'][0],
+															flaglearn = GL_Results_sell_secondry['islearned'][0],
 															flagtest = True
 															)
 			else:
@@ -516,7 +516,11 @@ class MACD:
 			lst_idx_buy_primary > lst_idx_sell_secondry and
 			lst_idx_buy_primary >= lst_idx_buy_secondry and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) >= 2
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) >= 2 and
+			macd_calc_buy_primary[GL_Results_buy_primary['MACD_column_div'][0]][lst_idx_buy_primary] < macd_calc_buy_primary[GL_Results_buy_primary['MACD_column_div'][0]][lst_idx_buy_primary + 1] and
+			macd_calc_buy_primary[GL_Results_buy_primary['MACD_column_div'][0]][lst_idx_buy_primary] < macd_calc_buy_primary[GL_Results_buy_primary['MACD_column_div'][0]][lst_idx_buy_primary + 2] and
+			macd_calc_buy_primary[GL_Results_buy_primary['MACD_column_div'][0]][lst_idx_buy_primary] < macd_calc_buy_primary[GL_Results_buy_primary['MACD_column_div'][0]][lst_idx_buy_primary - 1] and
+			macd_calc_buy_primary[GL_Results_buy_primary['MACD_column_div'][0]][lst_idx_buy_primary] < macd_calc_buy_primary[GL_Results_buy_primary['MACD_column_div'][0]][lst_idx_buy_primary - 2]
 			):
 
 			print('======> last signal buy primary macd ',symbol)
@@ -601,7 +605,11 @@ class MACD:
 			lst_idx_buy_secondry > lst_idx_sell_secondry and
 			lst_idx_buy_secondry > lst_idx_buy_primary and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) >= 2
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) >= 2 and
+			macd_calc_buy_secondry[GL_Results_buy_secondry['MACD_column_div'][0]][lst_idx_buy_secondry] < macd_calc_buy_secondry[GL_Results_buy_secondry['MACD_column_div'][0]][lst_idx_buy_secondry + 1] and
+			macd_calc_buy_secondry[GL_Results_buy_secondry['MACD_column_div'][0]][lst_idx_buy_secondry] < macd_calc_buy_secondry[GL_Results_buy_secondry['MACD_column_div'][0]][lst_idx_buy_secondry + 2] and
+			macd_calc_buy_secondry[GL_Results_buy_secondry['MACD_column_div'][0]][lst_idx_buy_secondry] < macd_calc_buy_secondry[GL_Results_buy_secondry['MACD_column_div'][0]][lst_idx_buy_secondry - 1] and
+			macd_calc_buy_secondry[GL_Results_buy_secondry['MACD_column_div'][0]][lst_idx_buy_secondry] < macd_calc_buy_secondry[GL_Results_buy_secondry['MACD_column_div'][0]][lst_idx_buy_secondry - 2]
 			):
 
 			print('======> last signal buy secondry macd ',symbol)
@@ -686,7 +694,11 @@ class MACD:
 			lst_idx_sell_primary >= lst_idx_sell_secondry and
 			lst_idx_sell_primary > lst_idx_buy_secondry and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 2
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 2 and
+			macd_calc_sell_primary[GL_Results_sell_primary['MACD_column_div'][0]][lst_idx_sell_primary] > macd_calc_sell_primary[GL_Results_sell_primary['MACD_column_div'][0]][lst_idx_sell_primary + 1] and
+			macd_calc_sell_primary[GL_Results_sell_primary['MACD_column_div'][0]][lst_idx_sell_primary] > macd_calc_sell_primary[GL_Results_sell_primary['MACD_column_div'][0]][lst_idx_sell_primary + 2] and
+			macd_calc_sell_primary[GL_Results_sell_primary['MACD_column_div'][0]][lst_idx_sell_primary] > macd_calc_sell_primary[GL_Results_sell_primary['MACD_column_div'][0]][lst_idx_sell_primary - 1] and
+			macd_calc_sell_primary[GL_Results_sell_primary['MACD_column_div'][0]][lst_idx_sell_primary] > macd_calc_sell_primary[GL_Results_sell_primary['MACD_column_div'][0]][lst_idx_sell_primary - 2]
 			):
 
 			print('======> last signal sell primary macd ',symbol)
@@ -765,7 +777,11 @@ class MACD:
 			lst_idx_sell_secondry > lst_idx_sell_primary and
 			lst_idx_sell_secondry > lst_idx_buy_secondry and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 2
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 2 and
+			macd_calc_sell_secondry[GL_Results_sell_secondry['MACD_column_div'][0]][lst_idx_sell_secondry] > macd_calc_sell_secondry[GL_Results_sell_secondry['MACD_column_div'][0]][lst_idx_sell_secondry + 1] and
+			macd_calc_sell_secondry[GL_Results_sell_secondry['MACD_column_div'][0]][lst_idx_sell_secondry] > macd_calc_sell_secondry[GL_Results_sell_secondry['MACD_column_div'][0]][lst_idx_sell_secondry + 2] and
+			macd_calc_sell_secondry[GL_Results_sell_secondry['MACD_column_div'][0]][lst_idx_sell_secondry] > macd_calc_sell_secondry[GL_Results_sell_secondry['MACD_column_div'][0]][lst_idx_sell_secondry - 1] and
+			macd_calc_sell_secondry[GL_Results_sell_secondry['MACD_column_div'][0]][lst_idx_sell_secondry] > macd_calc_sell_secondry[GL_Results_sell_secondry['MACD_column_div'][0]][lst_idx_sell_secondry - 2]
 			):
 
 			print('======> last signal sell secondry macd ',symbol)
