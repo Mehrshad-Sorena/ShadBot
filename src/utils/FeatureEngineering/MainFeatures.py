@@ -1,3 +1,4 @@
+from src.utils.Optimizers import NoiseCanceller
 from src.indicators.StochAstic.StochAstic import StochAstic
 from .ParameterReader import ParameterReader
 from src.indicators.MACD.MACD import MACD
@@ -117,25 +118,32 @@ class MainFeatures():
 
 		noise_canceller = NoiseCanceller.NoiseCanceller()
 
-		dataset = dataset.assign(
-								close_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'close_5m'),
-								open_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'open_5m'),
-								high_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'high_5m'),
-								low_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'low_5m'),
-								HL2_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HL2_5m'),
-								HLC3_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HLC3_5m'),
-								HLCC4_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HLCC4_5m'),
-								OHLC4_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'OHLC4_5m'),
+		dataset['time'] = dataset.index
+		dataset.index = range(0, len(dataset.index))
 
-								close_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'close_1h'),
-								open_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'open_1h'),
-								high_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'high_1h'),
-								low_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'low_1h'),
-								HL2_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HL2_1h'),
-								HLC3_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HLC3_1h'),
-								HLCC4_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HLCC4_1h'),
-								OHLC4_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'OHLC4_1h'),
+		dataset = dataset.assign(
+								close_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'close_5m'),
+								open_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'open_5m'),
+								high_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'high_5m'),
+								low_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'low_5m'),
+								HL2_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'HL2_5m'),
+								HLC3_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'HLC3_5m'),
+								HLCC4_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'HLCC4_5m'),
+								OHLC4_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'OHLC4_5m'),
+
+								close_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'close_1h'),
+								open_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'open_1h'),
+								high_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'high_1h'),
+								low_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'low_1h'),
+								HL2_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'HL2_1h'),
+								HLC3_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'HLC3_1h'),
+								HLCC4_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'HLCC4_1h'),
+								OHLC4_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset.copy(deep = True), applyto = 'OHLC4_1h'),
 							)
+
+		dataset.index = dataset['time']
+		dataset = dataset.drop(columns = ['time'])
+
 		return dataset
 
 	#/////////////////////////////////
@@ -486,6 +494,7 @@ class MainFeatures():
 
 		if mode == None:
 			dataset = datasetio.Read(name = 'main', symbol = symbol)
+			dataset = dataset.drop(columns = ['time'])
 
 			if dataset.empty == False:
 				return dataset
