@@ -62,6 +62,8 @@ class NoiseCanceller:
 		'Complex Gaussian wavelets', 'Shannon wavelets', 
 		'Frequency B-Spline wavelets', 'Complex Morlet wavelets']
 
+		# print(dataset[applyto].dropna())
+
 		wavelet = "haar"
 		coefficients = pywt.wavedec(dataset[applyto].dropna(), wavelet, mode='per')
 		coefficients[1:] = [pywt.threshold(i, value = self.scale_haar*dataset[applyto].mean(), mode='soft') for i in coefficients[1:]]
