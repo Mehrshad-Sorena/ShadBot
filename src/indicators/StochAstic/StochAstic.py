@@ -515,260 +515,268 @@ class StochAstic:
 			lst_idx_buy_primary > lst_idx_sell_secondry and
 			lst_idx_buy_primary >= lst_idx_buy_secondry and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) >= 2 and
-			StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary] < StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary + 1] and
-			StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary] < StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary + 2] and
-			StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary] < StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary - 1] and
-			StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary] < StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary - 2]
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) >= 2
 			):
 
-			print('======> last signal buy primary stochastic ',symbol)
-			print('dataset length: ',len(dataset_5M[symbol]['close']))
-			print('last index: ',lst_idx_buy_primary)
-			
+			if (
+				StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary] < StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary + 1] and
+				StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary] < StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary + 2] and
+				StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary] < StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary - 1] and
+				StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary] < StochAstic_calc_buy_primary[GL_Results_buy_primary['StochAstic_column_div'][0]][lst_idx_buy_primary - 2]
+				):
 
-			if lst_idx_buy_primary != 0:
+				print('======> last signal buy primary stochastic ',symbol)
+				print('dataset length: ',len(dataset_5M[symbol]['close']))
+				print('last index: ',lst_idx_buy_primary)
+				
 
-				res_pro_buy_primary = pd.DataFrame()
-				try:
-					res_pro_buy_primary = self.ProfitFinder(
-															dataset_5M = dataset_5M,
-															dataset_1H = dataset_1H,
-															symbol = symbol,
-															signal = signal_buy_primary, 
-															sigtype = 'buy', 
-															pr_parameters = pr_parameters_buy_primary, 
-															pr_config = pr_config_buy_primary
-															)
-				except Exception as ex:
-					print('ERROR PR Last Signal: ',ex)
-					res_pro_buy_primary = pd.DataFrame(np.zeros(int(lst_idx_buy_primary) + 1))
-					res_pro_buy_primary['high_upper'] = np.nan
-					res_pro_buy_primary['low_lower'] = np.nan
+				if lst_idx_buy_primary != 0:
+
+					res_pro_buy_primary = pd.DataFrame()
+					try:
+						res_pro_buy_primary = self.ProfitFinder(
+																dataset_5M = dataset_5M,
+																dataset_1H = dataset_1H,
+																symbol = symbol,
+																signal = signal_buy_primary, 
+																sigtype = 'buy', 
+																pr_parameters = pr_parameters_buy_primary, 
+																pr_config = pr_config_buy_primary
+																)
+					except Exception as ex:
+						print('ERROR PR Last Signal: ',ex)
+						res_pro_buy_primary = pd.DataFrame(np.zeros(int(lst_idx_buy_primary) + 1))
+						res_pro_buy_primary['high_upper'] = np.nan
+						res_pro_buy_primary['low_lower'] = np.nan
 
 
-				if (res_pro_buy_primary.empty == False):
+					if (res_pro_buy_primary.empty == False):
 
-					diff_pr_top_buy_primary = (((res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)]) - dataset_5M[symbol]['high'][int(lst_idx_buy_primary)])/dataset_5M[symbol]['high'][int(lst_idx_buy_primary)]) * 100
-					diff_pr_down_buy_primary = ((dataset_5M[symbol]['low'][int(lst_idx_buy_primary)] - (res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)]))/dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]) * 100
+						diff_pr_top_buy_primary = (((res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)]) - dataset_5M[symbol]['high'][int(lst_idx_buy_primary)])/dataset_5M[symbol]['high'][int(lst_idx_buy_primary)]) * 100
+						diff_pr_down_buy_primary = ((dataset_5M[symbol]['low'][int(lst_idx_buy_primary)] - (res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)]))/dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]) * 100
 
-					# if type(diff_pr_down_buy_primary) is np.ndarray:
-					# 	res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary[0]/100))
-					# else:
-					# 	res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary/100))
+						# if type(diff_pr_down_buy_primary) is np.ndarray:
+						# 	res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary[0]/100))
+						# else:
+						# 	res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary/100))
 
-					if diff_pr_top_buy_primary > pr_parameters_buy_primary.elements['tp_percent_max']:
-						diff_pr_top_buy_primary = pr_parameters_buy_primary.elements['tp_percent_max']
+						if diff_pr_top_buy_primary > pr_parameters_buy_primary.elements['tp_percent_max']:
+							diff_pr_top_buy_primary = pr_parameters_buy_primary.elements['tp_percent_max']
+							res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['high'][int(lst_idx_buy_primary)]*(1+(diff_pr_top_buy_primary/100))
+
+						if diff_pr_down_buy_primary > pr_parameters_buy_primary.elements['st_percent_max']:
+							diff_pr_down_buy_primary = pr_parameters_buy_primary.elements['st_percent_max']
+							res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary/100))
+
+
+						resist_buy = (res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)])
+						protect_buy = (res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)])
+
+						signal = 'buy_primary'
+
+					else:
+						res_pro_buy_primary = pd.DataFrame(np.zeros(int(lst_idx_buy_primary) + 1))
+						res_pro_buy_primary['high_upper'] = np.nan
+						res_pro_buy_primary['low_lower'] = np.nan
+
+						diff_pr_top_buy_primary = pr_parameters_buy_primary.elements['tp_percent_min']
 						res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['high'][int(lst_idx_buy_primary)]*(1+(diff_pr_top_buy_primary/100))
 
-					if diff_pr_down_buy_primary > pr_parameters_buy_primary.elements['st_percent_max']:
-						diff_pr_down_buy_primary = pr_parameters_buy_primary.elements['st_percent_max']
+						diff_pr_down_buy_primary = pr_parameters_buy_primary.elements['st_percent_min']
 						res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary/100))
 
+						resist_buy = (res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)])
+						protect_buy = (res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)])
 
-					resist_buy = (res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)])
-					protect_buy = (res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)])
+						signal = 'buy_primary'
 
-					signal = 'buy_primary'
+						# diff_pr_top_buy = 0
+						# diff_pr_down_buy = 0
+						# diff_pr_top_buy_power = 0
+						# diff_pr_down_buy_power = 0
 
-				else:
-					res_pro_buy_primary = pd.DataFrame(np.zeros(int(lst_idx_buy_primary) + 1))
-					res_pro_buy_primary['high_upper'] = np.nan
-					res_pro_buy_primary['low_lower'] = np.nan
+						# resist_buy = 0
+						# protect_buy = 0
 
-					diff_pr_top_buy_primary = pr_parameters_buy_primary.elements['tp_percent_min']
-					res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['high'][int(lst_idx_buy_primary)]*(1+(diff_pr_top_buy_primary/100))
+						# signal = 'no_trade'		
 
-					diff_pr_down_buy_primary = pr_parameters_buy_primary.elements['st_percent_min']
-					res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary/100))
-
-					resist_buy = (res_pro_buy_primary['high_upper'][int(lst_idx_buy_primary)])
-					protect_buy = (res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)])
-
-					signal = 'buy_primary'
-
-					# diff_pr_top_buy = 0
-					# diff_pr_down_buy = 0
-					# diff_pr_top_buy_power = 0
-					# diff_pr_down_buy_power = 0
-
-					# resist_buy = 0
-					# protect_buy = 0
-
-					# signal = 'no_trade'		
-
-			print('================================')\
+				print('================================')
 
 		elif (
 			lst_idx_buy_secondry > lst_idx_sell_primary and
 			lst_idx_buy_secondry > lst_idx_sell_secondry and
 			lst_idx_buy_secondry > lst_idx_buy_primary and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) >= 2 and
-			StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry] < StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry + 1] and
-			StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry] < StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry + 2] and
-			StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry] < StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry - 1] and
-			StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry] < StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry - 2]
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) >= 2
 			):
 
-			print('======> last signal buy secondry stochastic ',symbol)
-			print('dataset length: ',len(dataset_5M[symbol]['close']))
-			print('last index: ',lst_idx_buy_secondry)
-			
+			if (
+				StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry] < StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry + 1] and
+				StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry] < StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry + 2] and
+				StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry] < StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry - 1] and
+				StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry] < StochAstic_calc_buy_secondry[GL_Results_buy_secondry['StochAstic_column_div'][0]][lst_idx_buy_secondry - 2]
+				):
+				print('======> last signal buy secondry stochastic ',symbol)
+				print('dataset length: ',len(dataset_5M[symbol]['close']))
+				print('last index: ',lst_idx_buy_secondry)
+				
 
 
-			if lst_idx_buy_secondry != 0:
+				if lst_idx_buy_secondry != 0:
 
-				res_pro_buy_secondry = pd.DataFrame()
-				try:
-					res_pro_buy_secondry = self.ProfitFinder(
-															dataset_5M = dataset_5M,
-															dataset_1H = dataset_1H,
-															symbol = symbol,
-															signal = signal_buy_secondry, 
-															sigtype = 'buy', 
-															pr_parameters = pr_parameters_buy_secondry, 
-															pr_config = pr_config_buy_secondry
-															)
-				except Exception as ex:
-					print('ERROR PR Last Signal: ',ex)
-					res_pro_buy_secondry = pd.DataFrame(np.zeros(int(lst_idx_buy_secondry) + 1))
-					res_pro_buy_secondry['high_upper'] = np.nan
-					res_pro_buy_secondry['low_lower'] = np.nan
+					res_pro_buy_secondry = pd.DataFrame()
+					try:
+						res_pro_buy_secondry = self.ProfitFinder(
+																dataset_5M = dataset_5M,
+																dataset_1H = dataset_1H,
+																symbol = symbol,
+																signal = signal_buy_secondry, 
+																sigtype = 'buy', 
+																pr_parameters = pr_parameters_buy_secondry, 
+																pr_config = pr_config_buy_secondry
+																)
+					except Exception as ex:
+						print('ERROR PR Last Signal: ',ex)
+						res_pro_buy_secondry = pd.DataFrame(np.zeros(int(lst_idx_buy_secondry) + 1))
+						res_pro_buy_secondry['high_upper'] = np.nan
+						res_pro_buy_secondry['low_lower'] = np.nan
 
-				if (res_pro_buy_secondry.empty == False):
+					if (res_pro_buy_secondry.empty == False):
 
-					diff_pr_top_buy_secondry = (((res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)]) - dataset_5M[symbol]['high'][int(lst_idx_buy_secondry)])/dataset_5M[symbol]['high'][int(lst_idx_buy_secondry)]) * 100
-					diff_pr_down_buy_secondry = ((dataset_5M[symbol]['low'][int(lst_idx_buy_secondry)] - (res_pro_buy_secondry['low_lower'][int(lst_idx_buy_secondry)]))/dataset_5M[symbol]['low'][int(lst_idx_buy_secondry)]) * 100
+						diff_pr_top_buy_secondry = (((res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)]) - dataset_5M[symbol]['high'][int(lst_idx_buy_secondry)])/dataset_5M[symbol]['high'][int(lst_idx_buy_secondry)]) * 100
+						diff_pr_down_buy_secondry = ((dataset_5M[symbol]['low'][int(lst_idx_buy_secondry)] - (res_pro_buy_secondry['low_lower'][int(lst_idx_buy_secondry)]))/dataset_5M[symbol]['low'][int(lst_idx_buy_secondry)]) * 100
 
-					# if type(diff_pr_down_buy_primary) is np.ndarray:
-					# 	res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary[0]/100))
-					# else:
-					# 	res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary/100))
+						# if type(diff_pr_down_buy_primary) is np.ndarray:
+						# 	res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary[0]/100))
+						# else:
+						# 	res_pro_buy_primary['low_lower'][int(lst_idx_buy_primary)] = dataset_5M[symbol]['low'][int(lst_idx_buy_primary)]*(1-(diff_pr_down_buy_primary/100))
 
-					if diff_pr_top_buy_secondry > pr_parameters_buy_secondry.elements['tp_percent_max']:
-						diff_pr_top_buy_secondry = pr_parameters_buy_secondry.elements['tp_percent_max']
+						if diff_pr_top_buy_secondry > pr_parameters_buy_secondry.elements['tp_percent_max']:
+							diff_pr_top_buy_secondry = pr_parameters_buy_secondry.elements['tp_percent_max']
+							res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)] = dataset_5M[symbol]['high'][int(lst_idx_buy_secondry)]*(1+(diff_pr_top_buy_secondry/100))
+
+						if diff_pr_down_buy_secondry > pr_parameters_buy_secondry.elements['st_percent_max']:
+							diff_pr_down_buy_secondry = pr_parameters_buy_secondry.elements['st_percent_max']
+							res_pro_buy_secondry['low_lower'][int(lst_idx_buy_secondry)] = dataset_5M[symbol]['low'][int(lst_idx_buy_secondry)]*(1-(diff_pr_down_buy_secondry/100))
+
+
+						resist_buy = (res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)])
+						protect_buy = (res_pro_buy_secondry['low_lower'][int(lst_idx_buy_secondry)])
+
+						signal = 'buy_secondry'
+
+					else:
+
+						res_pro_buy_secondry = pd.DataFrame(np.zeros(int(lst_idx_buy_secondry) + 1))
+						res_pro_buy_secondry['high_upper'] = np.nan
+						res_pro_buy_secondry['low_lower'] = np.nan
+
+						diff_pr_top_buy_secondry = pr_parameters_buy_secondry.elements['tp_percent_min']
 						res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)] = dataset_5M[symbol]['high'][int(lst_idx_buy_secondry)]*(1+(diff_pr_top_buy_secondry/100))
 
-					if diff_pr_down_buy_secondry > pr_parameters_buy_secondry.elements['st_percent_max']:
-						diff_pr_down_buy_secondry = pr_parameters_buy_secondry.elements['st_percent_max']
+						diff_pr_down_buy_secondry = pr_parameters_buy_secondry.elements['st_percent_min']
 						res_pro_buy_secondry['low_lower'][int(lst_idx_buy_secondry)] = dataset_5M[symbol]['low'][int(lst_idx_buy_secondry)]*(1-(diff_pr_down_buy_secondry/100))
 
 
-					resist_buy = (res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)])
-					protect_buy = (res_pro_buy_secondry['low_lower'][int(lst_idx_buy_secondry)])
+						resist_buy = (res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)])
+						protect_buy = (res_pro_buy_secondry['low_lower'][int(lst_idx_buy_secondry)])
 
-					signal = 'buy_secondry'
+						signal = 'buy_secondry'
 
-				else:
+						# diff_pr_top_buy = 0
+						# diff_pr_down_buy = 0
+						# diff_pr_top_buy_power = 0
+						# diff_pr_down_buy_power = 0
 
-					res_pro_buy_secondry = pd.DataFrame(np.zeros(int(lst_idx_buy_secondry) + 1))
-					res_pro_buy_secondry['high_upper'] = np.nan
-					res_pro_buy_secondry['low_lower'] = np.nan
+						# resist_buy = 0
+						# protect_buy = 0
 
-					diff_pr_top_buy_secondry = pr_parameters_buy_secondry.elements['tp_percent_min']
-					res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)] = dataset_5M[symbol]['high'][int(lst_idx_buy_secondry)]*(1+(diff_pr_top_buy_secondry/100))
-
-					diff_pr_down_buy_secondry = pr_parameters_buy_secondry.elements['st_percent_min']
-					res_pro_buy_secondry['low_lower'][int(lst_idx_buy_secondry)] = dataset_5M[symbol]['low'][int(lst_idx_buy_secondry)]*(1-(diff_pr_down_buy_secondry/100))
-
-
-					resist_buy = (res_pro_buy_secondry['high_upper'][int(lst_idx_buy_secondry)])
-					protect_buy = (res_pro_buy_secondry['low_lower'][int(lst_idx_buy_secondry)])
-
-					signal = 'buy_secondry'
-
-					# diff_pr_top_buy = 0
-					# diff_pr_down_buy = 0
-					# diff_pr_top_buy_power = 0
-					# diff_pr_down_buy_power = 0
-
-					# resist_buy = 0
-					# protect_buy = 0
-
-					# signal = 'no_trade'	
+						# signal = 'no_trade'	
 
 		elif (
 			lst_idx_sell_primary > lst_idx_buy_primary and
 			lst_idx_sell_primary >= lst_idx_sell_secondry and
 			lst_idx_sell_primary > lst_idx_buy_secondry and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 2 and
-			StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary] > StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary + 1] and
-			StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary] > StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary + 2] and
-			StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary] > StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary - 1] and
-			StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary] > StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary - 2]
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 2
 			):
 
-			print('======> last signal sell primary stochastic ',symbol)
-			print('dataset length: ',len(dataset_5M[symbol]['close']))
-			print('last index: ',lst_idx_sell_primary)
-			
+			if (
+				StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary] > StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary + 1] and
+				StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary] > StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary + 2] and
+				StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary] > StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary - 1] and
+				StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary] > StochAstic_calc_sell_primary[GL_Results_sell_primary['StochAstic_column_div'][0]][lst_idx_sell_primary - 2]
+				):
 
-			if lst_idx_sell_primary != 0:
+				print('======> last signal sell primary stochastic ',symbol)
+				print('dataset length: ',len(dataset_5M[symbol]['close']))
+				print('last index: ',lst_idx_sell_primary)
+				
 
-				res_pro_sell_primary = pd.DataFrame()
-				try:
-					res_pro_sell_primary = self.ProfitFinder(
-															dataset_5M = dataset_5M,
-															dataset_1H = dataset_1H,
-															symbol = symbol,
-															signal = signal_sell_primary, 
-															sigtype = 'sell', 
-															pr_parameters = pr_parameters_sell_primary, 
-															pr_config = pr_config_sell_primary
-															)
-				except Exception as ex:
-					print('ERROR PR Last Signal: ',ex)
-					res_pro_sell_primary = pd.DataFrame(np.zeros(int(lst_idx_sell_primary) + 1))
-					res_pro_sell_primary['high_upper'] = np.nan
-					res_pro_sell_primary['low_lower'] = np.nan
+				if lst_idx_sell_primary != 0:
+
+					res_pro_sell_primary = pd.DataFrame()
+					try:
+						res_pro_sell_primary = self.ProfitFinder(
+																dataset_5M = dataset_5M,
+																dataset_1H = dataset_1H,
+																symbol = symbol,
+																signal = signal_sell_primary, 
+																sigtype = 'sell', 
+																pr_parameters = pr_parameters_sell_primary, 
+																pr_config = pr_config_sell_primary
+																)
+					except Exception as ex:
+						print('ERROR PR Last Signal: ',ex)
+						res_pro_sell_primary = pd.DataFrame(np.zeros(int(lst_idx_sell_primary) + 1))
+						res_pro_sell_primary['high_upper'] = np.nan
+						res_pro_sell_primary['low_lower'] = np.nan
 
 
-				if (res_pro_sell_primary.empty == False):
+					if (res_pro_sell_primary.empty == False):
 
-					diff_pr_top_sell_primary = (((res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)]) - dataset_5M[symbol]['high'][int(lst_idx_sell_primary)])/dataset_5M[symbol]['high'][int(lst_idx_sell_primary)]) * 100
-					diff_pr_down_sell_primary = ((dataset_5M[symbol]['low'][int(lst_idx_sell_primary)] - (res_pro_sell_primary['low_lower'][int(lst_idx_sell_primary)]))/dataset_5M[symbol]['low'][int(lst_idx_sell_primary)]) * 100
+						diff_pr_top_sell_primary = (((res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)]) - dataset_5M[symbol]['high'][int(lst_idx_sell_primary)])/dataset_5M[symbol]['high'][int(lst_idx_sell_primary)]) * 100
+						diff_pr_down_sell_primary = ((dataset_5M[symbol]['low'][int(lst_idx_sell_primary)] - (res_pro_sell_primary['low_lower'][int(lst_idx_sell_primary)]))/dataset_5M[symbol]['low'][int(lst_idx_sell_primary)]) * 100
 
 
-					if diff_pr_top_sell_primary > pr_parameters_sell_primary.elements['st_percent_max']:
-						diff_pr_top_sell_primary = pr_parameters_sell_primary.elements['st_percent_max']
+						if diff_pr_top_sell_primary > pr_parameters_sell_primary.elements['st_percent_max']:
+							diff_pr_top_sell_primary = pr_parameters_sell_primary.elements['st_percent_max']
+							(res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)]) = dataset_5M[symbol]['high'][int(lst_idx_sell_primary)]*(1+(diff_pr_top_sell_primary/100))
+
+						if diff_pr_down_sell_primary > pr_parameters_sell_primary.elements['tp_percent_max']:
+							diff_pr_down_sell_primary = pr_parameters_sell_primary.elements['tp_percent_max']
+							(res_pro_sell_primary['low_lower'][int(lst_idx_sell_primary)]) = dataset_5M[symbol]['low'][int(lst_idx_sell_primary)]*(1-(diff_pr_down_sell_primary/100))
+							
+
+						resist_sell = (res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)])
+						protect_sell = (res_pro_sell_primary['low_lower'][int(lst_idx_sell_primary)])
+
+						signal = 'sell_primary'
+
+					else:
+
+						res_pro_sell_primary = pd.DataFrame(np.zeros(int(lst_idx_sell_primary) + 1))
+						res_pro_sell_primary['high_upper'] = np.nan
+						res_pro_sell_primary['low_lower'] = np.nan
+
+						diff_pr_top_sell_primary = pr_parameters_sell_primary.elements['st_percent_min']
 						(res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)]) = dataset_5M[symbol]['high'][int(lst_idx_sell_primary)]*(1+(diff_pr_top_sell_primary/100))
 
-					if diff_pr_down_sell_primary > pr_parameters_sell_primary.elements['tp_percent_max']:
-						diff_pr_down_sell_primary = pr_parameters_sell_primary.elements['tp_percent_max']
+						diff_pr_down_sell_primary = pr_parameters_sell_primary.elements['tp_percent_min']
 						(res_pro_sell_primary['low_lower'][int(lst_idx_sell_primary)]) = dataset_5M[symbol]['low'][int(lst_idx_sell_primary)]*(1-(diff_pr_down_sell_primary/100))
-						
+							
+						resist_sell = (res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)])
+						protect_sell = (res_pro_sell_primary['low_lower'][int(lst_idx_sell_primary)])
 
-					resist_sell = (res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)])
-					protect_sell = (res_pro_sell_primary['low_lower'][int(lst_idx_sell_primary)])
+						signal = 'sell_primary'
 
-					signal = 'sell_primary'
+						# diff_pr_top_sell_primary = 0
+						# diff_pr_down_sell_primary = 0
 
-				else:
+						# resist_sell = 0
+						# protect_sell = 0
 
-					res_pro_sell_primary = pd.DataFrame(np.zeros(int(lst_idx_sell_primary) + 1))
-					res_pro_sell_primary['high_upper'] = np.nan
-					res_pro_sell_primary['low_lower'] = np.nan
-
-					diff_pr_top_sell_primary = pr_parameters_sell_primary.elements['st_percent_min']
-					(res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)]) = dataset_5M[symbol]['high'][int(lst_idx_sell_primary)]*(1+(diff_pr_top_sell_primary/100))
-
-					diff_pr_down_sell_primary = pr_parameters_sell_primary.elements['tp_percent_min']
-					(res_pro_sell_primary['low_lower'][int(lst_idx_sell_primary)]) = dataset_5M[symbol]['low'][int(lst_idx_sell_primary)]*(1-(diff_pr_down_sell_primary/100))
-						
-					resist_sell = (res_pro_sell_primary['high_upper'][int(lst_idx_sell_primary)])
-					protect_sell = (res_pro_sell_primary['low_lower'][int(lst_idx_sell_primary)])
-
-					signal = 'sell_primary'
-
-					# diff_pr_top_sell_primary = 0
-					# diff_pr_down_sell_primary = 0
-
-					# resist_sell = 0
-					# protect_sell = 0
-
-					# signal = 'no_trade'
+						# signal = 'no_trade'
 
 		
 		elif (
@@ -776,83 +784,86 @@ class StochAstic:
 			lst_idx_sell_secondry > lst_idx_sell_primary and
 			lst_idx_sell_secondry > lst_idx_buy_secondry and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) >= 2 and
-			StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry] > StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry + 1] and
-			StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry] > StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry + 2] and
-			StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry] > StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry - 1] and
-			StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry] > StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry - 2]
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) >= 2
 			):
 
-			print('======> last signal sell secondry stochastic ',symbol)
-			print('dataset length: ',len(dataset_5M[symbol]['close']))
-			print('last index: ',lst_idx_sell_secondry)
+			if (
+				StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry] > StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry + 1] and
+				StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry] > StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry + 2] and
+				StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry] > StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry - 1] and
+				StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry] > StochAstic_calc_sell_secondry[GL_Results_sell_secondry['StochAstic_column_div'][0]][lst_idx_sell_secondry - 2]
+				):
+			
+				print('======> last signal sell secondry stochastic ',symbol)
+				print('dataset length: ',len(dataset_5M[symbol]['close']))
+				print('last index: ',lst_idx_sell_secondry)
 
-			if lst_idx_sell_secondry != 0:
+				if lst_idx_sell_secondry != 0:
 
-				res_pro_sell_secondry = pd.DataFrame()
-				try:
-					res_pro_sell_secondry = self.ProfitFinder(
-															dataset_5M = dataset_5M,
-															dataset_1H = dataset_1H,
-															symbol = symbol,
-															signal = signal_sell_secondry, 
-															sigtype = 'sell', 
-															pr_parameters = pr_parameters_sell_secondry, 
-															pr_config = pr_config_sell_secondry
-															)
-				except Exception as ex:
-					print('ERROR PR Last Signal: ',ex)
-					res_pro_sell_secondry = pd.DataFrame(np.zeros(int(lst_idx_sell_secondry) + 1))
-					res_pro_sell_secondry['high_upper'] = np.nan
-					res_pro_sell_secondry['low_lower'] = np.nan
-
-
-				if (res_pro_sell_secondry.empty == False):
-
-					diff_pr_top_sell_secondry = (((res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)]) - dataset_5M[symbol]['high'][int(lst_idx_sell_secondry)])/dataset_5M[symbol]['high'][int(lst_idx_sell_secondry)]) * 100
-					diff_pr_down_sell_secondry = ((dataset_5M[symbol]['low'][int(lst_idx_sell_secondry)] - (res_pro_sell_secondry['low_lower'][int(lst_idx_sell_secondry)]))/dataset_5M[symbol]['low'][int(lst_idx_sell_secondry)]) * 100
+					res_pro_sell_secondry = pd.DataFrame()
+					try:
+						res_pro_sell_secondry = self.ProfitFinder(
+																dataset_5M = dataset_5M,
+																dataset_1H = dataset_1H,
+																symbol = symbol,
+																signal = signal_sell_secondry, 
+																sigtype = 'sell', 
+																pr_parameters = pr_parameters_sell_secondry, 
+																pr_config = pr_config_sell_secondry
+																)
+					except Exception as ex:
+						print('ERROR PR Last Signal: ',ex)
+						res_pro_sell_secondry = pd.DataFrame(np.zeros(int(lst_idx_sell_secondry) + 1))
+						res_pro_sell_secondry['high_upper'] = np.nan
+						res_pro_sell_secondry['low_lower'] = np.nan
 
 
-					if diff_pr_top_sell_secondry > pr_parameters_sell_secondry.elements['st_percent_max']:
-						diff_pr_top_sell_secondry = pr_parameters_sell_secondry.elements['st_percent_max']
+					if (res_pro_sell_secondry.empty == False):
+
+						diff_pr_top_sell_secondry = (((res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)]) - dataset_5M[symbol]['high'][int(lst_idx_sell_secondry)])/dataset_5M[symbol]['high'][int(lst_idx_sell_secondry)]) * 100
+						diff_pr_down_sell_secondry = ((dataset_5M[symbol]['low'][int(lst_idx_sell_secondry)] - (res_pro_sell_secondry['low_lower'][int(lst_idx_sell_secondry)]))/dataset_5M[symbol]['low'][int(lst_idx_sell_secondry)]) * 100
+
+
+						if diff_pr_top_sell_secondry > pr_parameters_sell_secondry.elements['st_percent_max']:
+							diff_pr_top_sell_secondry = pr_parameters_sell_secondry.elements['st_percent_max']
+							(res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)]) = dataset_5M[symbol]['high'][int(lst_idx_sell_secondry)]*(1+(diff_pr_top_sell_secondry/100))
+
+						if diff_pr_down_sell_secondry > pr_parameters_sell_secondry.elements['tp_percent_max']:
+							diff_pr_down_sell_secondry = pr_parameters_sell_secondry.elements['tp_percent_max']
+							(res_pro_sell_secondry['low_lower'][int(lst_idx_sell_secondry)]) = dataset_5M[symbol]['low'][int(lst_idx_sell_secondry)]*(1-(diff_pr_down_sell_secondry/100))
+							
+
+						resist_sell = (res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)])
+						protect_sell = (res_pro_sell_secondry['low_lower'][int(lst_idx_sell_secondry)])
+						
+						signal = 'sell_secondry'
+
+					else:
+
+						res_pro_sell_secondry = pd.DataFrame(np.zeros(int(lst_idx_sell_secondry) + 1))
+						res_pro_sell_secondry['high_upper'] = np.nan
+						res_pro_sell_secondry['low_lower'] = np.nan
+						
+						diff_pr_top_sell_secondry = pr_parameters_sell_secondry.elements['st_percent_min']
 						(res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)]) = dataset_5M[symbol]['high'][int(lst_idx_sell_secondry)]*(1+(diff_pr_top_sell_secondry/100))
 
-					if diff_pr_down_sell_secondry > pr_parameters_sell_secondry.elements['tp_percent_max']:
-						diff_pr_down_sell_secondry = pr_parameters_sell_secondry.elements['tp_percent_max']
+						diff_pr_down_sell_secondry = pr_parameters_sell_secondry.elements['tp_percent_min']
 						(res_pro_sell_secondry['low_lower'][int(lst_idx_sell_secondry)]) = dataset_5M[symbol]['low'][int(lst_idx_sell_secondry)]*(1-(diff_pr_down_sell_secondry/100))
+							
+						resist_sell = (res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)])
+						protect_sell = (res_pro_sell_secondry['low_lower'][int(lst_idx_sell_secondry)])
 						
+						signal = 'sell_secondry'
 
-					resist_sell = (res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)])
-					protect_sell = (res_pro_sell_secondry['low_lower'][int(lst_idx_sell_secondry)])
-					
-					signal = 'sell_secondry'
+						# diff_pr_top_sell_secondry = 0
+						# diff_pr_down_sell_secondry = 0
 
-				else:
+						# resist_sell = 0
+						# protect_sell = 0
 
-					res_pro_sell_secondry = pd.DataFrame(np.zeros(int(lst_idx_sell_secondry) + 1))
-					res_pro_sell_secondry['high_upper'] = np.nan
-					res_pro_sell_secondry['low_lower'] = np.nan
-					
-					diff_pr_top_sell_secondry = pr_parameters_sell_secondry.elements['st_percent_min']
-					(res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)]) = dataset_5M[symbol]['high'][int(lst_idx_sell_secondry)]*(1+(diff_pr_top_sell_secondry/100))
+						# signal = 'no_trade'			
 
-					diff_pr_down_sell_secondry = pr_parameters_sell_secondry.elements['tp_percent_min']
-					(res_pro_sell_secondry['low_lower'][int(lst_idx_sell_secondry)]) = dataset_5M[symbol]['low'][int(lst_idx_sell_secondry)]*(1-(diff_pr_down_sell_secondry/100))
-						
-					resist_sell = (res_pro_sell_secondry['high_upper'][int(lst_idx_sell_secondry)])
-					protect_sell = (res_pro_sell_secondry['low_lower'][int(lst_idx_sell_secondry)])
-					
-					signal = 'sell_secondry'
-
-					# diff_pr_top_sell_secondry = 0
-					# diff_pr_down_sell_secondry = 0
-
-					# resist_sell = 0
-					# protect_sell = 0
-
-					# signal = 'no_trade'			
-
-			print('================================')
+				print('================================')
 		else:
 			resist_sell = 0
 			protect_sell = 0
