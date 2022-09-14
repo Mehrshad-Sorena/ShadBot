@@ -411,7 +411,7 @@ class StochAstic:
 		self.elements['dataset_1H'] = dataset_1H
 		self.elements['symbol'] = symbol
 
-		StochAstic_calc = self.calculator_StochAstic()
+		StochAstic_calc_sell_primary = self.calculator_StochAstic()
 
 		signal_sell_primary = pd.DataFrame()
 
