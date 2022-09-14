@@ -112,6 +112,35 @@ class MainFeatures():
 	#/////////////////////////////////
 
 
+	#Noise Filterd Feature:
+	def AlphaFactorNoiseFilter(self, dataset):
+
+		noise_canceller = NoiseCanceller.NoiseCanceller()
+
+		dataset = dataset.assign(
+								close_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'close_5m'),
+								open_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'open_5m'),
+								high_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'high_5m'),
+								low_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'low_5m'),
+								HL2_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HL2_5m'),
+								HLC3_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HLC3_5m'),
+								HLCC4_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HLCC4_5m'),
+								OHLC4_5m_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'OHLC4_5m'),
+
+								close_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'close_1h'),
+								open_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'open_1h'),
+								high_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'high_1h'),
+								low_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'low_1h'),
+								HL2_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HL2_1h'),
+								HLC3_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HLC3_1h'),
+								HLCC4_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'HLCC4_1h'),
+								OHLC4_1h_filter = noise_canceller.NoiseWavelet(dataset = dataset, applyto = 'OHLC4_1h'),
+							)
+		return dataset
+
+	#/////////////////////////////////
+
+
 	def AlphaFactorOsilators(self, dataset, dataset_5M, dataset_1H, symbol):
 
 		signalpriority = ['primary', 'secondry', 'primary', 'secondry']
@@ -430,6 +459,8 @@ class MainFeatures():
 	def Run(self, dataset_5M, dataset_1H, symbol):
 		
 		dataset = self.DatasetCreation(dataset_5M = dataset_5M[symbol], dataset_1H = dataset_1H[symbol])
+
+		dataset = self.AlphaFactorNoiseFilter(dataset = dataset)
 
 		dataset = self.AlphaFactorOsilators(
 										dataset = dataset, 
