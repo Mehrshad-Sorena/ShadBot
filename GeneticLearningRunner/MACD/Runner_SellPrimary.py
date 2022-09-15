@@ -60,6 +60,7 @@ def Run():
 	macd = MACD(parameters = parameters, config = config)
 
 	try:
+		print(a)
 		macd_calc = macd.Genetic(
 								dataset_5M_real = dataset_5M_real,
 								dataset_5M = parameters.elements['dataset_5M'], 
