@@ -55,12 +55,11 @@ def Run():
 	optimizers.dataset = parameters.elements['dataset_5M'].copy()
 	optimizers.timeframe = '5M'
 
-	# optimizers.MacdOptimizer()
+	optimizers.MacdOptimizer()
 
 	macd = MACD(parameters = parameters, config = config)
 
 	try:
-		print(a)
 		macd_calc = macd.Genetic(
 								dataset_5M_real = dataset_5M_real,
 								dataset_5M = parameters.elements['dataset_5M'], 
@@ -76,7 +75,7 @@ def Run():
 
 	for turn in range(0,4):
 
-		if True:#try:
+		try:
 			macd_calc = macd.GetPermit(
 									dataset_5M_real = dataset_5M_real,
 									dataset_5M = parameters.elements['dataset_5M'],
@@ -93,5 +92,5 @@ def Run():
 				): 
 				break
 
-		else:#except Exception as ex:
+		except Exception as ex:
 			print('MACD GetPermit ERROR: ', ex)
