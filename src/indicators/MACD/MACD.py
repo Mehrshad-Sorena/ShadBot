@@ -1341,7 +1341,7 @@ class MACD:
 			ind_parameters.elements['dataset_1H'] = dataset_1H.copy()
 
 			macd_tester = Tester(parameters = ind_parameters, config = ind_config)
-			try:
+			if True:#try:
 
 				signal_output, learning_output_now = macd_tester.RunGL(
 																	dataset_5M_real = dataset_5M_real,
@@ -1355,7 +1355,7 @@ class MACD:
 																	flag_savepic = False
 																	)
 
-			except Exception as ex:
+			else:#except Exception as ex:
 				print('Learning Error: ',ex)
 				# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 				# 	print(signal)
