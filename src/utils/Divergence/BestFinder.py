@@ -301,7 +301,7 @@ class BestFinder:
 					Power_Mid_Line = 0
 			
 		except Exception as ex:
-			#print(ex)
+			print('ValuesPreparer Diverg Error: ', ex)
 			Upper_Line = 0
 			Lower_Line = 0
 			Mid_Line = 0
