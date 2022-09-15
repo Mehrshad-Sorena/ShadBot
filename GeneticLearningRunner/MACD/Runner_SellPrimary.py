@@ -76,7 +76,7 @@ def Run():
 
 	for turn in range(0,4):
 
-		try:
+		if True:#try:
 			macd_calc = macd.GetPermit(
 									dataset_5M_real = dataset_5M_real,
 									dataset_5M = parameters.elements['dataset_5M'],
@@ -93,5 +93,5 @@ def Run():
 				): 
 				break
 
-		except Exception as ex:
+		else:#except Exception as ex:
 			print('MACD GetPermit ERROR: ', ex)
