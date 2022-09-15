@@ -965,6 +965,9 @@ class MACD:
 
 		macd_calc = self.calculator_macd()
 
+		if 'permit' in GL_Results.columns:
+			if GL_Results['permit'][0] == True: return GL_Results
+
 		try:
 
 			signal, signaltype, indicator = macd.divergence(

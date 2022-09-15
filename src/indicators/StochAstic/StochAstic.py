@@ -961,6 +961,9 @@ class StochAstic:
 
 		StochAstic_calc = self.calculator_StochAstic()
 
+		if 'permit' in GL_Results.columns:
+			if GL_Results['permit'][0] == True: return GL_Results
+
 		try:
 
 			signal, signaltype, indicator = StochAstic.divergence(
