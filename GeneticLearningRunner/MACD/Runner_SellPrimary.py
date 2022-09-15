@@ -55,7 +55,7 @@ def Run():
 	optimizers.dataset = parameters.elements['dataset_5M'].copy()
 	optimizers.timeframe = '5M'
 
-	optimizers.MacdOptimizer()
+	# optimizers.MacdOptimizer()
 
 	macd = MACD(parameters = parameters, config = config)
 
