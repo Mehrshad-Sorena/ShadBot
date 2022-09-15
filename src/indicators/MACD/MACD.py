@@ -968,7 +968,7 @@ class MACD:
 		if 'permit' in GL_Results.columns:
 			if GL_Results['permit'][0] == True: return GL_Results
 
-		if True:#try:
+		try:
 
 			signal, signaltype, indicator = macd.divergence(
 															sigtype = signaltype,
@@ -1002,7 +1002,7 @@ class MACD:
 																indicator = indicator,
 																flag_savepic = flag_savepic
 																)
-		else:#except Exception as ex:
+		except Exception as ex:
 			print('Permit Error: ', ex)
 
 			signal_output = pd.DataFrame()

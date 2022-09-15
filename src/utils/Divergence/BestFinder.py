@@ -90,14 +90,23 @@ class BestFinder:
 																														kmeans_f = kmeans,
 																														distributions = ['expon', 'norm']
 																														)
-		alpha = self.elements[__class__.__name__ + '_alpha']
-		best_signals_interval = pd.DataFrame(
-										{
-										'interval': [Upper_Line,Mid_Line,Lower_Line],
-										'power': [Power_Upper_Line,Power_Mid_Line,Power_Lower_Line],
-										'alpha': [alpha,alpha,alpha],
-										}
-										)
+			alpha = self.elements[__class__.__name__ + '_alpha']
+			best_signals_interval = pd.DataFrame(
+											{
+											'interval': [Upper_Line,Mid_Line,Lower_Line],
+											'power': [Power_Upper_Line,Power_Mid_Line,Power_Lower_Line],
+											'alpha': [alpha,alpha,alpha],
+											}
+											)
+		else:
+			alpha = self.elements[__class__.__name__ + '_alpha']
+			best_signals_interval = pd.DataFrame(
+											{
+											'interval': [0,0,0],
+											'power': [0,0,0],
+											'alpha': [alpha,alpha,alpha],
+											}
+											)
 
 		return best_signals_interval
 
@@ -301,7 +310,7 @@ class BestFinder:
 					Power_Mid_Line = 0
 			
 		except Exception as ex:
-			#print(ex)
+			print('ValuesPreparer Diverg Error: ', ex)
 			Upper_Line = 0
 			Lower_Line = 0
 			Mid_Line = 0
