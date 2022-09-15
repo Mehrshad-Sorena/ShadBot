@@ -111,6 +111,14 @@ class BestFinder:
 																																			kmeans_f = kmeans_low,
 																																			distributions = ['expon','norm']
 																																			)
+		else:
+			Upper_Line_low = np.nan
+			Mid_Line_low = np.nan
+			Lower_Line_low = np.nan
+			Power_Upper_Line_low = np.nan
+			Power_Mid_Line_low = np.nan
+			Power_Lower_Line_low = np.nan
+
 		#//////////////////////////////////////////////////////////////////////////////////////
 
 		#************************************ Finding High *************************************
@@ -131,6 +139,13 @@ class BestFinder:
 																																					kmeans_f = kmeans_high,
 																																					distributions = ['expon','norm']
 																																					)
+		else:
+			Upper_Line_high = np.nan
+			Mid_Line_high = np.nan
+			Lower_Line_high = np.nan
+			Power_Upper_Line_high = np.nan
+			Power_Mid_Line_high = np.nan
+			Power_Lower_Line_high = np.nan
 		#/////////////////////////////////////////////////////////////////////////////////////////////
 
 		#Define DataFrame For OutPuts:
@@ -461,7 +476,7 @@ class BestFinder:
 					Power_Mid_Line = 0
 			
 		except Exception as ex:
-			print('ValuesPreparer Error: ', ex)
+			# print('ValuesPreparer Error: ', ex)
 			Upper_Line = 0
 			Lower_Line = 0
 			Mid_Line = 0
