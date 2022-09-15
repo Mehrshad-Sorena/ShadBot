@@ -966,7 +966,11 @@ class MACD:
 		macd_calc = self.calculator_macd()
 
 		if 'permit' in GL_Results.columns:
-			if GL_Results['permit'][0] == True: return GL_Results
+			if (
+				GL_Results['permit'][0] == True and
+				GL_Results['draw_down'][0] <= 7
+				): 
+				return GL_Results
 
 		try:
 
