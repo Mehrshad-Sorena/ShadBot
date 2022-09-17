@@ -1,7 +1,6 @@
 ![ShadRad Electronic](https://www.shadrad.ir/wp-content/uploads/2021/11/Shadrad1-1.png)
 Forex Robot
 -
-[html] div{ text-justify: auto; }[/html]
 
 1- ShadBot package:
 
