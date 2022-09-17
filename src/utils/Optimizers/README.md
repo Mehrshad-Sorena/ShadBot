@@ -12,6 +12,7 @@ Also, in this module, the FourierFinder function is defined to find the resonanc
 -
 
 **2.	OptimizerRunner module:**
+
 The OptimizerRunner module is responsible for running the optimizers in the ‘Optimizers’ module in multi-threaded parallel processing. Multi-threaded processing is intended to speed up calculations.
 
 -
