@@ -24,7 +24,7 @@ It should be noted that, throughout this package, secondary divergence refers to
 -
 
 ### Quick Project Setup
-1. Run `sudo git clone git@github.com:Mehrshad-Sorena/ForexBot.git`
+1. Run `sudo git clone git@github.com:Mehrshad-Sorena/ShadBot.git`
 2. Install Metatrader5 from `https://www.metatrader5.com/en/download`
 
 -
