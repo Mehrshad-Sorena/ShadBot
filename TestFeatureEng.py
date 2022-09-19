@@ -12,15 +12,49 @@ warnings.filterwarnings("ignore")
 
 loging = getdata()
 
-dataset_5M, dataset_1H = loging.readall(symbol = 'XAUUSD_i', number_5M = 'all', number_1H = 'all')
+dataset_5M = pd.DataFrame()
+dataset_1H = pd.DataFrame()
+
+# dataset_5M, dataset_1H = loging.readall(symbol = 'XAUUSD_i', number_5M = 'all', number_1H = 'all')
+
 
 # print(dataset_5M['XAUUSD_i'].to_timestamp(freq=None, how='start', copy=True))
 
-FE = FeatureEngineering()
-FE.symbol = 'XAUUSD_i'
+#*****************************************************************************************************
+#Main Features Creation:
+
+from src.utils.FeatureEngineering.MainFeatures import MainFeatures
+
+main_features = MainFeatures()
+main_features.symbol = 'XAUUSD_i'
 print('dataset geted')
-dataset = FE.DatasetCreation(dataset_5M = dataset_5M['XAUUSD_i'], dataset_1H = dataset_1H['XAUUSD_i'])
-# dataset = FE.AlphaDivergencePatternAndFactorOsilator(dataset = dataset, dataset_5M = dataset_5M, dataset_1H = dataset_1H)
+
+dataset = main_features.Get(
+							symbol = main_features.symbol,
+							dataset_5M = dataset_5M, 
+							dataset_1H = dataset_1H,
+							mode = None
+							)
+
+# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+# 	print(dataset)
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#*********************************************************************************************************
+#LagFeatures:
+
+from src.utils.FeatureEngineering.LagFeatures import LagFeatures
+
+lagfeature = LagFeatures()
+dataset_return = lagfeature.LagCreation(dataset = dataset)
+# print(dataset_return)
+# prices, time = dataset_return.index
+# print('prices = ', prices)
+with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+	print(dataset_return.loc['close_5m', ['return_11', 'real']])
+print(dataset_return.loc['close_5m'])
+
 
 
 #*******************************************************************************************************
@@ -29,7 +63,7 @@ dataset = FE.DatasetCreation(dataset_5M = dataset_5M['XAUUSD_i'], dataset_1H = d
 # from src.utils.FeatureEngineering.Frequencies import Frequencies
 
 # frequences = Frequencies()
-# frequences = frequences.Get(dataset = dataset, symbol = FE.symbol, mode = 'Run')
+# frequences = frequences.Get(dataset = dataset, symbol = main_features.symbol, mode = 'Run')
 # print(frequences)
 
 #/////////////////////////////////////////////////////////////////////////////////////
@@ -37,12 +71,31 @@ dataset = FE.DatasetCreation(dataset_5M = dataset_5M['XAUUSD_i'], dataset_1H = d
 #*******************************************************************************************************
 # Fourier Feature Module:
 
-from src.utils.FeatureEngineering.FourierFeatures import FourierFeatures
+# from src.utils.FeatureEngineering.FourierFeatures import FourierFeatures
 
-fourierfeatures = FourierFeatures()
-fourierfeatures = fourierfeatures.Get(dataset = dataset, symbol = FE.symbol, mode = 'Run', number_frequencies = 4)
-with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-	print(fourierfeatures)
+# fourierfeatures = FourierFeatures()
+# fourierfeatures = fourierfeatures.Get(dataset = dataset, symbol = main_features.symbol, mode = None, number_frequencies = 4)
+# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+# print(fourierfeatures)
+
+#/////////////////////////////////////////////////////////////////////////////////////
+
+#*******************************************************************************************************
+#Patterns Module:
+
+# from src.utils.FeatureEngineering.Patterns import Patterns
+
+# patterns = Patterns()
+# candle_pattern = patterns.Get(
+# 								dataset = dataset, 
+# 								mode = 'Run',
+# 								dataset_5M = dataset_5M, 
+# 								dataset_1H = dataset_1H, 
+# 								symbol = main_features.symbol
+# 								)
+
+# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+# 	print(candle_pattern)
 
 #/////////////////////////////////////////////////////////////////////////////////////
 
