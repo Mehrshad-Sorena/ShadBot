@@ -51,23 +51,7 @@ class FeatureEngineering:
 	
 
 
-	def MemontumCreation(self, dataset):
-
-		for lag in self.momentums:
-			dataset[f'momentum_{lag}'] = dataset[f'return_{lag}h'].sub(dataset.return_1h)
-		dataset[f'momentum_3_12'] = dataset[f'return_12h'].sub(dataset.return_3h)
-
-		return dataset
-
-	def LagShiftedCreation(self, dataset):
-
-		for t in self.timelags:
-			dataset[f'target_-{t}h'] = (dataset[f'return_{t}h'].shift(t))
-
-		for t in self.lags:
-			dataset[f'target_{t}h'] = (dataset[f'return_{t}h'].shift(-t))
-		
-		return dataset
+	
 
 	def MainDataAdd(self, dataset, data):
 
