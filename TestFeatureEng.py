@@ -47,16 +47,16 @@ dataset = main_features.Get(
 from src.utils.FeatureEngineering.LagFeatures import LagFeatures
 
 lagfeature = LagFeatures()
-dataset_return = lagfeature.LagCreation(dataset = dataset, symbol = 'XAUUSD_i')
+dataset_return = lagfeature.Get(dataset = dataset, symbol = 'XAUUSD_i', number_lags = 6, mode = None)
 # print(dataset_return)
 # prices, time = dataset_return.index
 # print('prices = ', prices)
 
 print(dataset_return['return_70_1'].dropna())
 
-with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-	print(dataset_return)
-	print(dataset_return.loc['close_5m', ['return_70_11', 'real_70']].dropna(subset=['real_70']))
+# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+print(dataset_return)
+print(dataset_return.loc['close_5m', ['return_70_7', 'real_70']].dropna(subset=['real_70']))
 
 print(dataset_return.info())
 # print(dataset_return.loc['close_5m'])
