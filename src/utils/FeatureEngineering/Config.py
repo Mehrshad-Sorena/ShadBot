@@ -22,6 +22,7 @@ class Config:
 						'path_fourier': os.path.join(Path(__file__).parent , 'Dataset' + path_slash + 'Fouriers' + path_slash),
 						'path_pattern': os.path.join(Path(__file__).parent , 'Dataset' + path_slash + 'Patterns' + path_slash),
 						'path_main': os.path.join(Path(__file__).parent , 'Dataset' + path_slash + 'Main' + path_slash),
+						'path_lags': os.path.join(Path(__file__).parent , 'Dataset' + path_slash + 'Lag' + path_slash),
 
 						#/////////////////////////////
 
