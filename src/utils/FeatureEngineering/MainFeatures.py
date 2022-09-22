@@ -1,5 +1,5 @@
-from src.utils.Optimizers import NoiseCanceller
 from src.indicators.StochAstic.StochAstic import StochAstic
+from src.utils.Optimizers import NoiseCanceller
 from .ParameterReader import ParameterReader
 from src.indicators.MACD.MACD import MACD
 from src.indicators.RSI.RSI import RSI
