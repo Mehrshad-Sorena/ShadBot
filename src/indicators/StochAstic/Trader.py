@@ -41,8 +41,8 @@ def get_all_deta_online(symbol, account_name):
 	loging.initilizer()
 	loging.login()
 
-	symbol_data_5M = loging.getone(timeframe = '5M', number = 18000, symbol = symbol)
-	symbol_data_1H = loging.getone(timeframe = '1H', number = 2000, symbol = symbol)
+	symbol_data_5M = loging.getone(timeframe = '5M', number = 3005, symbol = symbol)
+	symbol_data_1H = loging.getone(timeframe = '1H', number = 1005, symbol = symbol)
 
 	symbol = loging.get_symbols()
 
