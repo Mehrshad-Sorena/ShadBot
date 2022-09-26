@@ -783,7 +783,7 @@ class MACD:
 			lst_idx_sell_secondry > lst_idx_sell_primary and
 			lst_idx_sell_secondry > lst_idx_buy_secondry and
 			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 2
+			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) >= 2
 			):
 
 			if (
