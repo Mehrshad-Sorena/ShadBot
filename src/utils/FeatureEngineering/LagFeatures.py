@@ -38,6 +38,8 @@ class LagFeatures():
 
 	def LagCreation(self, dataset, symbol, number_lags):
 
+		datasetio = DatasetIO()
+
 		dataset_lag = dataset.copy(deep = True)
 		dataset_lag.index = pd.to_datetime(dataset_lag['time_5m'])
 		dataset_lag = dataset_lag.drop(columns = ['time_5m', 'time_1h'])
@@ -73,12 +75,16 @@ class LagFeatures():
 																	# .sub(1)
 													)
 
-			LagedData = self.MemontumCreation(dataset = LagedData, freq = freq)
-			LagedData = self.TargetCreation(dataset = LagedData, freq = freq)
+		# LagedData = self.MemontumCreation(dataset = LagedData, freq = freq)
+		LagedData = self.TargetCreation(dataset = LagedData, freq = freq)
 
-			LagedData[f'real_{freq}'] = (dataset_frequented.stack())
+		LagedData[f'real_{freq}'] = (dataset_frequented.stack())
 
 		LagedData = LagedData.swaplevel()
+
+		LagedData = LagedData.reset_index()
+		LagedData = LagedData.rename(columns = {'level_0': 'prices', 'time_5m': 'time'})
+		LagedData = LagedData.set_index(['prices', 'time'])
 
 		return LagedData
 
@@ -93,10 +99,10 @@ class LagFeatures():
 	def TargetCreation(self, dataset, freq):
 
 		for t in self.lags:
-			dataset[f'target_{freq}_-{t}'] = (dataset[f'return_{freq}_{t}'].shift(t))
+			dataset[f'target_{freq}_-{t}'] = dataset[f'return_{freq}_{t}'].shift(t)
 
 		for t in self.lags:
-			dataset[f'target_{freq}_{t}'] = (dataset[f'return_{freq}_{t}'].shift(-t))
+			dataset[f'target_{freq}_{t}'] = dataset[f'return_{freq}_{t}'].shift(-t)
 		
 		return dataset
 
@@ -115,6 +121,8 @@ class LagFeatures():
 
 		if mode == None:
 			dataset = datasetio.Read(name = 'lags', symbol = symbol)
+
+			dataset = dataset.set_index(['prices', 'time'])
 
 			if dataset.empty == False:
 				return dataset
