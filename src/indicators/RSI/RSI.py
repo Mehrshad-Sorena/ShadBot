@@ -384,7 +384,7 @@ class RSI:
 			lst_idx_buy_secondry = int(signal_buy_secondry['index'].iloc[-1])
 
 		else:
-			signal_buy_secondry = 0
+			lst_idx_buy_secondry = 0
 
 		#*****************************
 
