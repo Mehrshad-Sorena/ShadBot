@@ -33,11 +33,11 @@ class ParameterLimits:
 							'BestFinder_alpha_upper': 40,#99,
 							'BestFinder_alpha_lower': 1,
 
-							'Runner_methode1__lenght_data_5M_upper': 3000,
-							'Runner_methode1__lenght_data_5M_lower': 200,#20,
+							'Runner_methode1__lenght_data_5M_upper': 300,
+							'Runner_methode1__lenght_data_5M_lower': 20,#20,
 
 							'Runner_methode1__lenght_data_1H_upper': 1000,
-							'Runner_methode1__lenght_data_1H_lower': 200,#20,
+							'Runner_methode1__lenght_data_1H_lower': 20,#20,
 							
 							'ExtremePoints_num_max_5M_upper': 400,#250,
 							'ExtremePoints_num_max_5M_lower': 2,
