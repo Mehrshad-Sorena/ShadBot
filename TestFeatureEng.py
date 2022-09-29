@@ -33,7 +33,7 @@ print('data geted....')
 # print(dataset_5M)
 
 dataset = pd.DataFrame()
-outlier_cutoff = 0.01
+
 dataset['return_1'] = dataset_5M.drop(columns = ['time', 'XAUUSD_i']).pct_change().stack()
 dataset['return_2'] = dataset_5M.drop(columns = ['time', 'XAUUSD_i']).pct_change(2).stack()
 dataset_return = dataset.swaplevel()
