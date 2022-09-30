@@ -7,23 +7,17 @@ class ModelGenerator(tf.keras.Model):
 		super().__init__()
 		self.label_index = label_index
 
-		self.MAX_EPOCHS = 2
+		self.MAX_EPOCHS = 10
 
 	def call(self, inputs):
 
-		print('*********************************************')
-
 		if self.label_index is None: return inputs
-
-		print('inputs =====> ', inputs)
 
 		result = inputs[:, :, self.label_index]
 
-		print('*********************************************')
-
 		return result[:, :, tf.newaxis]
 
-	def compile_and_fit(self, model, window, patience=0):
+	def compile_and_fit(self, model, window, patience=2):
 
 		early_stopping = tf.keras.callbacks.EarlyStopping(
 															monitor = 'val_loss',
@@ -36,8 +30,6 @@ class ModelGenerator(tf.keras.Model):
 						optimizer = tf.keras.optimizers.Adam(),
 						metrics = [tf.keras.metrics.MeanAbsoluteError()]
 						)
-
-		print('window train = ', window.train)
 
 		history = model.fit(
 							window.train, 
