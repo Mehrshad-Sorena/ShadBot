@@ -7,6 +7,7 @@ from tensorflow import keras
 import numpy as np
 import pandas as pd
 import sys
+import seaborn as sns
 import warnings as warnings
 warnings.filterwarnings("ignore")
 
@@ -16,83 +17,113 @@ dataset_5M = pd.DataFrame()
 dataset_1H = pd.DataFrame()
 dataset = pd.DataFrame()
 
-dataset_5M, dataset_1H = loging.readall(symbol = 'XAUUSD_i', number_5M = 10000, number_1H = 0)
-dataset_5M = dataset_5M['XAUUSD_i']
-dataset_5M.index = dataset_5M['time']
+# dataset_5M, dataset_1H = loging.readall(symbol = 'XAUUSD_i', number_5M = 'all', number_1H = 0)
 
-print('data geted....')
+from src.utils.FeatureEngineering.MainFeatures import MainFeatures
 
-# dataset_mean = dataset_5M.drop(columns = ['time', 'XAUUSD_i']).mean()
-# dataset_std = dataset_5M.drop(columns = ['time', 'XAUUSD_i']).std()
+main_features = MainFeatures()
+main_features.symbol = 'XAUUSD_i'
+print('dataset geted')
 
-# print(dataset_mean)
+dataset_5M = main_features.Get(
+							symbol = main_features.symbol,
+							dataset_5M = dataset_5M, 
+							dataset_1H = dataset_1H,
+							mode = None
+							)
 
+# with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+# 	print(dataset_5M)
 
-# dataset_5M = (dataset_5M.drop(columns = ['time', 'XAUUSD_i']) - dataset_mean) / dataset_std
+# dataset_5M = dataset_5M['XAUUSD_i']
+dataset_5M.index = pd.to_datetime(dataset_5M['time_5m'])
 
-# print(dataset_5M)
+#Spliting Without Return:
 
-dataset = pd.DataFrame()
+dataset = dataset_5M.drop(columns = ['time_5m', 'time_1h']).copy(deep = True)
+dataset = dataset.copy(deep = True).resample(str(20) + 'T').last().dropna(subset=['close_5m'])
+dataset = dataset.pct_change(2).dropna()#subset=['close_5m'])
+dataset = (dataset.drop(columns = ['volume_5m', 'volume_1h']) * 100).assign(volume_5m = dataset['volume_5m'], volume_1h = dataset['volume_1h'])
 
-dataset['return_1'] = dataset_5M.drop(columns = ['time', 'XAUUSD_i']).pct_change().stack()
-dataset['return_2'] = dataset_5M.drop(columns = ['time', 'XAUUSD_i']).pct_change(2).stack()
-dataset_return = dataset.swaplevel()
+print(dataset)
 
-print('data pct changed....')
+# close = dataset['close']
+# bad_close = close == -9999.0
+# close[bad_close] = 0.0
 
+column_indices = {name: i for i, name in enumerate(dataset.columns)}
 
-#Spliting Data: *********************************************************************************
+n = len(dataset)
 
-column_indices = {name: i for i, name in enumerate(dataset_return.columns)}
+train_df = dataset[0:int(n*0.7)]
+val_df = dataset[int(n*0.7):int(n*0.9)]
+test_df = dataset[int(n*0.9):]
 
-print('column_indices geted .....')
-
-index_indices = list(pd.DataFrame(name[0] for i, name in enumerate(dataset_return.index)).drop_duplicates(keep = 'first')[0])
-
-print('index_indices geted....: ', len(index_indices))
-
-time_incices = dataset_return.index.get_level_values(1)
-
-n = len(dataset_return.loc[index_indices[0]]) * len(index_indices)
-
-idx = pd.IndexSlice
-
-train_df = dataset_return.loc[idx[:, time_incices[0:int(n*0.7)]], dataset_return.columns]
-
-print('train_df maked ....: ', len(train_df.index))
-#with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-
-val_df = dataset_return.loc[idx[:, time_incices[int(n*0.7):int(n*0.9)]], dataset_return.columns]
-
-print('val_df maked ....: ', len(val_df.index))
-
-test_df = dataset_return.loc[idx[:, time_incices[int(n*0.9):]], dataset_return.columns]
-
-print('test_df maked ....: ', len(test_df.index))
+num_features = dataset.shape[1]
 
 
-# train_mean = train_df.mean()
-# train_std = train_df.std()
+train_mean = train_df.mean()
+train_std = train_df.std()
 
 # train_df = (train_df - train_mean) / train_std
 # val_df = (val_df - train_mean) / train_std
 # test_df = (test_df - train_mean) / train_std
 
-# import matplotlib.pyplot as plt
-# import seaborn as sns
 
-# df_std = (dataset_return - train_mean) / train_std
+# df_std = (dataset - train_mean) / train_std
 # df_std = df_std.melt(var_name='Column', value_name='Normalized')
-
 # plt.figure(figsize=(12, 6))
 # ax = sns.violinplot(x='Column', y='Normalized', data=df_std)
-# _ = ax.set_xticklabels(dataset_return.keys(), rotation=90)
+# _ = ax.set_xticklabels(dataset.keys(), rotation=90)
+
 # plt.show()
 
 
 
+# sys.exit(train_df)
 
-num_features = dataset_return.shape[1]
+#/////////////////////////////////////////////////
+
+print('data geted....')
+
+# dataset = pd.DataFrame()
+
+# dataset['return_1'] = dataset_5M.drop(columns = ['time', 'XAUUSD_i']).pct_change().stack()
+# dataset['return_2'] = dataset_5M.drop(columns = ['time', 'XAUUSD_i']).pct_change(2).stack()
+# dataset_return = dataset.swaplevel()
+
+# print('data pct changed....')
+
+
+#Spliting Data: *********************************************************************************
+
+# column_indices = {name: i for i, name in enumerate(dataset_return.columns)}
+
+# print('column_indices geted .....')
+
+# index_indices = list(pd.DataFrame(name[0] for i, name in enumerate(dataset_return.index)).drop_duplicates(keep = 'first')[0])
+
+# print('index_indices geted....: ', len(index_indices))
+
+# time_incices = dataset_return.index.get_level_values(1)
+
+# n = len(dataset_return.loc[index_indices[0]]) * len(index_indices)
+
+# idx = pd.IndexSlice
+
+# train_df = dataset_return.loc[idx[:, time_incices[0:int(n*0.7)]], dataset_return.columns]
+
+# print('train_df maked ....: ', len(train_df.index))
+# #with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+
+# val_df = dataset_return.loc[idx[:, time_incices[int(n*0.7):int(n*0.9)]], dataset_return.columns]
+
+# print('val_df maked ....: ', len(val_df.index))
+
+# test_df = dataset_return.loc[idx[:, time_incices[int(n*0.9):]], dataset_return.columns]
+
+# print('test_df maked ....: ', len(test_df.index))
+# num_features = dataset_return.shape[1]
 
 #//////////////////////////////////////////////
 
@@ -132,13 +163,13 @@ from src.utils.FeatureEngineering.WindowGenerator import WindowGenerator
 # 				                    )
 
 wide_window = WindowGenerator(
-								input_width = 24, 
-								label_width = 24, 
+								input_width = 240 + 23, 
+								label_width = 240, 
 								shift = 1,
 								train_df = train_df,
 								val_df = val_df,
 								test_df = test_df,
-			                    label_columns=['return_1']
+			                    #label_columns=['close']
 			                    )
 
 #////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +180,7 @@ wide_window = WindowGenerator(
 
 #print('w2 Total Size = ', w2.total_window_size * len(index_indices))
 
-time_incices = train_df.index.get_level_values(1)
+# time_incices = train_df.index.get_level_values(1)
 # with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 # 	print(train_df)
 
@@ -190,7 +221,7 @@ from src.utils.FeatureEngineering.BaseLine import BaseLine
 # print('BaseLine Model Started .............')
 # print()
 
-# baseline = BaseLine(label_index = column_indices['return_1'])
+# baseline = BaseLine(label_index = column_indices['close'])
 
 # baseline.compile(
 # 				loss=tf.keras.losses.MeanSquaredError(),
@@ -204,7 +235,7 @@ from src.utils.FeatureEngineering.BaseLine import BaseLine
 
 # print('Input shape:', wide_window.example[0].shape)
 # print('Output shape:', baseline(wide_window.example[0]).shape)
-# wide_window.plot(model = baseline, plot_col = 'return_1')
+# wide_window.plot(model = baseline, plot_col = 'close')
 
 #////////////////////////////////////////
 
@@ -217,30 +248,27 @@ print()
 
 wide_window.PriceName = 'high'
 
-# linear = BaseLine(label_index = column_indices['return_1'])
-linear = tf.keras.Sequential([tf.keras.layers.Dense(units = 1)])
 
-linear.compile(
-				loss = tf.keras.losses.MeanSquaredError(),
-				#optimizer = tf.keras.optimizers.Adam(),
-				metrics = [tf.keras.metrics.MeanAbsoluteError()]
-				)
-print(wide_window.train)
-history = linear.fit(
-					wide_window.train, 
-					epochs = 1,
-					validation_data = wide_window.val,
-					#callbacks = [early_stopping]
-					)
-
-# linear = tf.keras.Sequential([tf.keras.layers.Dense(units = 1)])
+linear = tf.keras.Sequential([
+								#tf.keras.layers.Flatten(),
+								tf.keras.layers.LSTM(32, return_sequences = True),
+								tf.keras.layers.Conv1D(
+														filters = 32,
+							                           	kernel_size = (24,),
+							                           	activation = 'relu'),
+								#tf.keras.layers.Flatten(),
+								tf.keras.layers.Dense(units = 64, activation = 'relu'),
+								#tf.keras.layers.LSTM(32, return_sequences = False),
+								tf.keras.layers.Dense(units = num_features),
+								#tf.keras.layers.Reshape([1, -1]),
+							])
 
 print('Input shape:', wide_window.example[0].shape)
 print('Output shape:', linear(wide_window.example[0]).shape)
 
-# model_generator = ModelGenerator(label_index = column_indices['return_1'])
+model_generator = ModelGenerator(label_index = column_indices['close_5m'])
 
-# history = model_generator.compile_and_fit(model = linear, window = wide_window)
+history = model_generator.compile_and_fit(model = linear, window = wide_window)
 
 print(history)
 
@@ -250,7 +278,7 @@ performance = {}
 val_performance['Linear'] = linear.evaluate(wide_window.val)
 performance['Linear'] = linear.evaluate(wide_window.test, verbose=0)
 
-wide_window.plot(model = linear, plot_col = 'return_1')
+wide_window.plot(model = linear, plot_col = 'close_5m')
 
 # import matplotlib.pyplot as plt
 
