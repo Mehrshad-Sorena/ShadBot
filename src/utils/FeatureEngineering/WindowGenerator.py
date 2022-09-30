@@ -65,7 +65,7 @@ class WindowGenerator():
 
 		idx = pd.IndexSlice
 
-		data = np.array(data.loc[idx[self.PriceName , :], :], dtype=np.float32)
+		data = np.array(data, dtype=np.float32)
 
 		# print(data)
 
@@ -83,17 +83,14 @@ class WindowGenerator():
 
 	@property
 	def train(self):
-		print('Train Dataset ====> ')
 		return self.make_dataset(self.train_df)
 
 	@property
 	def val(self):
-		print('Val Dataset ====> ')
 		return self.make_dataset(self.val_df)
 
 	@property
 	def test(self):
-		print('Test Dataset ====> ')
 		return self.make_dataset(self.test_df)
 
 	@property
