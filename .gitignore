@@ -96,3 +96,10 @@ ENV/
 .ropeproject
 *.jpg
 *.png
+*.docx
+Documents/Package_en.pdf
+src/utils/FeatureEngineering/Dataset/Fouriers/XAUUSD_i.csv
+src/utils/FeatureEngineering/Dataset/Frequencies/XAUUSD_i.csv
+src/utils/FeatureEngineering/Dataset/Lag/XAUUSD_i.csv
+src/utils/FeatureEngineering/Dataset/Main/XAUUSD_i.csv
+src/utils/FeatureEngineering/Dataset/Patterns/XAUUSD_i.csv
