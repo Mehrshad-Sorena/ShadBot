@@ -21,6 +21,7 @@ from src.utils.Divergence.Tester import Tester
 from src.utils.ProtectResist.PRMethod.Runner import Runner
 from src.utils.Optimizers import NoiseCanceller
 
+import copy
 import sys
 
 
@@ -253,24 +254,26 @@ class RSI:
 	@stTime
 	def LastSignal(self,dataset_5M, dataset_1H, symbol):
 
-		noise_canceller = NoiseCanceller.NoiseCanceller()
-		dataset_5M[symbol]['close'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'close')
-		dataset_5M[symbol]['open'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'open')
-		dataset_5M[symbol]['high'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'high')
-		dataset_5M[symbol]['low'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'low')
-		dataset_5M[symbol]['HL/2'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'HL/2')
-		dataset_5M[symbol]['HLC/3'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'HLC/3')
-		dataset_5M[symbol]['HLCC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'HLCC/4')
-		dataset_5M[symbol]['OHLC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol], applyto = 'OHLC/4')
+		dataset_5M_real = copy.deepcopy(dataset_5M)
 
-		dataset_1H[symbol]['close'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'close')
-		dataset_1H[symbol]['open'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'open')
-		dataset_1H[symbol]['high'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'high')
-		dataset_1H[symbol]['low'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'low')
-		dataset_1H[symbol]['HL/2'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'HL/2')
-		dataset_1H[symbol]['HLC/3'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'HLC/3')
-		dataset_1H[symbol]['HLCC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'HLCC/4')
-		dataset_1H[symbol]['OHLC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol], applyto = 'OHLC/4')
+		noise_canceller = NoiseCanceller.NoiseCanceller()
+		dataset_5M[symbol]['close'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol].copy(deep = True), applyto = 'close')
+		dataset_5M[symbol]['open'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol].copy(deep = True), applyto = 'open')
+		dataset_5M[symbol]['high'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol].copy(deep = True), applyto = 'high')
+		dataset_5M[symbol]['low'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol].copy(deep = True), applyto = 'low')
+		dataset_5M[symbol]['HL/2'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol].copy(deep = True), applyto = 'HL/2')
+		dataset_5M[symbol]['HLC/3'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol].copy(deep = True), applyto = 'HLC/3')
+		dataset_5M[symbol]['HLCC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol].copy(deep = True), applyto = 'HLCC/4')
+		dataset_5M[symbol]['OHLC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_5M[symbol].copy(deep = True), applyto = 'OHLC/4')
+
+		dataset_1H[symbol]['close'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol].copy(deep = True), applyto = 'close')
+		dataset_1H[symbol]['open'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol].copy(deep = True), applyto = 'open')
+		dataset_1H[symbol]['high'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol].copy(deep = True), applyto = 'high')
+		dataset_1H[symbol]['low'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol].copy(deep = True), applyto = 'low')
+		dataset_1H[symbol]['HL/2'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol].copy(deep = True), applyto = 'HL/2')
+		dataset_1H[symbol]['HLC/3'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol].copy(deep = True), applyto = 'HLC/3')
+		dataset_1H[symbol]['HLCC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol].copy(deep = True), applyto = 'HLCC/4')
+		dataset_1H[symbol]['OHLC/4'] = noise_canceller.NoiseWavelet(dataset = dataset_1H[symbol].copy(deep = True), applyto = 'OHLC/4')
 
 		#BUY Primary:
 
@@ -314,7 +317,7 @@ class RSI:
 															dataset_1H = dataset_1H,
 															symbol = symbol,
 															flaglearn = GL_Results['islearned'][0],
-															flagtest = True
+															flagtest = False
 															)
 			else:
 				lst_idx_buy_primary = 0
@@ -370,7 +373,7 @@ class RSI:
 															dataset_1H = dataset_1H,
 															symbol = symbol,
 															flaglearn = GL_Results['islearned'][0],
-															flagtest = True
+															flagtest = False
 															)
 			else:
 				signal_buy_secondry = 0
@@ -425,7 +428,7 @@ class RSI:
 															dataset_1H = dataset_1H,
 															symbol = symbol,
 															flaglearn = GL_Results['islearned'][0],
-															flagtest = True
+															flagtest = False
 															)
 			else:
 				lst_idx_sell_primary = 0
@@ -480,7 +483,7 @@ class RSI:
 															dataset_1H = dataset_1H,
 															symbol = symbol,
 															flaglearn = GL_Results['islearned'][0],
-															flagtest = True
+															flagtest = False
 															)
 			else:
 				lst_idx_sell_secondry = 0
@@ -511,15 +514,18 @@ class RSI:
 			lst_idx_buy_primary > lst_idx_sell_primary and
 			lst_idx_buy_primary > lst_idx_sell_secondry and
 			lst_idx_buy_primary >= lst_idx_buy_secondry and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) >= 2
+			(len(dataset_5M_real[symbol]['close']) - 1 - lst_idx_buy_primary) <= 50
+			# (len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_primary) >= 2
 			):
+
+			SMA_50 = ind.sma(dataset_5M[symbol]['close'], length = 50)
 
 			if (
 				rsi_calc_buy_primary['rsi'][lst_idx_buy_primary] < rsi_calc_buy_primary['rsi'][lst_idx_buy_primary + 1] and
 				rsi_calc_buy_primary['rsi'][lst_idx_buy_primary] < rsi_calc_buy_primary['rsi'][lst_idx_buy_primary + 2] and
 				rsi_calc_buy_primary['rsi'][lst_idx_buy_primary] < rsi_calc_buy_primary['rsi'][lst_idx_buy_primary - 1] and
-				rsi_calc_buy_primary['rsi'][lst_idx_buy_primary] < rsi_calc_buy_primary['rsi'][lst_idx_buy_primary - 2]
+				rsi_calc_buy_primary['rsi'][lst_idx_buy_primary] < rsi_calc_buy_primary['rsi'][lst_idx_buy_primary - 2] and
+				dataset_5M_real[symbol]['low'][lst_idx_buy_primary] > np.mean(SMA_50[int(signal_buy_primary['index_back'][lst_idx_buy_primary]): lst_idx_buy_primary])
 				):
 
 				print('======> last signal buy primary rsi ',symbol)
@@ -595,23 +601,37 @@ class RSI:
 						# resist_buy = 0
 						# protect_buy = 0
 
-						# signal = 'no_trade'		
+						# signal = 'no_trade'
+				else:
+					resist_sell = 0
+					protect_sell = 0
 
-				print('================================')
+					signal = 'no_trade'	
+
+			else:
+				resist_sell = 0
+				protect_sell = 0
+
+				signal = 'no_trade'			
+
+				# print('================================')
 
 		elif (
 			lst_idx_buy_secondry > lst_idx_sell_primary and
 			lst_idx_buy_secondry > lst_idx_sell_secondry and
 			lst_idx_buy_secondry > lst_idx_buy_primary and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) >= 2
+			(len(dataset_5M_real[symbol]['close']) - 1 - lst_idx_buy_secondry) <= 50
+			# (len(dataset_5M[symbol]['close']) - 1 - lst_idx_buy_secondry) >= 2
 			):
+
+			SMA_50 = ind.sma(dataset_5M[symbol]['close'], length = 50)
 
 			if (
 				rsi_calc_buy_secondry['rsi'][lst_idx_buy_secondry] < rsi_calc_buy_secondry['rsi'][lst_idx_buy_secondry + 1] and
 				rsi_calc_buy_secondry['rsi'][lst_idx_buy_secondry] < rsi_calc_buy_secondry['rsi'][lst_idx_buy_secondry + 2] and
 				rsi_calc_buy_secondry['rsi'][lst_idx_buy_secondry] < rsi_calc_buy_secondry['rsi'][lst_idx_buy_secondry - 1] and
-				rsi_calc_buy_secondry['rsi'][lst_idx_buy_secondry] < rsi_calc_buy_secondry['rsi'][lst_idx_buy_secondry - 2]
+				rsi_calc_buy_secondry['rsi'][lst_idx_buy_secondry] < rsi_calc_buy_secondry['rsi'][lst_idx_buy_secondry - 2] and
+				dataset_5M_real[symbol]['low'][lst_idx_buy_secondry] > np.mean(SMA_50[int(signal_buy_secondry['index_back'][lst_idx_buy_secondry]): lst_idx_buy_secondry])
 				):
 
 				print('======> last signal buy secondry rsi ',symbol)
@@ -689,21 +709,36 @@ class RSI:
 						# resist_buy = 0
 						# protect_buy = 0
 
-						# signal = 'no_trade'	
+						# signal = 'no_trade'
+
+				else:
+					resist_sell = 0
+					protect_sell = 0
+
+					signal = 'no_trade'	
+
+			else:
+				resist_sell = 0
+				protect_sell = 0
+
+				signal = 'no_trade'		
 
 		elif (
 			lst_idx_sell_primary > lst_idx_buy_primary and
 			lst_idx_sell_primary >= lst_idx_sell_secondry and
 			lst_idx_sell_primary > lst_idx_buy_secondry and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 2
+			(len(dataset_5M_real[symbol]['close']) - 1 - lst_idx_sell_primary) <= 50
+			# (len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_primary) >= 2
 			):
+
+			SMA_50 = ind.sma(dataset_5M[symbol]['close'], length = 50)
 
 			if (
 				rsi_calc_sell_primary['rsi'][lst_idx_sell_primary] > rsi_calc_sell_primary['rsi'][lst_idx_sell_primary + 1] and
 				rsi_calc_sell_primary['rsi'][lst_idx_sell_primary] > rsi_calc_sell_primary['rsi'][lst_idx_sell_primary + 2] and
 				rsi_calc_sell_primary['rsi'][lst_idx_sell_primary] > rsi_calc_sell_primary['rsi'][lst_idx_sell_primary - 1] and
-				rsi_calc_sell_primary['rsi'][lst_idx_sell_primary] > rsi_calc_sell_primary['rsi'][lst_idx_sell_primary - 2]
+				rsi_calc_sell_primary['rsi'][lst_idx_sell_primary] > rsi_calc_sell_primary['rsi'][lst_idx_sell_primary - 2] and
+				dataset_5M_real[symbol]['high'][lst_idx_sell_primary] < np.mean(SMA_50[int(signal_sell_primary['index_back'][lst_idx_sell_primary]): lst_idx_sell_primary])
 				):
 
 				print('======> last signal sell primary rsi ',symbol)
@@ -776,20 +811,35 @@ class RSI:
 
 						# signal = 'no_trade'
 
+				else:
+					resist_sell = 0
+					protect_sell = 0
+
+					signal = 'no_trade'	
+
+			else:
+				resist_sell = 0
+				protect_sell = 0
+
+				signal = 'no_trade'	
+
 		
 		elif (
 			lst_idx_sell_secondry > lst_idx_buy_primary and
 			lst_idx_sell_secondry > lst_idx_sell_primary and
 			lst_idx_sell_secondry > lst_idx_buy_secondry and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) <= 6 and
-			(len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) >= 2
+			(len(dataset_5M_real[symbol]['close']) - 1 - lst_idx_sell_secondry) <= 50
+			# (len(dataset_5M[symbol]['close']) - 1 - lst_idx_sell_secondry) >= 2
 			):
+
+			SMA_50 = ind.sma(dataset_5M[symbol]['close'], length = 50)
 
 			if (
 				rsi_calc_sell_secondry['rsi'][lst_idx_sell_secondry] > rsi_calc_sell_secondry['rsi'][lst_idx_sell_secondry + 1] and
 				rsi_calc_sell_secondry['rsi'][lst_idx_sell_secondry] > rsi_calc_sell_secondry['rsi'][lst_idx_sell_secondry + 2] and
 				rsi_calc_sell_secondry['rsi'][lst_idx_sell_secondry] > rsi_calc_sell_secondry['rsi'][lst_idx_sell_secondry - 1] and
-				rsi_calc_sell_secondry['rsi'][lst_idx_sell_secondry] > rsi_calc_sell_secondry['rsi'][lst_idx_sell_secondry - 2]
+				rsi_calc_sell_secondry['rsi'][lst_idx_sell_secondry] > rsi_calc_sell_secondry['rsi'][lst_idx_sell_secondry - 2] and
+				dataset_5M_real[symbol]['high'][lst_idx_sell_secondry] < np.mean(SMA_50[int(signal_sell_secondry['index_back'][lst_idx_sell_secondry]): lst_idx_sell_secondry])
 				):
 
 				print('======> last signal sell secondry rsi ',symbol)
@@ -861,7 +911,20 @@ class RSI:
 
 						# signal = 'no_trade'			
 
-				print('================================')
+				# print('================================')
+
+				else:
+					resist_sell = 0
+					protect_sell = 0
+
+					signal = 'no_trade'	
+
+			else:
+				resist_sell = 0
+				protect_sell = 0
+
+				signal = 'no_trade'	
+
 		else:
 			resist_sell = 0
 			protect_sell = 0
