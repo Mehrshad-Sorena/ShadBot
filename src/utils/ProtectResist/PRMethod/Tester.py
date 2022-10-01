@@ -2,6 +2,7 @@
 from src.utils.DataReader.MetaTraderReader5.LoginGetData import LoginGetData as getdata
 from src.utils.Divergence.Config import Config as Divergence_Config
 from src.utils.Divergence.Divergence import Divergence
+import pandas_ta as ind
 import pandas as pd
 import numpy as np
 
@@ -108,7 +109,6 @@ class Tester:
 			diff_pr_top = tp_percent_max
 			extereme['high_upper'][loc_end_5M] = dataset_5M['high'][loc_end_5M] * (1+(tp_percent_max/100))
 
-
 		if (
 			dataset_5M_real['high'][loc_end_5M] * (1 + spred) >= extereme['high_upper'][loc_end_5M] or
 			dataset_5M_real['low'][loc_end_5M] <= extereme['low_lower'][loc_end_5M] #or
@@ -125,24 +125,48 @@ class Tester:
 										)
 			return extereme
 
+		#Checking SMA:
+
+		SMA_50 = ind.sma(dataset_5M['close'], length = 50)
+
+		if (len(np.where(dataset_5M_real['low'][loc_end_5M: loc_end_5M + 50] > max(SMA_50[int(signals['index_back'][loc_end_5M]): loc_end_5M]))[0])) > 1:
+			loc_end_5M_price = loc_end_5M +  min(np.where(dataset_5M_real['low'][loc_end_5M: loc_end_5M + 50] > max(SMA_50[int(signals['index_back'][loc_end_5M]): loc_end_5M]))[0])
+
+		elif (len(np.where(dataset_5M_real['low'][loc_end_5M: loc_end_5M + 50] > max(SMA_50[int(signals['index_back'][loc_end_5M]): loc_end_5M]))[0])) == 1:
+			loc_end_5M_price = loc_end_5M + np.where(dataset_5M_real['low'][loc_end_5M: loc_end_5M + 50] > max(SMA_50[int(signals['index_back'][loc_end_5M]): loc_end_5M]))[0][0]
+
+		else:
+			extereme = extereme.assign(
+										flag =  'no_flag',
+										tp_pr =  np.nan,
+										st_pr =  np.nan,
+										index_tp =  np.nan,
+										index_st = np.nan,
+										money = money,
+										time = np.nan,
+										)
+			return extereme
+
+		#////////////////////////////////
+
 
 		#*************** Finding Take Profit:
 
-		if (len(np.where(((dataset_5M_real['high'][(loc_end_5M):-1].values) >= extereme['high_upper'][loc_end_5M]))[0]) > 1):
-			index_tp =	loc_end_5M + min(
-										np.where(
-													(
-														(dataset_5M_real['high'][(loc_end_5M):-1].values) >= extereme['high_upper'][loc_end_5M]
-													)
-												)[0] 
-										)
+		if (len(np.where(((dataset_5M_real['high'][(loc_end_5M_price):-1].values) >= extereme['high_upper'][loc_end_5M]))[0]) > 1):
+			index_tp =	loc_end_5M_price + min(
+											np.where(
+														(
+															(dataset_5M_real['high'][(loc_end_5M_price):-1].values) >= extereme['high_upper'][loc_end_5M]
+														)
+													)[0] 
+											)
 
-		elif (len(np.where(((dataset_5M_real['high'][(loc_end_5M):-1].values) >= extereme['high_upper'][loc_end_5M]))[0]) == 1):
-			index_tp =	loc_end_5M + np.where(
-												(
-													(dataset_5M_real['high'][(loc_end_5M):-1].values) >= extereme['high_upper'][loc_end_5M]
-												)
-											)[0][0] 
+		elif (len(np.where(((dataset_5M_real['high'][(loc_end_5M_price):-1].values) >= extereme['high_upper'][loc_end_5M]))[0]) == 1):
+			index_tp =	loc_end_5M_price + np.where(
+													(
+														(dataset_5M_real['high'][(loc_end_5M_price):-1].values) >= extereme['high_upper'][loc_end_5M]
+													)
+												)[0][0] 
 
 		else:
 			index_tp = -1
@@ -151,19 +175,19 @@ class Tester:
 
 		#************ Finding Stop Loss:
 
-		if (len(np.where(((dataset_5M_real['low'][(loc_end_5M):-1].values) <= extereme['low_lower'][loc_end_5M]))[0]) > 1):
-			index_st =	loc_end_5M + min(
+		if (len(np.where(((dataset_5M_real['low'][(loc_end_5M_price):-1].values) <= extereme['low_lower'][loc_end_5M]))[0]) > 1):
+			index_st =	loc_end_5M_price + min(
 										np.where(
 													(
-														(dataset_5M_real['low'][(loc_end_5M):-1].values) <= extereme['low_lower'][loc_end_5M]
+														(dataset_5M_real['low'][(loc_end_5M_price):-1].values) <= extereme['low_lower'][loc_end_5M]
 													)
 												)[0]
 										)
 
-		elif (len(np.where(((dataset_5M_real['low'][(loc_end_5M):-1].values) <= extereme['low_lower'][loc_end_5M]))[0]) == 1):
-			index_st =	loc_end_5M + np.where(
+		elif (len(np.where(((dataset_5M_real['low'][(loc_end_5M_price):-1].values) <= extereme['low_lower'][loc_end_5M]))[0]) == 1):
+			index_st =	loc_end_5M_price + np.where(
 												(
-													(dataset_5M_real['low'][(loc_end_5M):-1].values) <= extereme['low_lower'][loc_end_5M]
+													(dataset_5M_real['low'][(loc_end_5M_price):-1].values) <= extereme['low_lower'][loc_end_5M]
 												)
 											)[0][0]
 
@@ -176,8 +200,8 @@ class Tester:
 			index_tp != -1
 			):
 
-			st_pr = ((dataset_5M_real['low'][loc_end_5M] - np.min(dataset_5M_real['low'][loc_end_5M:index_tp]))/dataset_5M_real['low'][loc_end_5M]) * 100
-			tp_pr = ((dataset_5M_real['high'][index_tp] - dataset_5M_real['high'][loc_end_5M]*(1 + spred))/(dataset_5M_real['high'][loc_end_5M] * (1 + spred))) * 100
+			st_pr = ((dataset_5M_real['low'][loc_end_5M_price] - np.min(dataset_5M_real['low'][loc_end_5M_price:index_tp]))/dataset_5M_real['low'][loc_end_5M_price]) * 100
+			tp_pr = ((dataset_5M_real['high'][index_tp] - dataset_5M_real['high'][loc_end_5M_price]*(1 + spred))/(dataset_5M_real['high'][loc_end_5M_price] * (1 + spred))) * 100
 
 			if tp_pr > tp_percent_max: tp_pr = tp_percent_max
 
@@ -202,15 +226,15 @@ class Tester:
 										index_tp = index_tp,
 										index_st = index_st,
 										money = my_money,
-										time = dataset_5M_real['time'][loc_end_5M],
+										time = dataset_5M_real['time'][loc_end_5M_price],
 										)
 
 		elif (
 			index_tp != -1 and
 			index_st == -1
 			):
-			st_pr = ((dataset_5M_real['low'][loc_end_5M] - np.min(dataset_5M_real['low'][loc_end_5M:index_tp]))/dataset_5M_real['low'][loc_end_5M]) * 100
-			tp_pr = ((dataset_5M_real['high'][index_tp] - dataset_5M_real['high'][loc_end_5M]*(1 + spred))/(dataset_5M_real['high'][loc_end_5M] * (1 + spred))) * 100
+			st_pr = ((dataset_5M_real['low'][loc_end_5M_price] - np.min(dataset_5M_real['low'][loc_end_5M_price:index_tp]))/dataset_5M_real['low'][loc_end_5M_price]) * 100
+			tp_pr = ((dataset_5M_real['high'][index_tp] - dataset_5M_real['high'][loc_end_5M_price]*(1 + spred))/(dataset_5M_real['high'][loc_end_5M_price] * (1 + spred))) * 100
 
 			if tp_pr > tp_percent_max: tp_pr = tp_percent_max
 
@@ -236,15 +260,15 @@ class Tester:
 										index_tp = index_tp,
 										index_st = index_st,
 										money = my_money,
-										time = dataset_5M_real['time'][loc_end_5M],
+										time = dataset_5M_real['time'][loc_end_5M_price],
 										)
 
 		elif (
 			index_st < index_tp and
 			index_st != -1
 			):
-			st_pr = ((dataset_5M_real['low'][loc_end_5M] - dataset_5M_real['low'][index_st])/dataset_5M_real['low'][loc_end_5M]) * 100
-			tp_pr = ((np.max(dataset_5M_real['high'][loc_end_5M:index_st]) - dataset_5M_real['high'][loc_end_5M]*(1 + spred))/(dataset_5M_real['high'][loc_end_5M] * (1 + spred))) * 100
+			st_pr = ((dataset_5M_real['low'][loc_end_5M_price] - dataset_5M_real['low'][index_st])/dataset_5M_real['low'][loc_end_5M_price]) * 100
+			tp_pr = ((np.max(dataset_5M_real['high'][loc_end_5M_price:index_st]) - dataset_5M_real['high'][loc_end_5M_price]*(1 + spred))/(dataset_5M_real['high'][loc_end_5M_price] * (1 + spred))) * 100
 
 			if st_pr > st_percent_max: st_pr = st_percent_max
 
@@ -269,15 +293,15 @@ class Tester:
 										index_tp =  index_tp,
 										index_st = index_st,
 										money = my_money,
-										time = dataset_5M_real['time'][loc_end_5M],
+										time = dataset_5M_real['time'][loc_end_5M_price],
 										)
 
 		elif (
 			index_tp == -1 and
 			index_st != -1
 			):
-			st_pr = ((dataset_5M_real['low'][loc_end_5M] - dataset_5M_real['low'][index_st])/dataset_5M_real['low'][loc_end_5M]) * 100
-			tp_pr = ((np.max(dataset_5M_real['high'][loc_end_5M:index_st]) - dataset_5M_real['high'][loc_end_5M]*(1 + spred))/(dataset_5M_real['high'][loc_end_5M] * (1 + spred))) * 100
+			st_pr = ((dataset_5M_real['low'][loc_end_5M_price] - dataset_5M_real['low'][index_st])/dataset_5M_real['low'][loc_end_5M_price]) * 100
+			tp_pr = ((np.max(dataset_5M_real['high'][loc_end_5M_price:index_st]) - dataset_5M_real['high'][loc_end_5M_price]*(1 + spred))/(dataset_5M_real['high'][loc_end_5M_price] * (1 + spred))) * 100
 			
 			if st_pr > st_percent_max: st_pr = st_percent_max
 
@@ -302,14 +326,14 @@ class Tester:
 										index_tp =  index_tp,
 										index_st = index_st,
 										money = my_money,
-										time = dataset_5M_real['time'][loc_end_5M],
+										time = dataset_5M_real['time'][loc_end_5M_price],
 										)
 
 		if index_st == index_tp:
 
 			if index_st != -1:
-				st_pr = ((dataset_5M_real['low'][loc_end_5M] - dataset_5M_real['low'][index_st])/dataset_5M_real['low'][loc_end_5M]) * 100
-				tp_pr = ((np.max(dataset_5M_real['high'][loc_end_5M:index_st]) - dataset_5M_real['high'][loc_end_5M]*(1 + spred))/(dataset_5M_real['high'][loc_end_5M] * (1 + spred))) * 100
+				st_pr = ((dataset_5M_real['low'][loc_end_5M_price] - dataset_5M_real['low'][index_st])/dataset_5M_real['low'][loc_end_5M_price]) * 100
+				tp_pr = ((np.max(dataset_5M_real['high'][loc_end_5M_price:index_st]) - dataset_5M_real['high'][loc_end_5M_price]*(1 + spred))/(dataset_5M_real['high'][loc_end_5M_price] * (1 + spred))) * 100
 				
 				if st_pr > st_percent_max: st_pr = st_percent_max
 
@@ -334,7 +358,7 @@ class Tester:
 											index_tp =  index_tp,
 											index_st = index_st,
 											money = my_money,
-											time = dataset_5M_real['time'][loc_end_5M],
+											time = dataset_5M_real['time'][loc_end_5M_price],
 											)
 			else:
 				extereme = extereme.assign(
@@ -440,21 +464,45 @@ class Tester:
 										)
 			return extereme
 
+		#Checking SMA:
+
+		SMA_50 = ind.sma(dataset_5M['close'], length = 50)
+
+		if (len(np.where(dataset_5M_real['high'][loc_end_5M: loc_end_5M + 50] < min(SMA_50[int(signals['index_back'][loc_end_5M]): loc_end_5M]))[0])) > 1:
+			loc_end_5M_price = loc_end_5M +  min(np.where(dataset_5M_real['high'][loc_end_5M: loc_end_5M + 50] < min(SMA_50[int(signals['index_back'][loc_end_5M]): loc_end_5M]))[0])
+
+		elif (len(np.where(dataset_5M_real['high'][loc_end_5M: loc_end_5M + 50] < min(SMA_50[int(signals['index_back'][loc_end_5M]): loc_end_5M]))[0])) == 1:
+			loc_end_5M_price = loc_end_5M + np.where(dataset_5M_real['high'][loc_end_5M: loc_end_5M + 50] < min(SMA_50[int(signals['index_back'][loc_end_5M]): loc_end_5M]))[0][0]
+
+		else:
+			extereme = extereme.assign(
+										flag =  'no_flag',
+										tp_pr =  np.nan,
+										st_pr =  np.nan,
+										index_tp =  np.nan,
+										index_st = np.nan,
+										money = money,
+										time = np.nan,
+										)
+			return extereme
+
+		#////////////////////////////////
+
 		#*************** Finding Take Profit:
 
-		if (len(np.where(((dataset_5M_real['low'][(loc_end_5M):-1].values * (1 + spred)) <= extereme['low_lower'][loc_end_5M]))[0]) > 1):
-			index_tp =	loc_end_5M + min(
+		if (len(np.where(((dataset_5M_real['low'][(loc_end_5M_price):-1].values * (1 + spred)) <= extereme['low_lower'][loc_end_5M]))[0]) > 1):
+			index_tp =	loc_end_5M_price + min(
 										np.where(
 													(
-														(dataset_5M_real['low'][(loc_end_5M):-1].values) * (1 + spred) <= extereme['low_lower'][loc_end_5M]
+														(dataset_5M_real['low'][(loc_end_5M_price):-1].values) * (1 + spred) <= extereme['low_lower'][loc_end_5M]
 													)
 												)[0] 
 										)
 
-		elif (len(np.where(((dataset_5M_real['low'][(loc_end_5M):-1].values * (1 + spred)) <= extereme['low_lower'][loc_end_5M]))[0]) == 1):
-			index_tp =	loc_end_5M + np.where(
+		elif (len(np.where(((dataset_5M_real['low'][(loc_end_5M_price):-1].values * (1 + spred)) <= extereme['low_lower'][loc_end_5M]))[0]) == 1):
+			index_tp =	loc_end_5M_price + np.where(
 												(
-													(dataset_5M_real['low'][(loc_end_5M):-1].values * (1 + spred)) <= extereme['low_lower'][loc_end_5M]
+													(dataset_5M_real['low'][(loc_end_5M_price):-1].values * (1 + spred)) <= extereme['low_lower'][loc_end_5M]
 												)
 											)[0][0] 
 
@@ -465,19 +513,19 @@ class Tester:
 
 		#************ Finding Stop Loss:
 
-		if (len(np.where(((dataset_5M_real['high'][(loc_end_5M):-1].values * (1 + spred)) >= extereme['high_upper'][loc_end_5M]))[0]) > 1):
-			index_st =	loc_end_5M + min(
+		if (len(np.where(((dataset_5M_real['high'][(loc_end_5M_price):-1].values * (1 + spred)) >= extereme['high_upper'][loc_end_5M]))[0]) > 1):
+			index_st =	loc_end_5M_price + min(
 										np.where(
 													(
-														(dataset_5M_real['high'][(loc_end_5M):-1].values * (1 + spred)) >= extereme['high_upper'][loc_end_5M]
+														(dataset_5M_real['high'][(loc_end_5M_price):-1].values * (1 + spred)) >= extereme['high_upper'][loc_end_5M]
 													)
 												)[0]
 										)
 
-		elif (len(np.where(((dataset_5M_real['high'][(loc_end_5M):-1].values * (1 + spred)) >= extereme['high_upper'][loc_end_5M]))[0]) == 1):
-			index_st =	loc_end_5M + np.where(
+		elif (len(np.where(((dataset_5M_real['high'][(loc_end_5M_price):-1].values * (1 + spred)) >= extereme['high_upper'][loc_end_5M]))[0]) == 1):
+			index_st =	loc_end_5M_price + np.where(
 												(
-													(dataset_5M_real['high'][(loc_end_5M):-1].values * (1 + spred)) >= extereme['high_upper'][loc_end_5M]
+													(dataset_5M_real['high'][(loc_end_5M_price):-1].values * (1 + spred)) >= extereme['high_upper'][loc_end_5M]
 												)
 											)[0][0]
 
@@ -490,8 +538,8 @@ class Tester:
 			index_tp != -1
 			):
 
-			st_pr = ((np.max(dataset_5M_real['high'][loc_end_5M:index_tp]) - dataset_5M_real['high'][loc_end_5M])/dataset_5M_real['high'][loc_end_5M]) * 100
-			tp_pr = ((dataset_5M_real['low'][loc_end_5M] - dataset_5M_real['low'][index_tp] * (1 + spred))/(dataset_5M_real['low'][loc_end_5M])) * 100
+			st_pr = ((np.max(dataset_5M_real['high'][loc_end_5M_price:index_tp]) - dataset_5M_real['high'][loc_end_5M_price])/dataset_5M_real['high'][loc_end_5M_price]) * 100
+			tp_pr = ((dataset_5M_real['low'][loc_end_5M_price] - dataset_5M_real['low'][index_tp] * (1 + spred))/(dataset_5M_real['low'][loc_end_5M_price])) * 100
 
 			if tp_pr > tp_percent_max: tp_pr = tp_percent_max
 
@@ -516,15 +564,15 @@ class Tester:
 										index_tp = index_tp,
 										index_st = index_st,
 										money = my_money,
-										time = dataset_5M_real['time'][loc_end_5M],
+										time = dataset_5M_real['time'][loc_end_5M_price],
 										)
 
 		elif (
 			index_tp != -1 and
 			index_st == -1
 			):
-			st_pr = ((np.max(dataset_5M_real['high'][loc_end_5M:index_tp]) - dataset_5M_real['high'][loc_end_5M])/dataset_5M_real['high'][loc_end_5M]) * 100
-			tp_pr = ((dataset_5M_real['low'][loc_end_5M] - dataset_5M_real['low'][index_tp] * (1 + spred))/(dataset_5M_real['low'][loc_end_5M])) * 100
+			st_pr = ((np.max(dataset_5M_real['high'][loc_end_5M_price:index_tp]) - dataset_5M_real['high'][loc_end_5M_price])/dataset_5M_real['high'][loc_end_5M_price]) * 100
+			tp_pr = ((dataset_5M_real['low'][loc_end_5M_price] - dataset_5M_real['low'][index_tp] * (1 + spred))/(dataset_5M_real['low'][loc_end_5M_price])) * 100
 
 			if tp_pr > tp_percent_max: tp_pr = tp_percent_max
 
@@ -549,15 +597,15 @@ class Tester:
 										index_tp = index_tp,
 										index_st = index_st,
 										money = my_money,
-										time = dataset_5M_real['time'][loc_end_5M],
+										time = dataset_5M_real['time'][loc_end_5M_price],
 										)
 
 		elif (
 			index_st < index_tp and
 			index_st != -1
 			):
-			st_pr = ((dataset_5M_real['high'][index_st] - dataset_5M_real['high'][loc_end_5M])/dataset_5M_real['high'][loc_end_5M]) * 100
-			tp_pr = ((dataset_5M_real['low'][loc_end_5M] - np.min(dataset_5M_real['low'][loc_end_5M:index_st]) * (1 + spred))/(dataset_5M_real['low'][loc_end_5M])) * 100
+			st_pr = ((dataset_5M_real['high'][index_st] - dataset_5M_real['high'][loc_end_5M_price])/dataset_5M_real['high'][loc_end_5M_price]) * 100
+			tp_pr = ((dataset_5M_real['low'][loc_end_5M_price] - np.min(dataset_5M_real['low'][loc_end_5M_price:index_st]) * (1 + spred))/(dataset_5M_real['low'][loc_end_5M_price])) * 100
 			
 			if st_pr > st_percent_max: st_pr = st_percent_max
 
@@ -582,15 +630,15 @@ class Tester:
 										index_tp =  index_tp,
 										index_st = index_st,
 										money = my_money,
-										time = dataset_5M_real['time'][loc_end_5M],
+										time = dataset_5M_real['time'][loc_end_5M_price],
 										)
 
 		elif (
 			index_tp == -1 and
 			index_st != -1
 			):
-			st_pr = ((dataset_5M_real['high'][index_st] - dataset_5M_real['high'][loc_end_5M])/dataset_5M_real['high'][loc_end_5M]) * 100
-			tp_pr = ((dataset_5M_real['low'][loc_end_5M] - np.min(dataset_5M_real['low'][loc_end_5M:index_st]) * (1 + spred))/(dataset_5M_real['low'][loc_end_5M])) * 100
+			st_pr = ((dataset_5M_real['high'][index_st] - dataset_5M_real['high'][loc_end_5M_price])/dataset_5M_real['high'][loc_end_5M_price]) * 100
+			tp_pr = ((dataset_5M_real['low'][loc_end_5M_price] - np.min(dataset_5M_real['low'][loc_end_5M_price:index_st]) * (1 + spred))/(dataset_5M_real['low'][loc_end_5M_price])) * 100
 			
 			if st_pr > st_percent_max: st_pr = st_percent_max
 
@@ -613,14 +661,14 @@ class Tester:
 										index_tp =  index_tp,
 										index_st = index_st,
 										money = my_money,
-										time = dataset_5M_real['time'][loc_end_5M],
+										time = dataset_5M_real['time'][loc_end_5M_price],
 										)
 
 		if index_st == index_tp:
 
 			if index_st != -1:
-				st_pr = ((dataset_5M_real['high'][index_st] - dataset_5M_real['high'][loc_end_5M])/dataset_5M_real['high'][loc_end_5M]) * 100
-				tp_pr = ((dataset_5M_real['low'][loc_end_5M] - np.min(dataset_5M_real['low'][loc_end_5M:index_st]) * (1 + spred))/(dataset_5M_real['low'][loc_end_5M])) * 100
+				st_pr = ((dataset_5M_real['high'][index_st] - dataset_5M_real['high'][loc_end_5M_price])/dataset_5M_real['high'][loc_end_5M_price]) * 100
+				tp_pr = ((dataset_5M_real['low'][loc_end_5M_price] - np.min(dataset_5M_real['low'][loc_end_5M_price:index_st]) * (1 + spred))/(dataset_5M_real['low'][loc_end_5M_price])) * 100
 				
 				if st_pr > st_percent_max: st_pr = st_percent_max
 				
@@ -645,7 +693,7 @@ class Tester:
 											index_tp =  index_tp,
 											index_st = index_st,
 											money = my_money,
-											time = dataset_5M_real['time'][loc_end_5M],
+											time = dataset_5M_real['time'][loc_end_5M_price],
 											)
 			else:
 				extereme = extereme.assign(
