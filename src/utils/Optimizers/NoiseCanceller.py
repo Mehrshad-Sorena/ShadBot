@@ -96,13 +96,17 @@ class NoiseCanceller:
 
 		# plt.show()
 
-		dataset['WaveletSmoothed' + applyto] = np.nan
+		dataset['WaveletSmoothed_' + applyto] = np.nan
 
 		reconstructed_signal = pd.DataFrame(reconstructed_signal, columns = [applyto])
 		reconstructed_signal = reconstructed_signal.reindex(index = dataset[applyto].index).shift((len(dataset[applyto].index) - len(dataset[applyto].dropna().index)))
 		
-		dataset['WaveletSmoothed' + applyto] = reconstructed_signal
-		dataset[applyto] = dataset['WaveletSmoothed' + applyto]
-		dataset = dataset.drop(columns = ['WaveletSmoothed' + applyto])
+		dataset['WaveletSmoothed_' + applyto] = reconstructed_signal
+		dataset[applyto] = dataset['WaveletSmoothed_' + applyto].values
+		dataset = dataset.drop(columns = ['WaveletSmoothed_' + applyto])
+
+		for clm in dataset.columns:
+			if 'WaveletSmoothed_' in clm:
+				dataset = dataset.drop(columns = [clm])
 
 		return dataset[applyto]
